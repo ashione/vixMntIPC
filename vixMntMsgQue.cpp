@@ -1,5 +1,6 @@
 #include <iostream>
-#include "vixMntMsgQue.h"
+#include <vixMntMsgQue.h>
+#include <vixMntMsgOp.h>
 
 using namespace std;
 
@@ -67,5 +68,33 @@ VixMntMsgQue::receive(char* msg_ptr,
          unsigned* msg_prio )
 {
     return mq_receive(this->getVixMntMsgID(),msg_ptr,msg_len,msg_prio);
+
+}
+
+bool
+VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
+        unsigned msg_prio = 0)
+{
+    const char* msg_str = getOpValue(msg_op);
+    return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
+}
+
+void
+VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
+        unsigned* msg_prio = NULL)
+{
+     this->getattr(&this->vixMntMsgAttr);
+     VixMntMsgOp* result = new VixMntMsgOp();
+
+     char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
+
+     if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) <= 0 )
+         *result = VixMntMsgOp::ERROR;
+     else
+         *result = getOpIndex(buf);
+
+     *msg_op = *result;
+     delete result;
+     delete buf;
 
 }

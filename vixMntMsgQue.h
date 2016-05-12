@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <vixMntMsgOp.h>
 
 class VixMntMsgQue {
     private  :
@@ -31,6 +32,9 @@ class VixMntMsgQue {
         mqd_t send( const char* , size_t , unsigned);
         mqd_t receive( char* , size_t , unsigned*);
 
+        bool  sendMsgOp(VixMntMsgOp,unsigned);
+        void  receiveMsgOp(VixMntMsgOp*,unsigned*);
+
 
     public :
         static VixMntMsgQue* vixMntMsgInstance;
@@ -43,5 +47,4 @@ class VixMntMsgQue {
 
 };
 
-//VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 #endif

@@ -6,9 +6,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstdlib>
-#include "vixMntMsgQue.h"
+#include <vixMntMsgQue.h>
 
 using namespace std;
+#define MAXTIME 1000
 
 int
 testfunc(){
@@ -62,15 +63,9 @@ testfunc(){
     return 0;
 }
 
-#define MAXTIME 1000
 void
+testVixMntClass(){
 
-testsleep(unsigned microseconds ){
-     usleep(microseconds);
-}
-
-int
-main(){
 
 //VixMntMsgQue::releaseMsgQueInstance();
     //VixMntMsgQue* vixMntMsgQue::vixMntMsgInstance = NULL;
@@ -84,10 +79,10 @@ main(){
     if ( fork() == 0  ){
 
         mq_attr mqAttr;
-        mq_getattr(myque->getVixMntMsgID(),&mqAttr);
+        myque->getattr(&mqAttr);
 
-        //char *buf = new char[mqAttr.mq_msgsize];
-        char buf[0xff];
+        char *buf = new char[mqAttr.mq_msgsize];
+        //char buf[0xff];
 
         for ( int i = 1; i<=MAXTIME ; ++i ){
             if(myque->receive(buf,mqAttr.mq_msgsize,NULL)< 0){
@@ -115,7 +110,15 @@ main(){
         cout<<"send message "<<i<<" sucess "<<endl;
     }
 
+}
 
+void
+testsleep(unsigned microseconds ){
+     usleep(microseconds);
+}
+
+int
+main(){
     return 0;
 }
 

@@ -1,15 +1,27 @@
-CFLAGS = -c -Wall -std=c++0x
+CCSTD= -std=c++0x
+CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
+INCLUDE=-I./
+OBJECTS = testop $(EXEC)
 
-all : test
+all :  $(OBJECTS)
 
-$(EXEC) : testMesgQue.cpp  vixMntMsgQue.o
-	  $(CC) -o $(EXEC)  $? -lrt
+$(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o
+	  $(CC) -o $(EXEC) $(CCSTD)  $? -lrt $(INCLUDE)
 
-vixMntMsgQue.o : vixMntMsgQue.h vixMntMsgQue.cpp
-	$(CC) $(CFLAGS) $?
+vixMntMsgQue.o : vixMntMsgOp.o vixMntMsgQue.cpp vixMntMsgQue.h
+	$(CC) $(CFLAGS) $? $(INCLUDE)
+	@echo target is $@ ,source $< , $?
+
+testop : testVixMntMsgOp.cpp vixMntMsgOp.o
+	$(CC) $(CCSTD) -o $@  $? $(INCLUDE)
+
+vixMntMsgOp.o: vixMntMsgOp.cpp vixMntMsgOp.h
+	$(CC) -c $(CCSTD) $? $(INCLUDE)
+	@echo target is $@ ,source $< , $?
+
 
 #.PTHON:
 clean : 
-	rm -rf test *.o *.gch
+	rm -rf $(OBJECTS) *.o *.gch
