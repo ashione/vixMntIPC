@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#define MMAP_PAGE_SIZE sysconf(_SC_PAGESIZE)
 
 VixMntMmap::VixMntMmap(
         size_t mmap_datasize,
@@ -10,10 +9,6 @@ VixMntMmap::VixMntMmap(
 {
     this->mmap_datasize = mmap_datasize?mmap_datasize : MMAP_PAGE_SIZE;
     this->mmap_pagenum = this->mmap_datasize/MMAP_PAGE_SIZE + 1;
-
-    printf("datasize : %ld pagenum : %ld : pagesize %ld\n",
-            this->mmap_datasize,this->mmap_pagenum,
-            MMAP_PAGE_SIZE);
 
     if(fid == -1){
         this->mmap_data =(char *) mmap(NULL,

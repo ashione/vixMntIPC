@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <memory>
 
+#define MMAP_PAGE_SIZE sysconf(_SC_PAGESIZE)
 
 class VixMntMmap{
 
