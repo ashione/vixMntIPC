@@ -3,7 +3,7 @@ CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
 INCLUDE=-I./
-OBJECTS = testop $(EXEC)
+OBJECTS = testop $(EXEC) testmmap
 
 all :  $(OBJECTS)
 
@@ -18,6 +18,13 @@ testop : testVixMntMsgOp.cpp vixMntMsgOp.o
 
 vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
+
+testmmap : testvixMntMmap.cpp vixMntMmap.o
+	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE)
+
+vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
+	$(CC) $(CFLAGS) $? $(INCLUDE)
+
 
 
 #.PTHON:
