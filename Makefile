@@ -20,7 +20,7 @@ vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
 testmmap : testvixMntMmap.cpp vixMntMmap.o
-	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE)
+	$(CC)  $(CCSTD) -g -o $@  $? $(INCLUDE)
 
 vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)

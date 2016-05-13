@@ -11,12 +11,14 @@ class VixMntMmap{
 
     public :
         VixMntMmap(size_t mmap_datasize = 0 ,int fid = -1);
-        void mntWriteMmap(char* buf);
+        ~VixMntMmap();
+        void mntWriteMmap(const char* buf);
         void mntReadMmap(char* buf);
 
     private :
         int fid;
         size_t mmap_datasize;
+        size_t mmap_pagenum;
         char* mmap_data;
 
 };
