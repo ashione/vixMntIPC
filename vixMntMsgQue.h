@@ -35,6 +35,9 @@ class VixMntMsgQue {
         bool  sendMsgOp(VixMntMsgOp,unsigned);
         void  receiveMsgOp(VixMntMsgOp*,unsigned*);
 
+        bool  sendMsg(VixMntMsgData*,unsigned);
+        void  receiveMsg(VixMntMsgData*,unsigned*);
+
 
     public :
         static VixMntMsgQue* vixMntMsgInstance;

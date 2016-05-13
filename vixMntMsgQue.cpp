@@ -84,17 +84,43 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
         unsigned* msg_prio = NULL)
 {
      this->getattr(&this->vixMntMsgAttr);
-     VixMntMsgOp* result = new VixMntMsgOp();
 
      char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
 
-     if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) <= 0 )
-         *result = VixMntMsgOp::ERROR;
+     if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) < 0 )
+         *msg_op = VixMntMsgOp::ERROR;
      else
-         *result = getOpIndex(buf);
+         *msg_op = getOpIndex(buf);
 
-     *msg_op = *result;
-     delete result;
      delete buf;
+
+}
+
+bool
+VixMntMsgQue::sendMsg(VixMntMsgData* msg_data,
+                      unsigned msg_prio)
+{
+    char *buf = new char[sizeof(VixMntMsgData)];
+    memcpy(buf,msg_data,sizeof(VixMntMsgData));
+    return send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+
+}
+
+void
+VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
+                      unsigned* msg_prio)
+{
+    mq_attr tempAttr;
+    this->getattr(&tempAttr);
+    char *buf = new char[tempAttr.mq_msgsize];
+
+    if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
+        msg_data->msg_op = VixMntMsgOp::ERROR;
+    }
+    else{
+        memcpy(msg_data,buf,sizeof(VixMntMsgData));
+    }
+
+    delete buf;
 
 }

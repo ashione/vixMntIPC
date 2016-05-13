@@ -1,7 +1,7 @@
 #include <vixMntMsgOp.h>
 
 bool
-operator== (VixMntMsgOp& op, const char* cstr_op){
+operator== (VixMntMsgOp op, const char* cstr_op){
 
     if(op != VixMntMsgOp::ERROR)
         return !strcmp(cstr_op,getOpValue(op));
@@ -9,16 +9,19 @@ operator== (VixMntMsgOp& op, const char* cstr_op){
 }
 
 bool
-operator== (VixMntMsgOp& op, std::string str_op) {
+operator== (VixMntMsgOp op, std::string str_op) {
     return operator==(op, str_op.c_str());
 }
 
-inline const char*
-getOpValue(VixMntMsgOp& op){
+const char*
+getOpValue(VixMntMsgOp op){
+
+    if( op == VixMntMsgOp::ERROR )
+        return NULL;
     return VIXMNT_MSG_OP_STR[(short)op];
 }
 
-inline VixMntMsgOp
+VixMntMsgOp
 getOpIndex(const char* str_op){
 
     VixMntMsgOp test_op[OP_MODE_NUM] = { VixMntMsgOp::MntInit, VixMntMsgOp::MntWrite, VixMntMsgOp::MntRead };
@@ -34,3 +37,18 @@ getOpIndex(const char* str_op){
 
 }
 
+VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+        size_t msg_datasize,
+        char* msg_buff)
+{
+   this->msg_op = msg_op;
+   this->msg_datasize = msg_datasize;
+   memcpy(this->msg_buff,msg_buff,this->msg_datasize);
+}
+
+VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+        char* msg_buff)
+{
+    size_t msg_len = strlen(msg_buff);
+    VixMntMsgData(msg_op,msg_len,msg_buff);
+}

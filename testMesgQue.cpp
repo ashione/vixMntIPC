@@ -117,8 +117,57 @@ testsleep(unsigned microseconds ){
      usleep(microseconds);
 }
 
+struct testMsgInfo{
+    int offsize;
+    char buff[0xff];
+};
+
 int
 main(){
+
+    VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
+    if( fork() == 0 ){
+
+        VixMntMsgData* msgre_data = new VixMntMsgData();
+        myque->receiveMsg(msgre_data,NULL);
+
+        cout<<getOpValue(msgre_data->msg_op)<<endl;
+        testMsgInfo result;
+        cout<<"msg_data size : "<<msgre_data->msg_datasize<<endl;
+        memcpy(&result,msgre_data->msg_buff,sizeof(testMsgInfo));
+        result.buff[result.offsize] = '\0';
+        cout<<result.offsize<<" "<<result.buff<<endl;
+
+        myque->receiveMsg(msgre_data,NULL);
+
+        cout<<getOpValue(msgre_data->msg_op)<<endl;
+
+        VixMntMsgQue::releaseMsgQueInstance();
+
+        delete msgre_data;
+        exit(0);
+    }
+    char pmsg[] = "fdsfdsfdsagdsagdfsgfdfkf df \n";
+    char msg[0xff];
+    testMsgInfo info;
+    info.offsize=strlen(pmsg);
+
+    memcpy(info.buff,pmsg,strlen(pmsg));
+
+    VixMntMsgData* msgdata = new VixMntMsgData();
+
+    msgdata->msg_op = VixMntMsgOp::MntWrite;
+    msgdata->msg_datasize = sizeof(testMsgInfo);
+
+    memcpy(msgdata->msg_buff,&info,sizeof(testMsgInfo));
+
+    myque->sendMsg(msgdata,0);
+    msgdata->msg_op = VixMntMsgOp::MntInit;
+    myque->sendMsg(msgdata,0);
+    cout<<"sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
+    delete msgdata;
+
+    //myque->sendMsgOp(VixMntMsgOp::MntWrite,0);
+    //cout<<getOpValue(VixMntMsgOp::MntInit)<<endl;
     return 0;
 }
-

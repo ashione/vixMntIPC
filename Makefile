@@ -12,14 +12,12 @@ $(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o
 
 vixMntMsgQue.o : vixMntMsgOp.o vixMntMsgQue.cpp vixMntMsgQue.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
-	@echo target is $@ ,source $< , $?
 
 testop : testVixMntMsgOp.cpp vixMntMsgOp.o
-	$(CC) $(CCSTD) -o $@  $? $(INCLUDE)
+	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE)
 
-vixMntMsgOp.o: vixMntMsgOp.cpp vixMntMsgOp.h
-	$(CC) -c $(CCSTD) $? $(INCLUDE)
-	@echo target is $@ ,source $< , $?
+vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
+	$(CC) $(CFLAGS) $? $(INCLUDE)
 
 
 #.PTHON:
