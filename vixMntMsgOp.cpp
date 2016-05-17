@@ -24,7 +24,14 @@ getOpValue(VixMntMsgOp op){
 VixMntMsgOp
 getOpIndex(const char* str_op){
 
-    VixMntMsgOp test_op[OP_MODE_NUM] = { VixMntMsgOp::MntInit, VixMntMsgOp::MntWrite, VixMntMsgOp::MntRead };
+    VixMntMsgOp test_op[OP_MODE_NUM] = {
+        VixMntMsgOp::MntInit,
+        VixMntMsgOp::MntInitDone,
+        VixMntMsgOp::MntWrite,
+        VixMntMsgOp::MntWriteDone,
+        VixMntMsgOp::MntRead,
+        VixMntMsgOp::MntReadDone
+    };
 
     for(int i = 0 ; i < OP_MODE_NUM ; ++i){
         if(test_op[i] == str_op)

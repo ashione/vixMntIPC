@@ -1,4 +1,4 @@
-CCSTD= -std=c++0x
+CCSTD= -g -std=c++0x
 CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
@@ -8,7 +8,7 @@ OBJECTS = testop $(EXEC) testmmap
 all :  $(OBJECTS)
 
 testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o
-	$(CC)  $(CCSTD) -g -o $@  $? $(INCLUDE) -lrt
+	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
 
 vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)

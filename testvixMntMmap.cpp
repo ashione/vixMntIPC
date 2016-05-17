@@ -19,7 +19,7 @@ main(int argc,char** args){
 
     struct timeval startTime,endTime;
 
-    const size_t msg_len = 1<<20;
+    const size_t msg_len = 1<<30;
     char *msg = new char[msg_len];
     memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
     //time(&startTime);
@@ -31,7 +31,7 @@ main(int argc,char** args){
 
     VixMntMmap* testmap = new VixMntMmap(msg_len);
     cout<<testmap->getMmapFileName()<<endl;
-    if( fork() ){
+    if( fork() == 0 ){
     //if( argc >= 2  ){
         //sleep(2);
         //VixMntMsgOp *receivedOp = new VixMntMsgOp();
@@ -53,6 +53,13 @@ main(int argc,char** args){
         long long m2 = carried_time.tv_sec*1000LL - carried_time.tv_usec/1000 ;
         long long milliseconds = m1 - m2;
         printf("elaped milliseconds : %lld\n",milliseconds);
+        if(myque->sendMsgOp(VixMntMsgOp::MntWriteDone))
+        {
+            printf("send msgOp writedone OK\n");
+        }
+        else{
+            printf("send msgOp writedone failed\n");
+        }
         delete buff;
         delete testmap;
         exit(0);
@@ -67,7 +74,19 @@ main(int argc,char** args){
     myque->sendMsg(timeMsg);
     //cout<<"send : "<<msg<<endl;
     //myque->sendMsgOp(VixMntMsgOp::MntWrite,0);
+    //sleep(2);
+    VixMntMsgOp* resultOp = new VixMntMsgOp();
+    myque->receiveMsgOp(resultOp);
 
+    if(*resultOp != VixMntMsgOp::ERROR){
+        printf("op %s\n",getOpValue(*resultOp));
+    }
+    else{
+         printf("vixMntMsgOp : Error\n");
+    }
+
+    delete buf;
+    delete resultOp;
     delete testmap;
     return 0;
 }

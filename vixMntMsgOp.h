@@ -5,13 +5,16 @@
 #include <cstring>
 #include <memory>
 
-#define OP_MODE_NUM 3
+#define OP_MODE_NUM 6
 #define OP_DATA_MAX_SIZE 0x400
 enum
 class VixMntMsgOp : short {
-    MntInit,
+    MntInit = 0,
+    MntInitDone,
     MntWrite,
+    MntWriteDone,
     MntRead,
+    MntReadDone,
     ERROR,
 };
 
@@ -33,8 +36,11 @@ class VixMntMsgData {
 static const char*
 VIXMNT_MSG_OP_STR[OP_MODE_NUM] = {
     "MntInit",
+    "MntInitDone",
     "MntWrite",
+    "MntWriteDone",
     "MntRead",
+    "MntReadDone",
 };
 
 const char* getOpValue(VixMntMsgOp op);
