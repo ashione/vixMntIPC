@@ -29,14 +29,14 @@ class VixMntMsgQue {
         inline void setattr(mq_attr *mqAttr){ mq_setattr(getVixMntMsgID(),mqAttr,&this->vixMntMsgAttr); }
         ~VixMntMsgQue();
 
-        mqd_t send( const char* , size_t , unsigned);
-        mqd_t receive( char* , size_t , unsigned*);
+        mqd_t send( const char* msg_data, size_t msg_size, unsigned msg_prio = 0);
+        mqd_t receive( char* msg_data, size_t msg_size, unsigned* msg_prio = NULL);
 
-        bool  sendMsgOp(VixMntMsgOp,unsigned);
-        void  receiveMsgOp(VixMntMsgOp*,unsigned*);
+        bool  sendMsgOp(VixMntMsgOp msg_op,unsigned msg_prio = 0);
+        void  receiveMsgOp(VixMntMsgOp* msg_op,unsigned* msg_prio = NULL);
 
-        bool  sendMsg(VixMntMsgData*,unsigned);
-        void  receiveMsg(VixMntMsgData*,unsigned*);
+        bool  sendMsg(VixMntMsgData* msg_data,unsigned msg_prio = 0);
+        void  receiveMsg(VixMntMsgData* msg_data,unsigned* msg_prio = NULL);
 
 
     public :

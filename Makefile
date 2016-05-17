@@ -25,10 +25,6 @@ testop : testVixMntMsgOp.cpp vixMntMsgOp.o
 vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
-
-
-
-#.PTHON:
 clean : 
 	rm -rf $(OBJECTS) *.o *.gch
 	rm -rf /tmp/file

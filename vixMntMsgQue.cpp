@@ -73,7 +73,7 @@ VixMntMsgQue::receive(char* msg_ptr,
 
 bool
 VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
-        unsigned msg_prio = 0)
+        unsigned msg_prio)
 {
     const char* msg_str = getOpValue(msg_op);
     return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
@@ -81,7 +81,7 @@ VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
 
 void
 VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
-        unsigned* msg_prio = NULL)
+        unsigned* msg_prio)
 {
      this->getattr(&this->vixMntMsgAttr);
 
