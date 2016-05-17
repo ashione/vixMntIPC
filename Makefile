@@ -7,6 +7,12 @@ OBJECTS = testop $(EXEC) testmmap
 
 all :  $(OBJECTS)
 
+testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o
+	$(CC)  $(CCSTD) -g -o $@  $? $(INCLUDE) -lrt
+
+vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
+	$(CC) $(CFLAGS) $? $(INCLUDE)
+
 $(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o
 	  $(CC) -o $(EXEC) $(CCSTD)  $? -lrt $(INCLUDE)
 
@@ -19,14 +25,10 @@ testop : testVixMntMsgOp.cpp vixMntMsgOp.o
 vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
-testmmap : testvixMntMmap.cpp vixMntMmap.o
-	$(CC)  $(CCSTD) -g -o $@  $? $(INCLUDE)
-
-vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
 
 
 
 #.PTHON:
 clean : 
 	rm -rf $(OBJECTS) *.o *.gch
+	rm -rf /tmp/file

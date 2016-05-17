@@ -24,4 +24,8 @@ class VixMntMmap{
 
 };
 
+extern *char
+getRandomFileName(){
+
+}
 #endif

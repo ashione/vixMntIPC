@@ -41,7 +41,7 @@ VixMntMmap::mntReadMmap(char* buf){
 VixMntMmap::~VixMntMmap(){
 
     munmap(this->mmap_data,this->mmap_pagenum * MMAP_PAGE_SIZE);
-
+    //printf("mmap_data : %x\n",this->mmap_data);
     if(fid > 0)
         close(fid);
 }
