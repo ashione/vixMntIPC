@@ -3,6 +3,7 @@
 #include <vixMntMsgOp.h>
 
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <iostream>
 #include <cstring>
 #include <ctime>
@@ -13,13 +14,15 @@ using namespace std;
 
 
 extern const char* random_str;
-int
 
+int
 main(int argc,char** args){
+
+    srand((unsigned) time(NULL));
 
     struct timeval startTime,endTime;
 
-    const size_t msg_len = 1<<2;
+    const size_t msg_len = 1<<12;
     char *msg = new char[msg_len];
     memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
     //time(&startTime);
@@ -32,7 +35,9 @@ main(int argc,char** args){
 
     VixMntMmap* testmap = new VixMntMmap(msg_len);
     cout<<testmap->getMmapFileName()<<endl;
-    if( fork() == 0 ){
+    int status;
+    pid_t pid = fork();
+    if(pid == 0 ){
     //if( argc >= 2  ){
         //sleep(2);
         //VixMntMsgOp *receivedOp = new VixMntMsgOp();
@@ -44,7 +49,7 @@ main(int argc,char** args){
         char* buff = new char[msg_len];
         testmap->mntReadMmap(buff);
         gettimeofday(&endTime,NULL);
-        //cout<<"receive : "<<buff<<endl;
+        cout<<"receive : "<<buff<<endl;
         struct timeval carried_time;
         mqd_t  resultMsgId ;
 
@@ -70,23 +75,23 @@ main(int argc,char** args){
         delete resultMsgQSender;
         delete buff;
         delete testmap;
-        exit(0);
+        return 0;
     }
 
     testmap->mntWriteMmap(msg);
 
     //sleep(1);
     char* buf = new char[sizeof(struct timeval)+sizeof(mqd_t)];
-    VixMntMsgQue* resultMsgQ = new VixMntMsgQue("/result");
+    VixMntMsgQue* resultMsgQ = new VixMntMsgQue("/result",true);
     //cout<<"buf size: "<<sizeof(buf)<<" "<<sizeof(*buf2)<<endl;
     memcpy(buf,&startTime,sizeof(struct timeval));
     mqd_t resultMsgQId = resultMsgQ->getVixMntMsgID();
     memcpy(buf+sizeof(struct timeval),&resultMsgQId,sizeof(mqd_t));
     VixMntMsgData* timeMsg = new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof(struct timeval)+sizeof(mqd_t),buf);
     myque->sendMsg(timeMsg);
-    //cout<<"send : "<<msg<<endl;
-    //myque->sendMsgOp(VixMntMsgOp::MntWrite,0);
-    //sleep(2);
+
+    //waitpid(pid,&status,0);
+
     VixMntMsgOp* resultOp = new VixMntMsgOp();
     resultMsgQ->receiveMsgOp(resultOp);
 

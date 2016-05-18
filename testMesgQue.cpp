@@ -125,29 +125,33 @@ struct testMsgInfo{
 int
 main(){
 
-    VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     if( fork() == 0 ){
+        //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
+        VixMntMsgQue* myque= new VixMntMsgQue("/testque",true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
-        myque->receiveMsg(msgre_data,NULL);
+        myque->receiveMsg(msgre_data);
 
-        cout<<getOpValue(msgre_data->msg_op)<<endl;
+        cout<<"messge 1 : "<<getOpValue(msgre_data->msg_op)<<endl;
         testMsgInfo result;
         cout<<"msg_data size : "<<msgre_data->msg_datasize<<endl;
         memcpy(&result,msgre_data->msg_buff,sizeof(testMsgInfo));
         result.buff[result.offsize] = '\0';
-        cout<<result.offsize<<" "<<result.buff<<endl;
+        cout<<" receiver : "<<result.offsize<<" "<<result.buff<<endl;
 
-        myque->receiveMsg(msgre_data,NULL);
+        myque->receiveMsg(msgre_data);
 
-        cout<<getOpValue(msgre_data->msg_op)<<endl;
+        cout<<"message 2 : "<<getOpValue(msgre_data->msg_op)<<endl;
 
-        VixMntMsgQue::releaseMsgQueInstance();
-
+        //VixMntMsgQue::releaseMsgQueInstance();
+        delete myque;
         delete msgre_data;
-        exit(0);
+        return 0;
     }
-    char pmsg[] = "fdsfdsfdsagdsagdfsgfdfkf df \n";
+
+    VixMntMsgQue* myque= new VixMntMsgQue("/testque");
+    //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
+    char pmsg[] = "333ss23fdsfdsfdsagdsagdfsgfdfkf df \n";
     char msg[0xff];
     testMsgInfo info;
     info.offsize=strlen(pmsg);
@@ -164,9 +168,9 @@ main(){
     myque->sendMsg(msgdata,0);
     msgdata->msg_op = VixMntMsgOp::MntInit;
     myque->sendMsg(msgdata,0);
-    cout<<"sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
+    cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
     delete msgdata;
-
+    delete myque;
     //myque->sendMsgOp(VixMntMsgOp::MntWrite,0);
     //cout<<getOpValue(VixMntMsgOp::MntInit)<<endl;
     return 0;

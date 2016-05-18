@@ -20,14 +20,17 @@ VixMntMsgQue::getMsgQueInstance(){
         return vixMntMsgInstance;
 }
 
-VixMntMsgQue::VixMntMsgQue(const char* msg_name){
+VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
     if(!msg_name){
         this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
     }
     else{
         this->vixMntMsgMapFileName = msg_name;
     }
-    this->vixMntMsgID = mq_open(this->vixMntMsgMapFileName,O_RDWR | O_CREAT | O_EXCL , 0666,NULL);
+    this->vixMntMsgID = mq_open(
+            this->vixMntMsgMapFileName,
+            (readonly? O_RDONLY : O_RDWR)
+            | O_CREAT , 0644,NULL);
     if(this->vixMntMsgID < 0){
         if(errno == EEXIST){
 /*

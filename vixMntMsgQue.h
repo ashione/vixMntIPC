@@ -15,7 +15,7 @@ class VixMntMsgQue {
     //private  :
     //    VixMntMsgQue();
     public :
-        explicit VixMntMsgQue(const char* msg_name=NULL);
+        explicit VixMntMsgQue(const char* msg_name=NULL,bool readonly = false);
         explicit VixMntMsgQue(mqd_t msg_id);
         static VixMntMsgQue* getMsgQueInstance();
 
