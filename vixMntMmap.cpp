@@ -4,14 +4,25 @@
 #include <cstring>
 #include <ctime>
 
-const std::string VixMntMmap::fileRoot = "/tmp/vmware_mnt";
+const std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
 
-VixMntMmap::VixMntMmap( size_t mmap_datasize)
+VixMntMmap::VixMntMmap(
+        size_t mmap_datasize,
+        bool isRoot)
 {
-    this->file_name = getRandomFileName(fileRoot);
-    //this->file_name = VixMntMmap::fileRoot;
+
+    if(isRoot)
+        this->file_name = VixMntMmap::fileRoot;
+    else
+        this->file_name = getRandomFileName(fileRoot);
+
     //this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
     this->fid = shm_open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
+
+    if(this->fid > 0)
+        printf("Log : open share memory %d\n",this->fid);
+    else
+        printf("Log : open share memory faild, map to file%d\n",this->fid);
 
     this->mmap_datasize = mmap_datasize>0?mmap_datasize : MMAP_PAGE_SIZE;
     this->mmap_pagenum = this->mmap_datasize/MMAP_PAGE_SIZE + 1;

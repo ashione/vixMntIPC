@@ -15,7 +15,7 @@
 class VixMntMmap{
 
     public :
-        VixMntMmap(size_t mmap_datasize = 0 );
+        VixMntMmap(size_t mmap_datasize = 0 , bool isRoot=false);
         ~VixMntMmap();
         void mntWriteMmap(const char* buf);
         void mntReadMmap(char* buf);

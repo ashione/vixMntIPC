@@ -14,33 +14,15 @@ using namespace std;
 
 extern const char* random_str;
 
-int
-main(int argc,char** args){
+const size_t msg_len = 1<<25;
+VixMntMmap* testmap = new VixMntMmap(msg_len,true);
 
-    srand((unsigned) time(NULL));
+void
+child_receiver(){
 
-    struct timeval startTime,endTime;
+        struct timeval endTime;
+        VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
 
-    const size_t msg_len = 1<<26;
-    char *msg = new char[msg_len];
-    memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
-    //time(&startTime);
-    gettimeofday(&startTime,NULL);
-
-    VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
-    //VixMntMsgQue* resultMsgQ = new VixMntMsgQue("/result");
-
-    //printf("%s\n",ctime(&startTime));
-
-    VixMntMmap* testmap = new VixMntMmap(msg_len);
-    cout<<testmap->getMmapFileName()<<endl;
-    int status;
-    pid_t pid = fork();
-    if(pid == 0 ){
-    //if( argc >= 2  ){
-        //sleep(2);
-        //VixMntMsgOp *receivedOp = new VixMntMsgOp();
-        //myque->receiveMsgOp(receivedOp,NULL);
         VixMntMsgData *receiveMsg = new VixMntMsgData();
         myque->receiveMsg(receiveMsg);
         //printf("op %s\n",getOpValue(*receivedOp));
@@ -73,38 +55,65 @@ main(int argc,char** args){
         delete resultMsgQSender;
         delete buff;
         //delete testmap;
+}
+
+int
+main(int argc,char** args){
+
+    srand((unsigned) time(NULL));
+
+    struct timeval startTime;
+
+    char *msg = new char[msg_len];
+    memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
+    //time(&startTime);
+
+    VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
+    //VixMntMsgQue* resultMsgQ = new VixMntMsgQue("/result");
+
+    //printf("%s\n",ctime(&startTime));
+
+    cout<<testmap->getMmapFileName()<<endl;
+
+    pid_t pid = fork();
+    if(pid == 0 ){
+        for(int i=0; i<8; ++i)
+            child_receiver();
         return 0;
     }
+    for(int i=0 ; i <8 ; ++i){
 
-    testmap->mntWriteMmap(msg);
+        gettimeofday(&startTime,NULL);
 
-    const char msg_name[10] = "/result";
-    char* buf = new char[sizeof(struct timeval)+strlen(msg_name)];
-    cout<<"msg_name len : "<<sizeof(msg_name)<<endl;
-    VixMntMsgQue* resultMsgQ = new VixMntMsgQue(msg_name,true);
-    //cout<<"buf size: "<<sizeof(buf)<<" "<<sizeof(*buf2)<<endl;
-    memcpy(buf,&startTime,sizeof(struct timeval));
-    mqd_t resultMsgQId = resultMsgQ->getVixMntMsgID();
-    memcpy(buf+sizeof(struct timeval),msg_name,strlen(msg_name));
-    VixMntMsgData* timeMsg = new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof(struct timeval)+strlen(msg_name),buf);
-    myque->sendMsg(timeMsg);
+        testmap->mntWriteMmap(msg);
 
-    //waitpid(pid,&status,0);
+        const char msg_name[10] = "/result";
+        char* buf = new char[sizeof(struct timeval)+strlen(msg_name)];
+        cout<<"msg_name len : "<<sizeof(msg_name)<<endl;
+        VixMntMsgQue* resultMsgQ = new VixMntMsgQue(msg_name,true);
+        memcpy(buf,&startTime,sizeof(struct timeval));
+        mqd_t resultMsgQId = resultMsgQ->getVixMntMsgID();
+        memcpy(buf+sizeof(struct timeval),msg_name,strlen(msg_name));
+        VixMntMsgData* timeMsg = new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof(struct timeval)+strlen(msg_name),buf);
+        myque->sendMsg(timeMsg);
 
-    VixMntMsgOp* resultOp = new VixMntMsgOp();
-    resultMsgQ->receiveMsgOp(resultOp);
 
-    if(*resultOp != VixMntMsgOp::ERROR){
-        printf("op %s\n",getOpValue(*resultOp));
+        VixMntMsgOp* resultOp = new VixMntMsgOp();
+        resultMsgQ->receiveMsgOp(resultOp);
+
+        if(*resultOp != VixMntMsgOp::ERROR){
+            printf("op %s\n",getOpValue(*resultOp));
+        }
+        else{
+             printf("vixMntMsgOp : Error\n");
+        }
+        delete buf;
+        delete resultOp;
+        delete resultMsgQ;
     }
-    else{
-         printf("vixMntMsgOp : Error\n");
-    }
+
     myque->releaseMsgQueInstance();
-    delete buf;
-    delete resultOp;
     delete testmap;
-    delete resultMsgQ;
 
     return 0;
 }
