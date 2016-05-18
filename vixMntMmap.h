@@ -39,8 +39,6 @@ class VixMntMmap{
 
 };
 
-
-
 std::string
 getRandomFileName(
         std::string rootPath,

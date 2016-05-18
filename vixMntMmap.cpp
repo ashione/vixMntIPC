@@ -10,11 +10,12 @@ VixMntMmap::VixMntMmap( size_t mmap_datasize)
 {
     this->file_name = getRandomFileName(fileRoot);
     //this->file_name = VixMntMmap::fileRoot;
-    this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
-    ftruncate(this->fid,mmap_datasize);
+    //this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
+    this->fid = shm_open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
 
-    this->mmap_datasize = mmap_datasize?mmap_datasize : MMAP_PAGE_SIZE;
+    this->mmap_datasize = mmap_datasize>0?mmap_datasize : MMAP_PAGE_SIZE;
     this->mmap_pagenum = this->mmap_datasize/MMAP_PAGE_SIZE + 1;
+    ftruncate(this->fid,this->mmap_pagenum* MMAP_PAGE_SIZE);
 
     if(this->fid == -1){
         this->mmap_data =(char *) mmap(NULL,
@@ -47,9 +48,10 @@ VixMntMmap::mntReadMmap(char* buf){
 VixMntMmap::~VixMntMmap(){
 
     munmap(this->mmap_data,this->mmap_pagenum * MMAP_PAGE_SIZE);
+    shm_unlink(this->file_name.c_str());
     //printf("mmap_data : %x\n",this->mmap_data);
-    if(fid > 0)
-        close(fid);
+    //if(fid > 0)
+    //    close(fid);
 }
 
 
