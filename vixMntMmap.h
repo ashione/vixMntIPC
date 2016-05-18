@@ -17,8 +17,8 @@ class VixMntMmap{
     public :
         VixMntMmap(size_t mmap_datasize = 0 , bool isRoot=false);
         ~VixMntMmap();
-        void mntWriteMmap(const char* buf);
-        void mntReadMmap(char* buf);
+        void mntWriteMmap(const char* buf, size_t write_pos= 0,size_t write_size = 0);
+        void mntReadMmap(char* buf, size_t read_pos = 0, size_t read_size = 0);
 
         inline std::string getMmapFileName(){
             return this->file_name;

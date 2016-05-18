@@ -6,6 +6,12 @@
 
 const std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
 
+/*
+ * VixMntMmap Constructor,
+ * share memory will be used when isRoot is True.
+ * XXX : it opens [datasize/pagesize] +1 frame for share memory or memory map.
+ */
+
 VixMntMmap::VixMntMmap(
         size_t mmap_datasize,
         bool isRoot)
@@ -45,15 +51,23 @@ VixMntMmap::VixMntMmap(
 }
 
 void
-VixMntMmap::mntWriteMmap(const char* buf){
+VixMntMmap::mntWriteMmap(
+        const char* buf,
+        size_t write_pos,
+        size_t write_size)
+{
 
-    memcpy(this->mmap_data,buf,this->mmap_datasize);
+    memcpy(this->mmap_data+write_pos,buf,write_size>0?write_size:this->mmap_datasize);
 
 }
 
 void
-VixMntMmap::mntReadMmap(char* buf){
-    memcpy(buf,this->mmap_data,this->mmap_datasize);
+VixMntMmap::mntReadMmap(
+        char* buf,
+        size_t read_pos,
+        size_t read_size)
+{
+    memcpy(buf,this->mmap_data+read_pos,read_size>0?read_size:this->mmap_datasize);
 }
 
 VixMntMmap::~VixMntMmap(){
