@@ -9,6 +9,7 @@ const std::string VixMntMmap::fileRoot = "/tmp/vmware_mnt";
 VixMntMmap::VixMntMmap( size_t mmap_datasize)
 {
     this->file_name = getRandomFileName(fileRoot);
+    //this->file_name = VixMntMmap::fileRoot;
     this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
     ftruncate(this->fid,mmap_datasize);
 

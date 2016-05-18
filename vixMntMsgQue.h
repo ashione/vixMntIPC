@@ -12,10 +12,11 @@
 #include <vixMntMsgOp.h>
 
 class VixMntMsgQue {
-    private  :
-        VixMntMsgQue();
+    //private  :
+    //    VixMntMsgQue();
     public :
-
+        explicit VixMntMsgQue(const char* msg_name=NULL);
+        explicit VixMntMsgQue(mqd_t msg_id);
         static VixMntMsgQue* getMsgQueInstance();
 
         static void releaseMsgQueInstance();
@@ -46,6 +47,7 @@ class VixMntMsgQue {
     private :
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
+        const char* vixMntMsgMapFileName;
 
 
 };

@@ -16,39 +16,53 @@ VixMntMsgQue::getMsgQueInstance(){
         }
 
         vixMntMsgInstance = new VixMntMsgQue();
-        if(vixMntMsgInstance->vixMntMsgID < 0){
-            if(errno == EEXIST){
-
-            mq_unlink(VixMntMsgQue::vixMntMsgName);
-            vixMntMsgInstance->vixMntMsgID =
-                mq_open(VixMntMsgQue::vixMntMsgName,
-                        O_RDWR | O_CREAT | O_EXCL,
-                        0664,
-                        NULL);
-            cout<<"reopen mqId : "<<vixMntMsgInstance->getVixMntMsgID()<<endl;
-            }
-            else{
-                cout<<" open mesage queue error ... "<<strerror(errno)<<endl;
-            }
-        }
 
         return vixMntMsgInstance;
 }
 
-VixMntMsgQue::VixMntMsgQue(){
-
-    this->vixMntMsgID = mq_open(VixMntMsgQue::vixMntMsgName,O_RDWR | O_CREAT | O_EXCL , 0664,NULL);
+VixMntMsgQue::VixMntMsgQue(const char* msg_name){
+    if(!msg_name){
+        this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
+    }
+    else{
+        this->vixMntMsgMapFileName = msg_name;
+    }
+    this->vixMntMsgID = mq_open(this->vixMntMsgMapFileName,O_RDWR | O_CREAT | O_EXCL , 0666,NULL);
+    if(this->vixMntMsgID < 0){
+        if(errno == EEXIST){
+/*
+            mq_unlink(this->vixMntMsgMapFileName);
+            this->vixMntMsgID =
+            mq_open(this->vixMntMsgMapFileName,
+                    O_RDWR | O_CREAT | O_EXCL,
+                    0666, NULL);
+*/
+            cout<<"exist mqId : "<<this->getVixMntMsgID()<<endl;
+        }
+        else{
+            cout<<" open mesage queue error ... "<<strerror(errno)<<endl;
+        }
+    }
 
 }
 
+VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
+     this->vixMntMsgID = msg_id;;
+}
+
 VixMntMsgQue::~VixMntMsgQue(){
-    mq_unlink(VixMntMsgQue::vixMntMsgName);
+    if(this->vixMntMsgID != -1){
+        mq_close(this->vixMntMsgID);
+        //mq_unlink(this->vixMntMsgMapFileName);
+    }
 }
 
 void
 VixMntMsgQue::releaseMsgQueInstance(){
-    if(vixMntMsgInstance)
+    if(vixMntMsgInstance){
         delete vixMntMsgInstance;
+        mq_unlink(VixMntMsgQue::vixMntMsgName);
+    }
     vixMntMsgInstance = NULL;
 
 }
