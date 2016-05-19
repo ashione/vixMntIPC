@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <vixMntMsgOp.h>
+#include <assert.h>
 
 class VixMntMsgQue {
     //private  :

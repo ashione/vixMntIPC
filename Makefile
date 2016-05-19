@@ -16,7 +16,7 @@ vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
 $(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o
 	  $(CC) -o $(EXEC) $(CCSTD)  $? -lrt $(INCLUDE)
 
-vixMntMsgQue.o : vixMntMsgOp.o vixMntMsgQue.cpp vixMntMsgQue.h
+vixMntMsgQue.o : vixMntMsgQue.cpp vixMntMsgQue.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
 testop : testVixMntMsgOp.cpp vixMntMsgOp.o

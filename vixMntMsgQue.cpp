@@ -21,9 +21,9 @@ VixMntMsgQue::getMsgQueInstance(){
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
-    this->vixMntMsgAttr.mq_flags = 0;
+    //this->vixMntMsgAttr.mq_flags = 0;
     this->vixMntMsgAttr.mq_maxmsg = 0xfffff;
-    this->vixMntMsgAttr.mq_msgsize = 4096;
+    this->vixMntMsgAttr.mq_msgsize = 81920;
     //this->vixMntMsgAttr.mq_curmsgs = 0;
     if(!msg_name){
         this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
@@ -34,16 +34,16 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
     this->vixMntMsgID = mq_open(
             this->vixMntMsgMapFileName,
             (readonly? O_RDONLY : O_RDWR)
-            | O_CREAT | O_EXCL , 0644,NULL);
+            | O_CREAT | O_EXCL , 0666,&this->vixMntMsgAttr);
     if(this->vixMntMsgID < 0){
         if(errno == EEXIST){
-/*
-            mq_unlink(this->vixMntMsgMapFileName);
-            this->vixMntMsgID =
-            mq_open(this->vixMntMsgMapFileName,
-                    O_RDWR | O_CREAT | O_EXCL,
-                    0666, NULL);
-*/
+
+            //mq_unlink(this->vixMntMsgMapFileName);
+            //this->vixMntMsgID =
+            //mq_open(this->vixMntMsgMapFileName,
+            //        O_RDWR | O_CREAT | O_EXCL,
+            //       0666, NULL);
+
             cout<<"exist mqId : "<<this->getVixMntMsgID()<<endl;
         }
         else{
@@ -133,6 +133,8 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
+    assert(vixMntMsgAttr.mq_msgsize >= tempAttr.mq_msgsize && tempAttr.mq_msgsize>=0);
+
     char *buf = new char[tempAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){

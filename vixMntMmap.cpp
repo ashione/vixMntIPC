@@ -87,7 +87,7 @@ getRandomFileName(std::string rootPath,size_t max_random_len){
     srand((unsigned) time(NULL));
 
     std::string rfile_name = rootPath;
-    for(int i = 0 ; i < max_random_len - 1 ; ++i){
+    for(size_t i = 0 ; i < max_random_len - 1 ; ++i){
         rfile_name+= random_str[rand()%MMAP_MAX_RANDOM];
     }
     rfile_name += '\0';

@@ -1,5 +1,15 @@
 #include <vixMntMsgOp.h>
 
+const char*
+VIXMNT_MSG_OP_STR[OP_MODE_NUM] = {
+    "MntInit",
+    "MntInitDone",
+    "MntWrite",
+    "MntWriteDone",
+    "MntRead",
+    "MntReadDone",
+};
+
 bool
 operator== (VixMntMsgOp op, const char* cstr_op){
 
