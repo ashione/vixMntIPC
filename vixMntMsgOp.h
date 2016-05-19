@@ -6,7 +6,7 @@
 #include <memory>
 
 #define OP_MODE_NUM 6
-#define OP_DATA_MAX_SIZE 0x400
+#define OP_DATA_MAX_SIZE 8192
 enum
 class VixMntMsgOp : short {
     MntInit = 0,

@@ -21,6 +21,10 @@ VixMntMsgQue::getMsgQueInstance(){
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
+    this->vixMntMsgAttr.mq_flags = 0;
+    this->vixMntMsgAttr.mq_maxmsg = 0xfffff;
+    this->vixMntMsgAttr.mq_msgsize = 4096;
+    //this->vixMntMsgAttr.mq_curmsgs = 0;
     if(!msg_name){
         this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
     }
@@ -30,7 +34,7 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
     this->vixMntMsgID = mq_open(
             this->vixMntMsgMapFileName,
             (readonly? O_RDONLY : O_RDWR)
-            | O_CREAT , 0644,NULL);
+            | O_CREAT | O_EXCL , 0644,NULL);
     if(this->vixMntMsgID < 0){
         if(errno == EEXIST){
 /*

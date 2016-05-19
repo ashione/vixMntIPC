@@ -53,6 +53,7 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
    memcpy(this->msg_buff,msg_buff,this->msg_datasize);
 }
 
+// using this only when msg_buff is string
 VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
         char* msg_buff)
 {
