@@ -31,6 +31,7 @@ class VixMntMsgQue {
         inline void getattr(mq_attr *mqAttr) { mq_getattr(getVixMntMsgID(),mqAttr); }
 
         inline void setattr(mq_attr *mqAttr){ mq_setattr(getVixMntMsgID(),mqAttr,&this->vixMntMsgAttr); }
+
         ~VixMntMsgQue();
 
         mqd_t send( const char* msg_data, size_t msg_size, unsigned msg_prio = 0);

@@ -126,8 +126,15 @@ int
 main(int argc,char** argv){
 
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
-    if( fork() == 0 ){
+    if(mq_unlink(argv[1]) < 0){
+        cout<<strerror(errno)<<endl;
+    }
+    else{
+        cout<<"unlink successful"<<endl;
+    }
 
+    if( fork() == 0 ){
+        
         VixMntMsgQue* myque= new VixMntMsgQue(argv[1],true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
@@ -170,6 +177,9 @@ main(int argc,char** argv){
     msgdata->msg_op = VixMntMsgOp::MntInit;
     myque->sendMsg(msgdata);
     cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
+    sleep(2);
+    myque->unlink();
+    
     delete msgdata;
     delete myque;
     //myque->sendMsgOp(VixMntMsgOp::MntWrite);

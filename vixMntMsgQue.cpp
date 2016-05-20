@@ -21,16 +21,11 @@ VixMntMsgQue::getMsgQueInstance(){
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
-    struct mq_attr tmpAttr;
-    tmpAttr.mq_flags = 0;
-    tmpAttr.mq_maxmsg = 20;
-    tmpAttr.mq_msgsize = 20;
-    tmpAttr.mq_curmsgs = 0;
 
-    //this->vixMntMsgAttr.mq_flags = 0;
-    //this->vixMntMsgAttr.mq_maxmsg = 8192;
-    //this->vixMntMsgAttr.mq_msgsize = 4096;
-    //this->vixMntMsgAttr.mq_curmsgs = 0;
+    this->vixMntMsgAttr.mq_flags = 0;
+    this->vixMntMsgAttr.mq_maxmsg = 8192;
+    this->vixMntMsgAttr.mq_msgsize = 4096;
+    this->vixMntMsgAttr.mq_curmsgs = 0;
 
     this->needUnlink = needunlink;
 
@@ -46,7 +41,7 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
     this->vixMntMsgID =
         mq_open(
             this->vixMntMsgMapFileName,
-            O_RDWR | O_CREAT | O_EXCL,
+            this->needUnlink?O_RDWR:O_RDONLY | O_CREAT | O_EXCL,
             0644,NULL);
 
     if( this->vixMntMsgID < 0){
@@ -160,11 +155,11 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
-    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld\n",vixMntMsgAttr.mq_msgsize,vixMntMsgAttr.mq_curmsgs);
-    assert(vixMntMsgAttr.mq_msgsize >= tempAttr.mq_msgsize && tempAttr.mq_msgsize>=0);
+    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld\n",vixMntMsgAttr.mq_msgsize,vixMntMsgAttr.mq_curmsgs,tempAttr.mq_msgsize);
+    assert( 8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
 
     //char *buf = new char[tempAttr.mq_msgsize];
-    char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
+    char *buf = new char[tempAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
         msg_data->msg_op = VixMntMsgOp::ERROR;
