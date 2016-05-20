@@ -18,7 +18,7 @@ class VixMntMsgQue {
     //private  :
     //    VixMntMsgQue();
     public :
-        explicit VixMntMsgQue(const char* msg_name=NULL,bool readonly = false);
+        explicit VixMntMsgQue(const char* msg_name=NULL,bool needunlink = false);
         explicit VixMntMsgQue(mqd_t msg_id);
         static VixMntMsgQue* getMsgQueInstance();
 
@@ -41,6 +41,7 @@ class VixMntMsgQue {
 
         bool  sendMsg(VixMntMsgData* msg_data,unsigned msg_prio = 0);
         void  receiveMsg(VixMntMsgData* msg_data,unsigned* msg_prio = NULL);
+        void  unlink();
 
 
     public :
@@ -51,7 +52,7 @@ class VixMntMsgQue {
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
         char vixMntMsgMapFileName[MSG_FILENAME_LEN_MAX];
-        bool readOnly;
+        bool needUnlink;
 
 
 };

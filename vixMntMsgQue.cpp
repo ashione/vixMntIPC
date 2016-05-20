@@ -20,13 +20,19 @@ VixMntMsgQue::getMsgQueInstance(){
         return vixMntMsgInstance;
 }
 
-VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
+VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
+    struct mq_attr tmpAttr;
+    tmpAttr.mq_flags = 0;
+    tmpAttr.mq_maxmsg = 20;
+    tmpAttr.mq_msgsize = 20;
+    tmpAttr.mq_curmsgs = 0;
 
-    this->vixMntMsgAttr.mq_flags = 0;
-    this->vixMntMsgAttr.mq_maxmsg = 81920;
-    this->vixMntMsgAttr.mq_msgsize = 8192;
-    this->readOnly = readonly;
+    //this->vixMntMsgAttr.mq_flags = 0;
+    //this->vixMntMsgAttr.mq_maxmsg = 8192;
+    //this->vixMntMsgAttr.mq_msgsize = 4096;
     //this->vixMntMsgAttr.mq_curmsgs = 0;
+
+    this->needUnlink = needunlink;
 
     if(!msg_name){
         strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
@@ -34,17 +40,18 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
     else{
         strcpy(this->vixMntMsgMapFileName , msg_name);
     }
+
     printf("msg map filename %s\n",this->vixMntMsgMapFileName);
-    //mq_unlink(this->vixMntMsgMapFileName);
+
     this->vixMntMsgID =
         mq_open(
             this->vixMntMsgMapFileName,
-            ( this->readOnly? O_RDONLY : O_RDWR)|O_CREAT,
-            0644,&(this->vixMntMsgAttr));
+            O_RDWR | O_CREAT | O_EXCL,
+            0644,NULL);
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
-
+            //this->unlink();
             //mq_unlink(this->vixMntMsgMapFileName);
             //this->vixMntMsgID =
             //       mq_open(this->vixMntMsgMapFileName,
@@ -66,13 +73,21 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
      this->vixMntMsgID = msg_id;;
 }
 
+void
+VixMntMsgQue::unlink(){
+    if(!this->needUnlink)
+        return;
+
+    printf("Log unlink %s\n",this->vixMntMsgMapFileName);
+    if(mq_unlink(this->vixMntMsgMapFileName) < 0){
+        printf("Log unlink error : %s\n",strerror(errno));
+    }
+}
 VixMntMsgQue::~VixMntMsgQue(){
 
     if(this->vixMntMsgID != -1){
         mq_close(this->vixMntMsgID);
-
-        if(!this->readOnly)
-            mq_unlink(this->vixMntMsgMapFileName);
+        unlink();
     }
 }
 

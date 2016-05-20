@@ -33,4 +33,4 @@ vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h
 
 
 clean : 
-	rm -rf $(OBJECTS) *.o *.gch 
+	rm -rf $(OBJECTS) *.o *.gch  core.*

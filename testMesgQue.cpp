@@ -123,12 +123,12 @@ struct testMsgInfo{
 };
 
 int
-main(){
+main(int argc,char** argv){
 
-        //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
+    //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     if( fork() == 0 ){
 
-        VixMntMsgQue* myque= new VixMntMsgQue("/operation",true);
+        VixMntMsgQue* myque= new VixMntMsgQue(argv[1],true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
         myque->receiveMsg(msgre_data);
@@ -145,12 +145,12 @@ main(){
         cout<<"message 2 : "<<getOpValue(msgre_data->msg_op)<<endl;
 
         //VixMntMsgQue::releaseMsgQueInstance();
-        //delete myque;
+        delete myque;
         delete msgre_data;
         exit(0);
     }
 
-    VixMntMsgQue* myque= new VixMntMsgQue("/operation");
+    VixMntMsgQue* myque= new VixMntMsgQue(argv[1]);
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     char pmsg[] = "fkfdf 2 3\n";
     char msg[0xff];
@@ -171,7 +171,7 @@ main(){
     myque->sendMsg(msgdata);
     cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
     delete msgdata;
-    //delete myque;
+    delete myque;
     //myque->sendMsgOp(VixMntMsgOp::MntWrite);
     //cout<<getOpValue(VixMntMsgOp::MntInit)<<endl;
     return 0;
