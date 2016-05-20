@@ -20,18 +20,19 @@ main(int argc,char** argv){
         VixMntOpRead t("/tmp",buf,3,2);
         printf("OpRead struct size : %d %d %d\n",sizeof(VixMntOpRead),t.size(),sizeof(t));
         printf("buf addr : %x %s\n",buf,buf);
-        VixMntMsgQue* msgQue = new VixMntMsgQue("/devela");
+        VixMntMsgQue* msgQue = new VixMntMsgQue("/operationabcde");
         //char* msgbuf = new char[sizeof(t)];
         //memcpy(msgbuf,&t,sizeof(t));
         VixMntMsgData* msgdata = new VixMntMsgData(VixMntMsgOp::MntInit,sizeof(t),(char *)&t);
         msgQue->sendMsg(msgdata);
         printf("send ok\n");
 
-        return 0;
+        exit(0);
+
     }
 
     //VixMntMsgQue* msgQue = VixMntMsgQue::getMsgQueInstance();
-    VixMntMsgQue* msgQue = new VixMntMsgQue("/devela");
+    VixMntMsgQue* msgQue = new VixMntMsgQue("/operationabcde",true);
 
     VixMntMsgData* msgdata = new VixMntMsgData();
     msgQue->receiveMsg(msgdata);

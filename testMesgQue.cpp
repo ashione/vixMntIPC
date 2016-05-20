@@ -128,12 +128,12 @@ main(){
         //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     if( fork() == 0 ){
 
-        VixMntMsgQue* myque= new VixMntMsgQue("/devel");
+        VixMntMsgQue* myque= new VixMntMsgQue("/operation",true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
         myque->receiveMsg(msgre_data);
 
-        cout<<"messge 1 : "<<getOpValue(msgre_data->msg_op)<<endl;
+        cout<<"message 1 : "<<getOpValue(msgre_data->msg_op)<<endl;
         testMsgInfo result;
         cout<<"msg_data size : "<<msgre_data->msg_datasize<<endl;
         memcpy(&result,msgre_data->msg_buff,sizeof(testMsgInfo));
@@ -147,12 +147,12 @@ main(){
         //VixMntMsgQue::releaseMsgQueInstance();
         //delete myque;
         delete msgre_data;
-        return 0;
+        exit(0);
     }
 
-    VixMntMsgQue* myque= new VixMntMsgQue("/devel");
+    VixMntMsgQue* myque= new VixMntMsgQue("/operation");
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
-    char pmsg[] = "fkf df \n";
+    char pmsg[] = "fkfdf 2 3\n";
     char msg[0xff];
     testMsgInfo info;
     info.offsize=strlen(pmsg);

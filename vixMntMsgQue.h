@@ -12,6 +12,8 @@
 #include <vixMntMsgOp.h>
 #include <assert.h>
 
+#define MSG_FILENAME_LEN_MAX 256
+
 class VixMntMsgQue {
     //private  :
     //    VixMntMsgQue();
@@ -48,7 +50,8 @@ class VixMntMsgQue {
     private :
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
-        const char* vixMntMsgMapFileName;
+        char vixMntMsgMapFileName[MSG_FILENAME_LEN_MAX];
+        bool readOnly;
 
 
 };

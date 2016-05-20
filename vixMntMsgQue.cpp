@@ -25,19 +25,21 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
     this->vixMntMsgAttr.mq_flags = 0;
     this->vixMntMsgAttr.mq_maxmsg = 81920;
     this->vixMntMsgAttr.mq_msgsize = 8192;
-    this->vixMntMsgAttr.mq_curmsgs = 0;
+    this->readOnly = readonly;
+    //this->vixMntMsgAttr.mq_curmsgs = 0;
 
     if(!msg_name){
-        this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
+        strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
     }
     else{
-        this->vixMntMsgMapFileName = msg_name;
+        strcpy(this->vixMntMsgMapFileName , msg_name);
     }
+    printf("msg map filename %s\n",this->vixMntMsgMapFileName);
     //mq_unlink(this->vixMntMsgMapFileName);
     this->vixMntMsgID =
         mq_open(
             this->vixMntMsgMapFileName,
-            ( readonly? O_RDONLY : O_RDWR)|O_CREAT,
+            ( this->readOnly? O_RDONLY : O_RDWR)|O_CREAT,
             0644,&(this->vixMntMsgAttr));
 
     if( this->vixMntMsgID < 0){
@@ -65,9 +67,12 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
 }
 
 VixMntMsgQue::~VixMntMsgQue(){
+
     if(this->vixMntMsgID != -1){
         mq_close(this->vixMntMsgID);
-        //mq_unlink(this->vixMntMsgMapFileName);
+
+        if(!this->readOnly)
+            mq_unlink(this->vixMntMsgMapFileName);
     }
 }
 
@@ -140,7 +145,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
-    //printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] new mq_msgsize = %ld\n",vixMntMsgAttr.mq_msgsize);
+    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld\n",vixMntMsgAttr.mq_msgsize,vixMntMsgAttr.mq_curmsgs);
     assert(vixMntMsgAttr.mq_msgsize >= tempAttr.mq_msgsize && tempAttr.mq_msgsize>=0);
 
     //char *buf = new char[tempAttr.mq_msgsize];
