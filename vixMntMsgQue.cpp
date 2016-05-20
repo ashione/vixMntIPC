@@ -21,35 +21,42 @@ VixMntMsgQue::getMsgQueInstance(){
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool readonly){
-    //this->vixMntMsgAttr.mq_flags = 0;
-    this->vixMntMsgAttr.mq_maxmsg = 0xfffff;
-    this->vixMntMsgAttr.mq_msgsize = 81920;
-    //this->vixMntMsgAttr.mq_curmsgs = 0;
+
+    this->vixMntMsgAttr.mq_flags = 0;
+    this->vixMntMsgAttr.mq_maxmsg = 81920;
+    this->vixMntMsgAttr.mq_msgsize = 8192;
+    this->vixMntMsgAttr.mq_curmsgs = 0;
+
     if(!msg_name){
         this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
     }
     else{
         this->vixMntMsgMapFileName = msg_name;
     }
-    this->vixMntMsgID = mq_open(
+    //mq_unlink(this->vixMntMsgMapFileName);
+    this->vixMntMsgID =
+        mq_open(
             this->vixMntMsgMapFileName,
-            (readonly? O_RDONLY : O_RDWR)
-            | O_CREAT | O_EXCL , 0666,&this->vixMntMsgAttr);
-    if(this->vixMntMsgID < 0){
+            ( readonly? O_RDONLY : O_RDWR)|O_CREAT,
+            0644,&(this->vixMntMsgAttr));
+
+    if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
 
             //mq_unlink(this->vixMntMsgMapFileName);
             //this->vixMntMsgID =
-            //mq_open(this->vixMntMsgMapFileName,
-            //        O_RDWR | O_CREAT | O_EXCL,
-            //       0666, NULL);
+            //       mq_open(this->vixMntMsgMapFileName,
+            //       O_RDWR | O_CREAT | O_EXCL,
+            //       0644, NULL);
 
-            cout<<"exist mqId : "<<this->getVixMntMsgID()<<endl;
+            printf("exist mqid : %d | mq_name : %s\n",this->getVixMntMsgID(),vixMntMsgMapFileName);
         }
         else{
             cout<<" open mesage queue error ... "<<strerror(errno)<<endl;
         }
     }
+
+    assert(this->vixMntMsgID > 0);
 
 }
 
@@ -133,9 +140,11 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
+    //printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] new mq_msgsize = %ld\n",vixMntMsgAttr.mq_msgsize);
     assert(vixMntMsgAttr.mq_msgsize >= tempAttr.mq_msgsize && tempAttr.mq_msgsize>=0);
 
-    char *buf = new char[tempAttr.mq_msgsize];
+    //char *buf = new char[tempAttr.mq_msgsize];
+    char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
         msg_data->msg_op = VixMntMsgOp::ERROR;

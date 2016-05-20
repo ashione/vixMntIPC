@@ -26,7 +26,7 @@ class VixMntMsgQue {
          return this->vixMntMsgID;
         }
 
-        inline void getattr(mq_attr *mqAttr) const { mq_getattr(getVixMntMsgID(),mqAttr); }
+        inline void getattr(mq_attr *mqAttr) { mq_getattr(getVixMntMsgID(),mqAttr); }
 
         inline void setattr(mq_attr *mqAttr){ mq_setattr(getVixMntMsgID(),mqAttr,&this->vixMntMsgAttr); }
         ~VixMntMsgQue();

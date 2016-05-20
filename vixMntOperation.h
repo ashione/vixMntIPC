@@ -43,6 +43,7 @@ class VixMntOpRead : public VixMntOpBase{
 
     public :
         explicit VixMntOpRead(const char*,char* ,size_t,off_t);
+        explicit VixMntOpRead(){};
         BREW_CONVERTOR(VixMntOpRead)
 
     public :
