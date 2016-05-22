@@ -11,6 +11,7 @@
 #include <memory>
 #include <vixMntMsgOp.h>
 #include <assert.h>
+#include <map>
 
 #define MSG_FILENAME_LEN_MAX 256
 
@@ -18,7 +19,7 @@ class VixMntMsgQue {
     //private  :
     //    VixMntMsgQue();
     public :
-        explicit VixMntMsgQue(const char* msg_name=NULL,bool needunlink = false);
+        explicit VixMntMsgQue(const char* msg_name=NULL,bool readOnly = false);
         explicit VixMntMsgQue(mqd_t msg_id);
         static VixMntMsgQue* getMsgQueInstance();
 
@@ -42,18 +43,19 @@ class VixMntMsgQue {
 
         bool  sendMsg(VixMntMsgData* msg_data,unsigned msg_prio = 0);
         void  receiveMsg(VixMntMsgData* msg_data,unsigned* msg_prio = NULL);
-        void  unlink();
+        static void  unlink();
 
 
     public :
         static VixMntMsgQue* vixMntMsgInstance;
         static const char* vixMntMsgName;
+        static std::map<const char*,mqd_t> vixMntMsgMap;
 
     private :
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
         char vixMntMsgMapFileName[MSG_FILENAME_LEN_MAX];
-        bool needUnlink;
+        bool readOnly;
 
 
 };

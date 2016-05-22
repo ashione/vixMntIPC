@@ -125,7 +125,6 @@ struct testMsgInfo{
 int
 main(int argc,char** argv){
 
-    //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     if(mq_unlink(argv[1]) < 0){
         cout<<strerror(errno)<<endl;
     }
@@ -134,7 +133,7 @@ main(int argc,char** argv){
     }
 
     if( fork() == 0 ){
-        
+
         VixMntMsgQue* myque= new VixMntMsgQue(argv[1],true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
@@ -151,9 +150,9 @@ main(int argc,char** argv){
 
         cout<<"message 2 : "<<getOpValue(msgre_data->msg_op)<<endl;
 
-        //VixMntMsgQue::releaseMsgQueInstance();
         delete myque;
         delete msgre_data;
+        VixMntMsgQue::unlink();
         exit(0);
     }
 
@@ -173,13 +172,13 @@ main(int argc,char** argv){
 
     memcpy(msgdata->msg_buff,&info,sizeof(testMsgInfo));
 
-    myque->sendMsg(msgdata);
+    assert(myque->sendMsg(msgdata));
     msgdata->msg_op = VixMntMsgOp::MntInit;
-    myque->sendMsg(msgdata);
+    assert( myque->sendMsg(msgdata) );
     cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
-    sleep(2);
-    myque->unlink();
-    
+    //sleep(2);
+    //myque->unlink();
+
     delete msgdata;
     delete myque;
     //myque->sendMsgOp(VixMntMsgOp::MntWrite);

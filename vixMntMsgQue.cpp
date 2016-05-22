@@ -7,7 +7,7 @@ using namespace std;
 
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const char* VixMntMsgQue::vixMntMsgName = "/vixMntApi";
-
+std::map<const char*,mqd_t> VixMntMsgQue::vixMntMsgMap;
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(){
 
@@ -20,15 +20,14 @@ VixMntMsgQue::getMsgQueInstance(){
         return vixMntMsgInstance;
 }
 
-VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
+VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     this->vixMntMsgAttr.mq_flags = 0;
     this->vixMntMsgAttr.mq_maxmsg = 8192;
     this->vixMntMsgAttr.mq_msgsize = 4096;
     this->vixMntMsgAttr.mq_curmsgs = 0;
 
-    this->needUnlink = needunlink;
-
+    this->readOnly = readOnly;
     if(!msg_name){
         strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
     }
@@ -41,8 +40,8 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
     this->vixMntMsgID =
         mq_open(
             this->vixMntMsgMapFileName,
-            this->needUnlink?O_RDWR:O_RDONLY | O_CREAT | O_EXCL,
-            0644,NULL);
+            this->readOnly? O_RDONLY : O_RDWR
+            | O_CREAT | O_EXCL,0644,NULL);
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
@@ -61,28 +60,40 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name, bool needunlink){
     }
 
     assert(this->vixMntMsgID > 0);
+    VixMntMsgQue::vixMntMsgMap[this->vixMntMsgName] = this->vixMntMsgID;
+    printf("Log : msg_queue size %ld\n",VixMntMsgQue::vixMntMsgMap.size());
 
 }
 
 VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
-     this->vixMntMsgID = msg_id;;
+
+     this->vixMntMsgID = msg_id;
+     std::map<const char*,mqd_t>::iterator item = VixMntMsgQue::vixMntMsgMap.begin();
+     for( ;item != VixMntMsgQue::vixMntMsgMap.end();item++){
+         if( this->vixMntMsgID == item->second ){
+             this->vixMntMsgName = item->first;
+         }
+     }
+     assert(item!= VixMntMsgQue::vixMntMsgMap.end());
 }
 
 void
 VixMntMsgQue::unlink(){
-    if(!this->needUnlink)
-        return;
 
-    printf("Log unlink %s\n",this->vixMntMsgMapFileName);
-    if(mq_unlink(this->vixMntMsgMapFileName) < 0){
-        printf("Log unlink error : %s\n",strerror(errno));
+    std::map<const char*, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.begin();
+    while(itr != VixMntMsgQue::vixMntMsgMap.end()){
+        if(mq_unlink(itr->first) < 0 ){
+            printf("Log %s unlink faild.",itr->first);
+        }
+        else{
+            printf("Log %s unlink ok.",itr->first);
+        }
     }
 }
 VixMntMsgQue::~VixMntMsgQue(){
 
     if(this->vixMntMsgID != -1){
         mq_close(this->vixMntMsgID);
-        unlink();
     }
 }
 
@@ -101,6 +112,7 @@ VixMntMsgQue::send(const char* msg_ptr,
         size_t msg_len,
         unsigned msg_prio)
 {
+    assert(!this->readOnly);
     return mq_send(this->getVixMntMsgID(),msg_ptr,msg_len,msg_prio);
 
 }
@@ -155,13 +167,19 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
-    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld\n",vixMntMsgAttr.mq_msgsize,vixMntMsgAttr.mq_curmsgs,tempAttr.mq_msgsize);
+    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld\n",
+            vixMntMsgAttr.mq_msgsize,
+            vixMntMsgAttr.mq_curmsgs,
+            tempAttr.mq_msgsize);
+
     assert( 8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
 
     //char *buf = new char[tempAttr.mq_msgsize];
     char *buf = new char[tempAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
+        printf("Log : line %s - %s [ receive error]",__LINE__,__FILE__);
+
         msg_data->msg_op = VixMntMsgOp::ERROR;
     }
     else{
