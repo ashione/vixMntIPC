@@ -52,7 +52,7 @@ class VixMntMsgQue {
     public :
         static VixMntMsgQue* vixMntMsgInstance;
         static const char* vixMntMsgName;
-        static std::map<const char*,mqd_t> vixMntMsgMap;
+        static std::map<std::string,mqd_t> vixMntMsgMap;
 
     public :
         mqd_t vixMntMsgID;

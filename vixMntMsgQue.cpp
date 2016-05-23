@@ -6,7 +6,7 @@ using namespace std;
 
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const char* VixMntMsgQue::vixMntMsgName = "/vixMntApi";
-std::map<const char*,mqd_t> VixMntMsgQue::vixMntMsgMap;
+std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(){
 
@@ -68,10 +68,10 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
 
      this->vixMntMsgID = msg_id;
-     std::map<const char*,mqd_t>::iterator item = VixMntMsgQue::vixMntMsgMap.begin();
+     std::map<std::string,mqd_t>::iterator item = VixMntMsgQue::vixMntMsgMap.begin();
      for( ;item != VixMntMsgQue::vixMntMsgMap.end();item++){
          if( this->vixMntMsgID == item->second ){
-             this->vixMntMsgName = item->first;
+             this->vixMntMsgName = item->first.c_str();
          }
      }
      assert(item!= VixMntMsgQue::vixMntMsgMap.end());
@@ -80,13 +80,13 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
 void
 VixMntMsgQue::unlink(){
 
-    std::map<const char*, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.begin();
+    std::map<std::string, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.begin();
     while(itr != VixMntMsgQue::vixMntMsgMap.end()){
-        if(mq_unlink(itr->first) < 0 ){
-            ILog("%s unlink faild.",itr->first);
+        if(mq_unlink(itr->first.c_str()) < 0 ){
+            ILog("%s unlink faild.",itr->first.c_str());
         }
         else{
-            ILog("%s unlink ok.",itr->first);
+            ILog("%s unlink ok.",itr->first.c_str());
         }
         itr++;
     }
