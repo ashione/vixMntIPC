@@ -1,4 +1,8 @@
 #include <vixMntUtility.h>
+/*
+ * TODO:
+ *  Multithread safe
+ */
 
 void
 vixMntLog(short level,
