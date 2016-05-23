@@ -25,7 +25,9 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     this->vixMntMsgAttr.mq_maxmsg = 8192;
     this->vixMntMsgAttr.mq_msgsize = 8192;
     this->vixMntMsgAttr.mq_curmsgs = 0;
-
+    /*
+     * readOnly is unused now.
+     */
     this->readOnly = readOnly;
 
     if(!msg_name){

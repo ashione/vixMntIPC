@@ -156,6 +156,9 @@ main(int argc,char** argv){
     }
 
     VixMntMsgQue myque(argv[1]);
+    mq_attr tempAttr;
+    myque.getattr(&tempAttr);
+    ILog("msgsize : %d, maxmsg %d",tempAttr.mq_msgsize,tempAttr.mq_maxmsg);
 
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     char pmsg[] = "fkfdf 2 3\n";
@@ -177,5 +180,6 @@ main(int argc,char** argv){
     assert( myque.sendMsg(msgdata) );
     cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
     delete msgdata;
+
     return 0;
 }
