@@ -1,6 +1,8 @@
 #ifndef VIXMNTMMAP_H
 #define VIXMNTMMAP_H
 
+#include <vixMntUtility.h>
+
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -11,7 +13,10 @@
 #define MMAP_MAX_RANDOM 10
 #define MMAP_PAGE_SIZE sysconf(_SC_PAGESIZE)
 
-
+/*
+ * Todo :
+ *  fullfill share memory address in multi-process
+ */
 class VixMntMmap{
 
     public :
@@ -27,6 +32,10 @@ class VixMntMmap{
              return this->fid;
         }
 
+        inline char* getDataAddr(){
+            return this->mmap_data;
+        }
+
     private :
         int fid;
         size_t mmap_datasize;
@@ -34,7 +43,8 @@ class VixMntMmap{
         char* mmap_data;
         std::string file_name;
 
-        const static std::string fileRoot;
+    public :
+        static std::string fileRoot;
 
 
 };

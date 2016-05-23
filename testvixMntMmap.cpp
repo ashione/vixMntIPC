@@ -15,11 +15,12 @@ using namespace std;
 extern const char* random_str;
 
 const size_t msg_len = 1<<10;
-VixMntMmap* testmap = new VixMntMmap(msg_len,true);
 
 void
 child_receiver(){
 
+        VixMntMmap* testmap = new VixMntMmap(msg_len,true);
+        ILog("shm c_addr : %x",testmap->getDataAddr());
         struct timeval endTime;
         VixMntMsgQue* myque= new VixMntMsgQue("/input",true);
 
@@ -30,7 +31,7 @@ child_receiver(){
         char* buff = new char[msg_len];
         testmap->mntReadMmap(buff);
         gettimeofday(&endTime,NULL);
-        //cout<<"receive : "<<buff<<endl;
+        ILog("receive : %x , %c",buff,buff[0]);
         struct timeval carried_time;
         char msg_name[10];
 
@@ -47,6 +48,10 @@ child_receiver(){
 
         VixMntMsgQue* resultMsgQSender  = new VixMntMsgQue(msg_name);
 
+        buff[0] = 'A'+milliseconds%10;
+        ILog("receiver change buff[0] to %c",buff[0]);
+        testmap->mntWriteMmap(buff);
+
         if(resultMsgQSender->sendMsgOp(VixMntMsgOp::MntWriteDone))
         {
             ILog("send msgOp writedone OK");
@@ -62,12 +67,12 @@ child_receiver(){
 int
 main(int argc,char** args){
 
+
     srand((unsigned) time(NULL));
 
     struct timeval startTime;
 
     char *msg = new char[msg_len];
-    memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
 
     if(mq_unlink("/input") < 0){
         ILog("unlink input error");
@@ -76,7 +81,7 @@ main(int argc,char** args){
         ILog("unlink result error");
     }
 
-    const int testNum = 1;
+    const int testNum = 3;
 
     pid_t pid = fork();
 
@@ -86,10 +91,12 @@ main(int argc,char** args){
         exit(0);
     }
 
+    VixMntMmap* testmap = new VixMntMmap(msg_len,true);
     VixMntMsgQue* myque = new VixMntMsgQue("/input");
 
     for(int i=0 ; i <testNum ; ++i){
-
+        ILog("shm p_addr : %x",testmap->getDataAddr());
+        memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
         gettimeofday(&startTime,NULL);
 
         testmap->mntWriteMmap(msg);
@@ -114,10 +121,13 @@ main(int argc,char** args){
 
         if(*resultOp != VixMntMsgOp::ERROR){
             ILog("op %s\n",getOpValue(*resultOp));
+            testmap->mntReadMmap(msg);
+            ILog("share memory show changed bit %c",msg[0]);
         }
         else{
              ILog("vixMntMsgOp : Error\n");
         }
+
         delete buf;
         delete resultOp;
         delete resultMsgQ;

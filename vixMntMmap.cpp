@@ -3,8 +3,9 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <exception>
 
-const std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
+std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
 
 /*
  * VixMntMmap Constructor,
@@ -16,19 +17,25 @@ VixMntMmap::VixMntMmap(
         size_t mmap_datasize,
         bool isRoot)
 {
-
-    if(isRoot)
-        this->file_name = VixMntMmap::fileRoot;
-    else
-        this->file_name = getRandomFileName(fileRoot);
+    try{
+        if(isRoot)
+            this->file_name = VixMntMmap::fileRoot;
+        else
+        //    this->file_name = getRandomFileName(fileRoot);
+            this->file_name = VixMntMmap::fileRoot;
+    }
+    catch(std::exception &e){
+        ELog("set file_name error");
+        this->file_name = "/vmware_mnt_shm";
+    }
 
     //this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
     this->fid = shm_open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC,0666);
 
     if(this->fid > 0)
-        printf("Log : open share memory %d\n",this->fid);
+        ILog("open share memory %d %s",this->fid,this->file_name.c_str());
     else
-        printf("Log : open share memory faild, map to file%d\n",this->fid);
+        ILog("open share memory faild, map to file%d",this->fid);
 
     this->mmap_datasize = mmap_datasize>0?mmap_datasize : MMAP_PAGE_SIZE;
     this->mmap_pagenum = this->mmap_datasize/MMAP_PAGE_SIZE + 1;
@@ -47,6 +54,8 @@ VixMntMmap::VixMntMmap(
                 PROT_READ | PROT_WRITE,
                 MAP_SHARED,
                 this->fid,0);
+
+    ILog("shm mmap addr : %x",this->mmap_data);
 
 }
 
