@@ -61,7 +61,10 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     assert(this->vixMntMsgID > 0);
     VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
-    printf("Log : msg_queue size %ld\n",VixMntMsgQue::vixMntMsgMap.size());
+    //printf("Log : msg_queue size %ld\n",VixMntMsgQue::vixMntMsgMap.size());
+    ILog("1 Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
+    ILog("2 Messge size %s","sdf");
+    ILog("3 Messge size");
 
 }
 
@@ -180,7 +183,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
     char *buf = new char[tempAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
-        printf("Log : line %s - %s [ receive error]",__LINE__,__FILE__);
+        printf("Log : line %d - %s [ receive error]",__LINE__,__FILE__);
 
         msg_data->msg_op = VixMntMsgOp::ERROR;
     }

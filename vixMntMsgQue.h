@@ -1,5 +1,9 @@
 #ifndef VIXMNTAPI_MSQQUE_H
 #define VIXMNTAPI_MSQQUE_H
+
+#include <vixMntMsgOp.h>
+#include <vixMntUtility.h>
+
 #include <cstring>
 #include <cstdio>
 #include <unistd.h>
@@ -9,7 +13,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <vixMntMsgOp.h>
 #include <assert.h>
 #include <map>
 

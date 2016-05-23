@@ -13,7 +13,7 @@ testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o
 vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
-$(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o
+$(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
 	  $(CC) -o $(EXEC) $(CCSTD)  $? $(INCLUDE) -lrt
 
 vixMntMsgQue.o : vixMntMsgQue.cpp vixMntMsgQue.h
@@ -29,6 +29,9 @@ testst : testMntOperation.cpp vixMntOperation.o vixMntMsgQue.o vixMntMsgOp.o
 	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
 
 vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h
+	$(CC) $(CFLAGS) $? $(INCLUDE)
+
+vixMntUtility.o : vixMntUtility.cpp vixMntUtility.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
 
