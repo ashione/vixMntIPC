@@ -25,7 +25,7 @@ testop : testVixMntMsgOp.cpp vixMntMsgOp.o
 vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
-testst : testMntOperation.cpp vixMntOperation.o vixMntMsgQue.o vixMntMsgOp.o
+testst : testMntOperation.cpp vixMntOperation.o vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
 	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
 
 vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h

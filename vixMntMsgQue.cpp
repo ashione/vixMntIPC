@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vixMntMsgQue.h>
 #include <vixMntMsgOp.h>
 
@@ -38,15 +37,18 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     ILog("msg map filename %s",this->vixMntMsgMapFileName);
 
-    long flag = O_RDONLY | O_CREAT | O_EXCL;
-    if(!readOnly){
-        flag = O_RDWR | O_CREAT | O_EXCL;
-    }
-    this->vixMntMsgID =
-        mq_open(
+    //if(!readOnly){
+        this->vixMntMsgID =
+            mq_open(
             this->vixMntMsgMapFileName,
-            flag,
+            O_CREAT | O_RDWR ,
             0644,NULL);
+    //}
+    //else{
+    //    this->vixMntMsgID =
+    //        mq_open(
+    //        this->vixMntMsgMapFileName,O_RDONLY);
+    //}
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){

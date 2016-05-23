@@ -54,7 +54,7 @@ class VixMntMsgQue {
         static const char* vixMntMsgName;
         static std::map<const char*,mqd_t> vixMntMsgMap;
 
-    private :
+    public :
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
         char vixMntMsgMapFileName[MSG_FILENAME_LEN_MAX];

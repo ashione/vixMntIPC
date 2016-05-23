@@ -69,10 +69,13 @@ main(int argc,char** args){
     char *msg = new char[msg_len];
     memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
 
-    mq_unlink("/input");
-    mq_unlink("/result");
+    if(mq_unlink("/input") < 0){
+        ILog("unlink input error");
+    }
+    if(mq_unlink("/result") < 0 ){
+        ILog("unlink result error");
+    }
 
-    VixMntMsgQue* myque = new VixMntMsgQue("/input");
     const int testNum = 1;
 
     pid_t pid = fork();
@@ -82,6 +85,8 @@ main(int argc,char** args){
             child_receiver();
         exit(0);
     }
+
+    VixMntMsgQue* myque = new VixMntMsgQue("/input");
 
     for(int i=0 ; i <testNum ; ++i){
 
