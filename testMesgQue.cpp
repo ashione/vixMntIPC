@@ -125,19 +125,19 @@ struct testMsgInfo{
 int
 main(int argc,char** argv){
 
+    VixMntMsgQue::unlink();
     if(mq_unlink(argv[1]) < 0){
-        cout<<strerror(errno)<<endl;
+        ILog("%s",strerror(errno));
     }
     else{
-        cout<<"unlink successful"<<endl;
+        ILog("unlink successful");
     }
 
     if( fork() == 0 ){
-
-        VixMntMsgQue* myque= new VixMntMsgQue(argv[1],true);
+        VixMntMsgQue myque(argv[1],true);
 
         VixMntMsgData* msgre_data = new VixMntMsgData();
-        myque->receiveMsg(msgre_data);
+        myque.receiveMsg(msgre_data);
 
         cout<<"message 1 : "<<getOpValue(msgre_data->msg_op)<<endl;
         testMsgInfo result;
@@ -146,17 +146,17 @@ main(int argc,char** argv){
         result.buff[result.offsize] = '\0';
         cout<<" receiver : "<<result.offsize<<" "<<result.buff<<endl;
 
-        myque->receiveMsg(msgre_data);
+        myque.receiveMsg(msgre_data);
 
         cout<<"message 2 : "<<getOpValue(msgre_data->msg_op)<<endl;
 
-        delete myque;
         delete msgre_data;
         VixMntMsgQue::unlink();
         exit(0);
     }
 
-    VixMntMsgQue* myque= new VixMntMsgQue(argv[1]);
+    VixMntMsgQue myque(argv[1]);
+
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     char pmsg[] = "fkfdf 2 3\n";
     char msg[0xff];
@@ -172,16 +172,10 @@ main(int argc,char** argv){
 
     memcpy(msgdata->msg_buff,&info,sizeof(testMsgInfo));
 
-    assert(myque->sendMsg(msgdata));
+    assert(myque.sendMsg(msgdata));
     msgdata->msg_op = VixMntMsgOp::MntInit;
-    assert( myque->sendMsg(msgdata) );
+    assert( myque.sendMsg(msgdata) );
     cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
-    //sleep(2);
-    //myque->unlink();
-
     delete msgdata;
-    delete myque;
-    //myque->sendMsgOp(VixMntMsgOp::MntWrite);
-    //cout<<getOpValue(VixMntMsgOp::MntInit)<<endl;
     return 0;
 }

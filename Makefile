@@ -7,7 +7,7 @@ OBJECTS = testop $(EXEC) testmmap testst
 
 all :  $(OBJECTS)
 
-testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o
+testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
 	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
 
 vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h

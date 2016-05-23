@@ -28,6 +28,7 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     this->vixMntMsgAttr.mq_curmsgs = 0;
 
     this->readOnly = readOnly;
+
     if(!msg_name){
         strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
     }
@@ -35,36 +36,30 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
         strcpy(this->vixMntMsgMapFileName , msg_name);
     }
 
-    printf("msg map filename %s\n",this->vixMntMsgMapFileName);
+    ILog("msg map filename %s",this->vixMntMsgMapFileName);
 
+    long flag = O_RDONLY | O_CREAT | O_EXCL;
+    if(!readOnly){
+        flag = O_RDWR | O_CREAT | O_EXCL;
+    }
     this->vixMntMsgID =
         mq_open(
             this->vixMntMsgMapFileName,
-            this->readOnly? O_RDONLY : O_RDWR
-            | O_CREAT | O_EXCL,0666,NULL);
+            flag,
+            0644,NULL);
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
-            //this->unlink();
-            //mq_unlink(this->vixMntMsgMapFileName);
-            //this->vixMntMsgID =
-            //       mq_open(this->vixMntMsgMapFileName,
-            //       O_RDWR | O_CREAT | O_EXCL,
-            //       0644, NULL);
-
-            printf("exist mqid : %d | mq_name : %s\n",this->getVixMntMsgID(),vixMntMsgMapFileName);
+            WLog("exist mqid : %d | mq_name : %s",this->getVixMntMsgID(),vixMntMsgMapFileName);
         }
         else{
-            cout<<" open mesage queue error ... "<<strerror(errno)<<endl;
+            ELog("open mesage queue error %s ",strerror(errno));
         }
     }
 
     assert(this->vixMntMsgID > 0);
     VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
-    //printf("Log : msg_queue size %ld\n",VixMntMsgQue::vixMntMsgMap.size());
-    ILog("1 Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
-    ILog("2 Messge size %s","sdf");
-    ILog("3 Messge size");
+    ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
 
 }
 
@@ -86,13 +81,14 @@ VixMntMsgQue::unlink(){
     std::map<const char*, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.begin();
     while(itr != VixMntMsgQue::vixMntMsgMap.end()){
         if(mq_unlink(itr->first) < 0 ){
-            printf("Log %s unlink faild.\n",itr->first);
+            ILog("%s unlink faild.",itr->first);
         }
         else{
-            printf("Log %s unlink ok.\n",itr->first);
+            ILog("%s unlink ok.",itr->first);
         }
         itr++;
     }
+    VixMntMsgQue::vixMntMsgMap.clear();
 }
 VixMntMsgQue::~VixMntMsgQue(){
 
@@ -172,7 +168,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
-    printf("Log : [ receiveMsg function in vixMntMsgQue.cpp ] mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld\n",
+    ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
             vixMntMsgAttr.mq_msgsize,
             vixMntMsgAttr.mq_curmsgs,
             tempAttr.mq_msgsize);
@@ -183,7 +179,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
     char *buf = new char[tempAttr.mq_msgsize];
 
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
-        printf("Log : line %d - %s [ receive error]",__LINE__,__FILE__);
+        ELog("receive error");
 
         msg_data->msg_op = VixMntMsgOp::ERROR;
     }
