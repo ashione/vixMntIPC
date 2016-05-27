@@ -14,7 +14,7 @@ using namespace std;
 
 extern const char* random_str;
 
-const size_t msg_len = 1<<10;
+const size_t msg_len = 1<<20;
 VixMntMmap* testmap = new VixMntMmap(msg_len,true);
 
 void

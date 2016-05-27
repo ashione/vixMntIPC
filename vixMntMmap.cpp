@@ -39,7 +39,10 @@ VixMntMmap::VixMntMmap(
 
     this->mmap_datasize = mmap_datasize>0?mmap_datasize : MMAP_PAGE_SIZE;
     this->mmap_pagenum = this->mmap_datasize/MMAP_PAGE_SIZE + 1;
-    ftruncate(this->fid,this->mmap_pagenum* MMAP_PAGE_SIZE);
+    int sh_result = ftruncate(this->fid,this->mmap_pagenum* MMAP_PAGE_SIZE);
+    if(sh_result < 0){
+        ELog("shm ftruncate error ");
+    }
 
     if(this->fid == -1){
         this->mmap_data =(char *) mmap(NULL,

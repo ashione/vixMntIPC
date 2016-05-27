@@ -2,38 +2,17 @@ CCSTD= -g -std=c++0x
 CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
-INCLUDE=-I./
-OBJECTS = testop $(EXEC) testmmap testst
+INCLUDE= -I./ -I$(BORA_ROOT)/lib/public
+LIBSPATH= -L${BORA_ROOT}/build/obj-x64/vddk/lib
+LIBS = -l-fuseMountIPC-obj
+
+#OBJECTS = testop $(EXEC) testmmap testst
+OBJECTS = $(EXEC) 
 
 all :  $(OBJECTS)
 
-testmmap : testvixMntMmap.cpp vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
-	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
-
-vixMntMmap.o : vixMntMmap.cpp vixMntMmap.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
-
-$(EXEC) : testMesgQue.cpp  vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
-	  $(CC) -o $(EXEC) $(CCSTD)  $? $(INCLUDE) -lrt
-
-vixMntMsgQue.o : vixMntMsgQue.cpp vixMntMsgQue.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
-
-testop : testVixMntMsgOp.cpp vixMntMsgOp.o
-	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE)
-
-vixMntMsgOp.o : vixMntMsgOp.cpp  vixMntMsgOp.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
-
-testst : testMntOperation.cpp vixMntOperation.o vixMntMsgQue.o vixMntMsgOp.o vixMntUtility.o
-	$(CC)  $(CCSTD) -o $@  $? $(INCLUDE) -lrt
-
-vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
-
-vixMntUtility.o : vixMntUtility.cpp vixMntUtility.h
-	$(CC) $(CFLAGS) $? $(INCLUDE)
-
+test : testMesgQue.cpp
+	$(CC) $(CCSTD) -o $(EXEC)  $? $(INCLUDE) $(LIBSPATH) $(LIBS)
 
 clean : 
 	rm -rf $(OBJECTS) *.o *.gch  core.*

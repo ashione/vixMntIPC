@@ -31,10 +31,12 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     this->readOnly = readOnly;
 
     if(!msg_name){
-        strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
+        //strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
+        Str_Strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName,Str_Strlen(VixMntMsgQue::vixMntMsgName,0x100));
     }
     else{
-        strcpy(this->vixMntMsgMapFileName , msg_name);
+        Str_Strcpy(this->vixMntMsgMapFileName , msg_name,Str_Strlen(msg_name,0x100));
+        //strcpy(this->vixMntMsgMapFileName , msg_name);
     }
 
     ILog("msg map filename %s",this->vixMntMsgMapFileName);

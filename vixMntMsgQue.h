@@ -3,6 +3,7 @@
 
 #include <vixMntMsgOp.h>
 #include <vixMntUtility.h>
+#include <str.h>
 
 #include <cstring>
 #include <cstdio>

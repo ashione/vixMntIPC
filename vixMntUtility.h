@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string>
 #include <time.h>
+#include <str.h>
 
 #define ILog(format,...) vixMntLog(0,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
