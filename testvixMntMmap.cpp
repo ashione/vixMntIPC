@@ -15,11 +15,11 @@ using namespace std;
 extern const char* random_str;
 
 const size_t msg_len = 1<<10;
+VixMntMmap* testmap = new VixMntMmap(msg_len,true);
 
 void
 child_receiver(){
 
-        VixMntMmap* testmap = new VixMntMmap(msg_len,true);
         ILog("shm c_addr : %x",testmap->getDataAddr());
         struct timeval endTime;
         VixMntMsgQue* myque= new VixMntMsgQue("/input",true);
@@ -91,7 +91,7 @@ main(int argc,char** args){
         exit(0);
     }
 
-    VixMntMmap* testmap = new VixMntMmap(msg_len,true);
+    //VixMntMmap* testmap = new VixMntMmap(msg_len,true);
     VixMntMsgQue* myque = new VixMntMsgQue("/input");
 
     for(int i=0 ; i <testNum ; ++i){

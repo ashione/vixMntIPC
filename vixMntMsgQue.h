@@ -18,6 +18,12 @@
 
 #define MSG_FILENAME_LEN_MAX 256
 
+/*
+ * class VixMntMsgQue is designed to deliver control path message
+ * among different process.
+ * Actually, suitable queue message size will be helpful.
+ */
+
 class VixMntMsgQue {
     //private  :
     //    VixMntMsgQue();
