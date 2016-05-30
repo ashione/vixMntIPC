@@ -1,7 +1,6 @@
 #ifndef VIXMNTMMAP_H
 #define VIXMNTMMAP_H
 
-#include <vixMntUtility.h>
 
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -21,6 +20,7 @@ class VixMntMmap{
 
     public :
         VixMntMmap(size_t mmap_datasize = 0 , bool isRoot=false);
+        VixMntMmap(){};
         ~VixMntMmap();
         void mntWriteMmap(const char* buf, size_t write_pos= 0,size_t write_size = 0);
         void mntReadMmap(char* buf, size_t read_pos = 0, size_t read_size = 0);

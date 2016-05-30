@@ -34,8 +34,8 @@ vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h
 vixMntUtility.o : vixMntUtility.cpp vixMntUtility.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
 
-testutil : testMntUtility.c vixMntUtility.o
-	$(CC) -g -DVIXIPCTEST -o $@ $? $(INCLUDE)
+testutil : testMntUtility.cpp vixMntUtility.o vixMntMmap.o vixMntMsgQue.o vixMntMsgOp.o
+	$(CC) $(CCSTD) -DVIXIPCTEST -o $@ $? $(INCLUDE) -lrt
 
 
 clean : 

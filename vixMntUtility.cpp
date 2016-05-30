@@ -5,6 +5,10 @@ extern "C" {
     #include "str.h"
 #endif
 /*
+ * Init mmap instance
+ */
+
+/*
  * TODO:
  *  Multithread safe
  */
@@ -54,6 +58,58 @@ void getnow(char* buffer){
     strftime(buffer,80,"%X|%F",timeinfo);
 
 }
+
+int vixMntIPC_InitMmap(
+        size_t mmap_datasize,
+        int isRoot)
+{
+    if (!mmap_instance)
+        mmap_instance = new VixMntMmap(mmap_datasize,isRoot!=0);
+    else
+        WLog("map instance already init");
+
+    return 0;
+}
+
+int vixMntIPC_CleanMmap(){
+
+    if(mmap_instance)
+        delete mmap_instance;
+        mmap_instance = NULL;
+        ILog("unmap instance ok");
+        return 0;
+
+    WLog("no instance set up");
+    return -1;
+}
+
+
+void
+vixMntIPC_WriteMmap(
+        const char* buf,
+        size_t write_pos ,
+        size_t write_size )
+{
+    if(!mmap_instance){
+        FLog("mmap instance never init");
+        return;
+    }
+    mmap_instance->mntWriteMmap(buf,write_pos,write_size);
+}
+void
+vixMntIPC_ReadMmap(
+        char* buf,
+        size_t read_pos,
+        size_t read_size)
+{
+    if(!mmap_instance) {
+        FLog("mmap instance never init");
+        return;
+    }
+
+    mmap_instance->mntReadMmap(buf,read_pos,read_size);
+}
+
 
 #ifndef VIXIPCTEST
 }
