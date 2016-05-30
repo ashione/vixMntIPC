@@ -1,11 +1,12 @@
 #include <vixMntMsgQue.h>
 #include <vixMntMsgOp.h>
+//#include <str.h>
 
 using namespace std;
 
 
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
-const char* VixMntMsgQue::vixMntMsgName = "/vixMntApi";
+const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(){
@@ -32,19 +33,21 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     if(!msg_name){
         //strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
-        Str_Strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName,Str_Strlen(VixMntMsgQue::vixMntMsgName,0x100));
+        //Str_Strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName,Str_Strlen(VixMntMsgQue::vixMntMsgName,0x100));
+        this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
     }
     else{
-        Str_Strcpy(this->vixMntMsgMapFileName , msg_name,Str_Strlen(msg_name,0x100));
+        //Str_Strcpy(this->vixMntMsgMapFileName , msg_name,Str_Strlen(msg_name,0x100));
         //strcpy(this->vixMntMsgMapFileName , msg_name);
+        this->vixMntMsgMapFileName = msg_name;
     }
 
-    ILog("msg map filename %s",this->vixMntMsgMapFileName);
+    ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
 
     //if(!readOnly){
         this->vixMntMsgID =
             mq_open(
-            this->vixMntMsgMapFileName,
+            this->vixMntMsgMapFileName.c_str(),
             O_CREAT | O_RDWR ,
             0644,NULL);
     //}
@@ -56,7 +59,7 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
-            WLog("exist mqid : %d | mq_name : %s",this->getVixMntMsgID(),vixMntMsgMapFileName);
+            WLog("exist mqid : %d | mq_name : %s",this->getVixMntMsgID(),vixMntMsgMapFileName.c_str());
         }
         else{
             ELog("open mesage queue error %s ",strerror(errno));
@@ -75,7 +78,7 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id){
      std::map<std::string,mqd_t>::iterator item = VixMntMsgQue::vixMntMsgMap.begin();
      for( ;item != VixMntMsgQue::vixMntMsgMap.end();item++){
          if( this->vixMntMsgID == item->second ){
-             this->vixMntMsgName = item->first.c_str();
+             this->vixMntMsgMapFileName = item->first;
          }
      }
      assert(item!= VixMntMsgQue::vixMntMsgMap.end());
@@ -107,7 +110,7 @@ void
 VixMntMsgQue::releaseMsgQueInstance(){
     if(vixMntMsgInstance){
         delete vixMntMsgInstance;
-        mq_unlink(VixMntMsgQue::vixMntMsgName);
+        mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
     }
     vixMntMsgInstance = NULL;
 

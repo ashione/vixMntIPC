@@ -21,15 +21,22 @@ vixMntLog(short level,
     char timebuf[80];
 
     getnow(timebuf);
-    //sprintf(buffer,
-    //        buffLog,
-    //        levelStr[level],pid,timebuf,fileName,func,line);
+
+#ifndef VIXIPCTEST
     Str_Sprintf(buffer,
             0x100,
             buffLog,
             levelStr[level],pid,timebuf,fileName,func,line);
-    //vsprintf(buffer+strlen(buffer),format,args);
     Str_Vsnprintf(buffer,strlen(buffer),format,args);
+    printf("NOTEST");
+#else
+    sprintf(buffer,
+            buffLog,
+            levelStr[level],pid,timebuf,fileName,func,line);
+    vsprintf(buffer+strlen(buffer),format,args);
+    printf("VIXTEST");
+#endif
+
     va_end(args);
 
     printf("%s\n",buffer);

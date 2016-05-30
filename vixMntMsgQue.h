@@ -3,7 +3,6 @@
 
 #include <vixMntMsgOp.h>
 #include <vixMntUtility.h>
-#include <str.h>
 
 #include <cstring>
 #include <cstdio>
@@ -58,13 +57,13 @@ class VixMntMsgQue {
 
     public :
         static VixMntMsgQue* vixMntMsgInstance;
-        static const char* vixMntMsgName;
+        static const std::string vixMntMsgName;
         static std::map<std::string,mqd_t> vixMntMsgMap;
 
     public :
         mqd_t vixMntMsgID;
         mq_attr vixMntMsgAttr;
-        char vixMntMsgMapFileName[MSG_FILENAME_LEN_MAX];
+        std::string vixMntMsgMapFileName;
         bool readOnly;
 
 

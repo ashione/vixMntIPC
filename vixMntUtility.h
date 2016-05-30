@@ -1,6 +1,10 @@
 #ifndef VIXMNTUTILITY_H
 #define VIXMNTUTILITY_H
 
+#ifndef VIXIPCTEST
+    #include <str.h>
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
@@ -8,7 +12,6 @@
 #include <unistd.h>
 #include <string>
 #include <time.h>
-#include <str.h>
 
 #define ILog(format,...) vixMntLog(0,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
