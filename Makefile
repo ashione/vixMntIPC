@@ -3,7 +3,7 @@ CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
 INCLUDE=-I./
-OBJECTS = testop $(EXEC) testmmap testst
+OBJECTS = testop $(EXEC) testmmap testst testutil
 
 all :  $(OBJECTS)
 
@@ -33,6 +33,9 @@ vixMntOperation.o : vixMntOperation.cpp vixMntOperation.h
 
 vixMntUtility.o : vixMntUtility.cpp vixMntUtility.h
 	$(CC) $(CFLAGS) $? $(INCLUDE)
+
+testutil : testMntUtility.c vixMntUtility.o
+	$(CC) -g -DVIXIPCTEST -o $@ $? $(INCLUDE)
 
 
 clean : 

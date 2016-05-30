@@ -1,17 +1,18 @@
 #ifndef VIXMNTUTILITY_H
 #define VIXMNTUTILITY_H
 
-#ifndef VIXIPCTEST
-    #include <str.h>
-#endif
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
 #include <string.h>
 #include <unistd.h>
-#include <string>
 #include <time.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ILog(format,...) vixMntLog(0,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
@@ -31,5 +32,9 @@ vixMntLog(short level,
         ...);
 
 void getnow(char* buffer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //VIXMNTUTILITY_H

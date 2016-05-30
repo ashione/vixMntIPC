@@ -1,4 +1,4 @@
-A IPC tool
+An IPC tool
 ===
 ## simple implementation 
 * __Message Queue__

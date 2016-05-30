@@ -1,4 +1,9 @@
 #include <vixMntUtility.h>
+
+#ifndef VIXIPCTEST
+extern "C" {
+    #include "str.h"
+#endif
 /*
  * TODO:
  *  Multithread safe
@@ -28,13 +33,11 @@ vixMntLog(short level,
             buffLog,
             levelStr[level],pid,timebuf,fileName,func,line);
     Str_Vsnprintf(buffer,strlen(buffer),format,args);
-    printf("NOTEST");
 #else
     sprintf(buffer,
             buffLog,
             levelStr[level],pid,timebuf,fileName,func,line);
     vsprintf(buffer+strlen(buffer),format,args);
-    printf("VIXTEST");
 #endif
 
     va_end(args);
@@ -51,3 +54,7 @@ void getnow(char* buffer){
     strftime(buffer,80,"%X|%F",timeinfo);
 
 }
+
+#ifndef VIXIPCTEST
+}
+#endif
