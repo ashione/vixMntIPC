@@ -3,14 +3,39 @@ CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 #EXEC = test
 INCLUDE=-I./include
-SRC = src/*
+SRC = $(wildcard src/*.cpp)
 #EXES = testop $(EXEC) testmmap testst testutil
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
+LIBS = -lrt -L$(dir $(TARGET)) -lfuseipc
 
-all : 
+BINDIR = bin
+TESTDIR= src/test
+TESTSRC=$(wildcard $(TESTDIR)/*.cpp)
+TESTOBJ=$(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(TESTSRC))
+
+
+all : $(TARGET) test $(TESTOBJ)
+
+$(TARGET) :
+	test -d lib || mkdir lib
 	$(CC) $(CCSTD) -o $(TARGET) $(SRC)  $(LDFLAGS) $(INCLUDE)
 	@cp $(TARGET) ~/lib/
+	@echo generate share library
+
+ctest :
+	test -d bin || mkdir bin
+
+test : ctest $(TESTOBJ)
+
+$(TESTOBJ): $(TESTSRC)
+	$(CC) $(CCSTD) -o $@ $< $(INCLUDE) $(LIBS)
+
+
+
+.PHONY : clean
+clean : 
+	rm -rf lib bin $(TARGET) *.o
 
 #all :  $(EXES)
 #
@@ -47,5 +72,3 @@ all :
 #share : $(OBJECTS)
 #	$(CC) $(CCSTD) -o $(TARGET)  $(OBJECTS) $(LDFLAGS)
 
-#clean : 
-#	rm -rf $(OBJECTS) $(EXES) *.o *.gch  core.* $(TARGET)

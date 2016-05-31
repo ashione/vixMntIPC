@@ -1,3 +1,4 @@
+
 #include <vixMntMmap.h>
 #include <vixMntUtility.h>
 
@@ -8,8 +9,11 @@
 #include <exception>
 
 std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
-
+const char* random_str = "0123456789";
 /*
+#ifdef __cplusplus
+extern "C" {
+#endif
  * VixMntMmap Constructor,
  * share memory will be used when isRoot is True.
  * XXX : it opens [datasize/pagesize] +1 frame for share memory or memory map.
@@ -93,9 +97,6 @@ VixMntMmap::~VixMntMmap(){
     //    close(fid);
 }
 
-
-const char* random_str = "0123456789";
-
 std::string
 getRandomFileName(std::string rootPath,size_t max_random_len){
     srand((unsigned) time(NULL));
@@ -107,3 +108,4 @@ getRandomFileName(std::string rootPath,size_t max_random_len){
     rfile_name += '\0';
     return rfile_name;;
 }
+

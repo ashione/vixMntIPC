@@ -2,8 +2,8 @@ CCSTD= -g -std=c++0x -DVIXIPCTEST -fPIC
 CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 EXEC = test
-INCLUDE=-I../include
-LIBS = -L../lib -lrt -lfuseipc
+INCLUDE=-I../../include
+LIBS = -L../../lib -lrt -lfuseipc
 EXES = testop $(EXEC) testmmap testst testutil
 
 all :  $(EXES)
