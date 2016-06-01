@@ -2,10 +2,16 @@ An IPC tool
 ===
 ## simple implementation 
 * __Message Queue__
-* Share Memory & Memory Map
+* __Share Memory & Memory Map__
+* __Simple Log __
 
 ## usage ( on \*inx )
-**Make** will generate all test cases
-**./mksg xx** generate single test case
+* **make** will generate share library
+* **make test ** can compile all test cases from src/test to executables in bin/
+
+
+## Hint
+* if you wanto run sample test case, remember to add .so to LD_LIBRARY_PATH
+
 
 
