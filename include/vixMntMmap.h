@@ -1,6 +1,7 @@
 #ifndef VIXMNTMMAP_H
 #define VIXMNTMMAP_H
 
+
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -15,6 +16,11 @@
  * Todo :
  *  fullfill share memory address in multi-process
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 class VixMntMmap{
 
     public :
@@ -53,4 +59,8 @@ getRandomFileName(
         std::string rootPath,
         size_t max_random_len = MMAP_MAX_RANDOM);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif // end VIXMNTMMAP_H

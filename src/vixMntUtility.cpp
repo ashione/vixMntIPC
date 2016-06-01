@@ -2,10 +2,6 @@
 #include <vixMntMsgQue.h>
 #include <vixMntMmap.h>
 
-#ifndef VIXIPCTEST
-extern "C" {
-    #include "str.h"
-#endif
 
 static VixMntMmap *mmap_instance = NULL;
 /*
@@ -35,18 +31,11 @@ vixMntLog(short level,
 
     getnow(timebuf);
 
-#ifndef VIXIPCTEST
-    Str_Sprintf(buffer,
+    snprintf(buffer,
             0x100,
             buffLog,
             levelStr[level],pid,timebuf,fileName,func,line);
-    Str_Vsnprintf(buffer,strlen(buffer),format,args);
-#else
-    sprintf(buffer,
-            buffLog,
-            levelStr[level],pid,timebuf,fileName,func,line);
-    vsprintf(buffer+strlen(buffer),format,args);
-#endif
+    vsnprintf(buffer+strlen(buffer),80,format,args);
 
     va_end(args);
 
@@ -115,7 +104,3 @@ vixMntIPC_ReadMmap(
     mmap_instance->mntReadMmap(buf,read_pos,read_size);
 }
 
-
-#ifndef VIXIPCTEST
-}
-#endif

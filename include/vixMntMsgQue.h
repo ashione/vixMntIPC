@@ -18,6 +18,9 @@
 
 #define MSG_FILENAME_LEN_MAX 256
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*
  * class VixMntMsgQue is designed to deliver control path message
  * among different process.
@@ -69,4 +72,7 @@ class VixMntMsgQue {
 
 };
 
+#ifdef __cplusplus
+}
 #endif
+#endif //end VIXMNT_API_MSGQUE_H

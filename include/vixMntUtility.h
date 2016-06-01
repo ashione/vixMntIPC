@@ -1,6 +1,7 @@
 #ifndef VIXMNTUTILITY_H
 #define VIXMNTUTILITY_H
 
+//static VixMntMmap *mmap_instance = NULL;
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -10,8 +11,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-
-//static VixMntMmap *mmap_instance = NULL;
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,8 +23,6 @@ extern "C" {
 #define ELog(format,...) vixMntLog(2,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
 #define FLog(format,...) vixMntLog(3,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
-
-
 
 void
 vixMntLog(short level,

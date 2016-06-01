@@ -1,9 +1,12 @@
 #ifndef VIXMNT_OPEARTION_H
 #define VIXMNT_OPEARTION_H
+
+
 #include <sys/types.h>
 #include <cstring>
 #include <memory>
 //#include "fuse_common.h"
+
 
 #define VIXMNT_FILENAME_MAXLEN 256
 #define VIXMNT_TRANSPORT_BUF_MAXLEN 4096
@@ -21,6 +24,10 @@
         virtual ~classname(){}
 
 #define def_SHARE(classname,inst) std::shared_ptr<classname> inst
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 class VixMntOpBase{
 
@@ -57,4 +64,7 @@ class VixMntOpRead : public VixMntOpBase{
 };
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif // VIXMNT_OPERATION_H

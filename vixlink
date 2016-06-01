@@ -1,0 +1,4 @@
+#!/bin/bash
+for i in `ls src/*.cpp`; do
+    ln -sf $i `basename $i`
+done

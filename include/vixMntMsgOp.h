@@ -1,7 +1,12 @@
 #ifndef VIXMNT_MSG_OP_H
 #define VIXMNT_MSG_OP_H
 
+
 #include <string>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define OP_MODE_NUM 6
 #define OP_DATA_MAX_SIZE 0x400
@@ -35,8 +40,13 @@ class VixMntMsgData {
 const char* getOpValue(VixMntMsgOp op);
 VixMntMsgOp getOpIndex(const char* str_op);
 bool operator== (VixMntMsgOp op, const char* cstr_op);
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
 bool operator== (VixMntMsgOp op, std::string str_op);
 
-
-
-#endif
+#endif //end vixMNT_MSG_OP_H
