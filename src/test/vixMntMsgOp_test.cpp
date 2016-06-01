@@ -15,6 +15,10 @@ int main(){
     assert(getOpIndex("MntInit") == testop);
     assert(getOpIndex("MntWrite") != testop);
     assert(getOpIndex("ffft") != testop);
+
+    testop = VixMntMsgOp::MntRead;
+    assert(getOpIndex("MntRead") == testop);
+
     cout<<"Test successful"<<endl;
     return 0;
 }

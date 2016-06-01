@@ -56,6 +56,10 @@ vixMntIPC_ReadMmap(
         size_t read_pos,
         size_t read_size);
 
+void* vixMntIPC_run(void*);
+
+void listening();
+
 #ifdef __cplusplus
 }
 #endif

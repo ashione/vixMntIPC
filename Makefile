@@ -7,7 +7,7 @@ SRC = $(wildcard src/*.cpp)
 
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
-LIBS = -lrt -L$(dir $(TARGET)) -lfuseipc
+LIBS = -L./lib -lfuseipc -lpthread -lrt
 
 BINDIR = bin
 TESTDIR= src/test
@@ -15,7 +15,7 @@ TESTSRC=$(wildcard $(TESTDIR)/*.cpp)
 TESTOBJ=$(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(TESTSRC))
 
 
-all : $(TARGET) test $(TESTOBJ)
+all : $(TARGET) 
 
 $(TARGET) :
 	test -d lib || mkdir lib
@@ -31,9 +31,12 @@ test : ctest $(TESTOBJ)
 $(TESTOBJ): 
 	$(CC) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.cpp,$@) $(INCLUDE) $(LIBS)
 
-
 .PHONY : clean
-clean : 
-	rm -rf lib bin $(TARGET) *.o
+
+cleantest : 
+	rm -rf bin
+
+clean :  cleantest
+	rm -rf lib  $(TARGET) *.o
 
 

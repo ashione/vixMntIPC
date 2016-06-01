@@ -142,6 +142,10 @@ bool
 VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
         unsigned msg_prio)
 {
+    /*
+     * bug : if op equal to ERROR
+     */
+    assert(msg_op != VixMntMsgOp::ERROR);
     const char* msg_str = getOpValue(msg_op);
     return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
 }

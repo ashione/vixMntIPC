@@ -1,5 +1,5 @@
 #include <vixMntMsgOp.h>
-#include <cstring>
+#include <string.h>
 #include <string>
 #include <memory>
 
@@ -11,6 +11,7 @@ VIXMNT_MSG_OP_STR[OP_MODE_NUM] = {
     "MntWriteDone",
     "MntRead",
     "MntReadDone",
+    "HALT"
 };
 
 bool
@@ -43,15 +44,15 @@ getOpIndex(const char* str_op){
         VixMntMsgOp::MntWrite,
         VixMntMsgOp::MntWriteDone,
         VixMntMsgOp::MntRead,
-        VixMntMsgOp::MntReadDone
+        VixMntMsgOp::MntReadDone,
+        VixMntMsgOp::HALT
+
     };
 
     for(int i = 0 ; i < OP_MODE_NUM ; ++i){
         if(test_op[i] == str_op)
             return test_op[i];
     }
-    //if( VixMntMsgOp::MntInit  == str_op)
-    //    return VixMntMsgOp::MntInit;
 
     return VixMntMsgOp::ERROR;
 

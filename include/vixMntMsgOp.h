@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#define OP_MODE_NUM 6
+#define OP_MODE_NUM 7
 #define OP_DATA_MAX_SIZE 0x400
 enum
 class VixMntMsgOp : short {
@@ -18,6 +18,7 @@ class VixMntMsgOp : short {
     MntWriteDone,
     MntRead,
     MntReadDone,
+    HALT,
     ERROR,
 };
 

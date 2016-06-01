@@ -1,4 +1,7 @@
 #include <vixMntUtility.h>
+#include <vixMntMsgQue.h>
+#include <vixMntMsgOp.h>
+
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -47,5 +50,24 @@ main(){
 
     delete buf;
 
+    listening();
+
+    VixMntMsgQue* msgque = VixMntMsgQue::getMsgQueInstance();
+
+    /*
+     * TODO :
+     *  will received ERROR when send HALT
+     */
+
+    msgque->sendMsgOp(VixMntMsgOp::MntInit);
+    msgque->sendMsgOp(VixMntMsgOp::MntWrite);
+    msgque->sendMsgOp(VixMntMsgOp::MntRead);
+
+    msgque->sendMsgOp(VixMntMsgOp::HALT);
+
+    sleep(4);
+    msgque->unlink();
+    delete msgque;
+    ILog("end all");
     return 0;
 }
