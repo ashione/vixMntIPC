@@ -3,7 +3,7 @@ An IPC tool
 ## simple implementation 
 * __Message Queue__
 * __Share Memory & Memory Map__
-* __Simple Log __
+* __Simple Log__
 
 ## usage ( on \*inx )
 * **make** will generate share library
@@ -14,4 +14,6 @@ An IPC tool
 * if you wanto run sample test case, remember to add .so to LD_LIBRARY_PATH
 
 
-
+## Resouces 
+* vixlink : link source files for whole project in subdirectory root
+* _mksg_ : unused now
