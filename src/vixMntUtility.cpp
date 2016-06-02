@@ -3,8 +3,6 @@
 #include <vixMntMmap.h>
 #include <vixMntMsgOp.h>
 
-#include <pthread.h>
-
 
 static VixMntMmap *mmap_instance = NULL;
 /*
@@ -135,7 +133,7 @@ vixMntIPC_run(void* arg)
     return NULL;
 }
 
-void
+pthread_t
 listening(){
 
     pthread_t pt_id;
@@ -143,8 +141,9 @@ listening(){
 
     if(err){
       ELog("can't create thread");
-      return ;
+      return 0;
     }
 
-    ILog("thread running");
+    ILog("thread running, %u",pt_id);
+    return pt_id;
 }

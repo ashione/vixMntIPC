@@ -157,23 +157,34 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
      this->getattr(&this->vixMntMsgAttr);
 
      char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
+    // if not memeset, it may be old value
+     memset(buf,0,this->vixMntMsgAttr.mq_msgsize);
 
      if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) < 0 )
          *msg_op = VixMntMsgOp::ERROR;
      else
          *msg_op = getOpIndex(buf);
 
-     delete buf;
+     delete[] buf;
 
 }
 
+/*
+ * @input parma : msg_data
+ * @input parma : msg_prio
+ * @ouput bool : send msg is ok if return true
+ *
+ */
 bool
 VixMntMsgQue::sendMsg(VixMntMsgData* msg_data,
                       unsigned msg_prio)
 {
     char *buf = new char[sizeof(VixMntMsgData)];
     memcpy(buf,msg_data,sizeof(VixMntMsgData));
-    return send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+    bool flag = send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+    delete[] buf;
+
+    return flag;
 
 }
 
@@ -202,6 +213,6 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
         memcpy(msg_data,buf,sizeof(VixMntMsgData));
     }
 
-    delete buf;
+    delete[] buf;
 
 }

@@ -46,13 +46,17 @@ main(){
     vixMntIPC_CleanMmap();
 
     ILog("buf len %d  -- (%s)",msg_len,buf);
-    printf("%s\n",buf);
 
-    delete buf;
+    delete[] buf;
 
-    listening();
+    pthread_t pid_t = listening();
 
     VixMntMsgQue* msgque = VixMntMsgQue::getMsgQueInstance();
+
+    if(!pid_t){
+        ELog("error goto clean");
+        goto clean;
+    }
 
     /*
      * TODO :
@@ -65,9 +69,13 @@ main(){
 
     msgque->sendMsgOp(VixMntMsgOp::HALT);
 
-    sleep(4);
+    //sleep(4);
+    pthread_join(pid_t,NULL);
     msgque->unlink();
+
     delete msgque;
+
+clean:
     ILog("end all");
     return 0;
 }

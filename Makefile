@@ -1,4 +1,4 @@
-CCSTD= -g -std=c++0x -DVIXIPCTEST -fPIC
+CCSTD= -g -std=c++0x -fPIC
 CFLAGS = -c -Wall $(CCSTD)
 CC = g++
 
