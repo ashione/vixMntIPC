@@ -127,8 +127,8 @@ vixMntIPC_run(void* arg)
             ILog("receive %s",getOpValue(msg_op));
 
     }
-
-    delete vixmntmsg;
+    // instance is not belong to this thread
+    //VixMntMsgQue::releaseMsgQueInstance();
 
     return NULL;
 }

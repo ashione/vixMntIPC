@@ -52,6 +52,8 @@ main(){
     pthread_t pid_t = listening();
 
     VixMntMsgQue* msgque = VixMntMsgQue::getMsgQueInstance();
+    VixMntMsgQue* msgque2 = VixMntMsgQue::getMsgQueInstance();
+    VixMntMsgQue* msgque3 = VixMntMsgQue::getMsgQueInstance();
 
     if(!pid_t){
         ELog("error goto clean");
@@ -73,8 +75,7 @@ main(){
     pthread_join(pid_t,NULL);
     msgque->unlink();
 
-    delete msgque;
-
+    VixMntMsgQue::releaseMsgQueInstance();
 clean:
     ILog("end all");
     return 0;

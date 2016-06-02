@@ -1,25 +1,47 @@
 #include <vixMntMsgQue.h>
 #include <vixMntMsgOp.h>
+#include <vixMntLock.h>
+#include <vixMntException.h>
+
 #include <assert.h>
 #include <cstdlib>
-//#include <str.h>
+#include <pthread.h>
 
-using namespace std;
 
 
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
+pthread_mutex_t VixMntMsgQue::vixMntMsgLock;
+
+/*
+ * this static pthread_mutex_t lock maybe not work in different threads
+ *  TODO :
+ *      add mutex in share memory
+ */
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(){
+    try
+    {
+    VixMntMutex vixMutexLock(&vixMntMsgLock);
+    vixMutexLock.lock();
 
-        if( vixMntMsgInstance ){
-            return vixMntMsgInstance;
+        if( !vixMntMsgInstance ){
+            ILog("first init instance");
+            vixMntMsgInstance = new VixMntMsgQue();
+        }
+        else{
+            ILog("already init instance");
         }
 
-        vixMntMsgInstance = new VixMntMsgQue();
+    vixMutexLock.unlock();
+    }
 
-        return vixMntMsgInstance;
+    catch ( VixMntException& e ){
+
+        ELog("%s",e.what());
+    }
+    return vixMntMsgInstance;
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
@@ -110,11 +132,22 @@ VixMntMsgQue::~VixMntMsgQue(){
 
 void
 VixMntMsgQue::releaseMsgQueInstance(){
-    if(vixMntMsgInstance){
-        delete vixMntMsgInstance;
-        mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
+    try{
+
+    VixMntMutex vixMutexLock(&vixMntMsgLock);
+    vixMutexLock.lock();
+
+        if(vixMntMsgInstance){
+            delete vixMntMsgInstance;
+            mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
+        }
+        vixMntMsgInstance = NULL;
+
+    vixMutexLock.unlock();
     }
-    vixMntMsgInstance = NULL;
+    catch( VixMntException& e ){
+         ELog("%s",e.what());
+    }
 
 }
 
