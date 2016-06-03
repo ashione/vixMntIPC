@@ -1,6 +1,7 @@
-CCSTD= -g -std=c++0x -DVIXIPCTEST -fPIC
+CCSTD= -g  -DVIXIPCTEST -fPIC
 CFLAGS = -c -Wall $(CCSTD)
-CC = g++
+CXX = g++ -std=c++0x
+CC = gcc
 
 INCLUDE=-I./include
 SRC = $(wildcard src/*.cpp)
@@ -9,31 +10,38 @@ TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
 LIBS = -lrt -L$(dir $(TARGET)) -lfuseipc
 
-BINDIR = bin
-TESTDIR= src/test
-TESTSRC=$(wildcard $(TESTDIR)/*.cpp)
-TESTOBJ=$(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(TESTSRC))
+BINDIR  = bin
+TESTDIR = src/test
+TESTSRC = $(wildcard $(TESTDIR)/*.cpp)
+TESTSRC += $(wildcard $(TESTDIR)/*.c)
+
+TESTBIN_CPP = $(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(filter %.cpp,$(TESTSRC)))
+TESTBIN_C   = $(patsubst $(TESTDIR)/%.c,$(BINDIR)/%.bin,$(filter %.c,$(TESTSRC)))
 
 
-all : $(TARGET) test $(TESTOBJ)
+all : $(TARGET)
 
 $(TARGET) :
-	test -d lib || mkdir lib
-	$(CC) $(CCSTD) -o $(TARGET) $(SRC)  $(LDFLAGS) $(INCLUDE)
+	test -d lib || ( mkdir lib && sh vixlink )
+	$(CXX) $(CCSTD) -o $(TARGET) $(SRC)  $(LDFLAGS) $(INCLUDE)
 	@cp $(TARGET) ~/lib/
 	@echo generate share library
 
 ctest :
 	test -d bin || mkdir bin
 
-test : ctest $(TESTOBJ)
+test : ctest $(TESTBIN_CPP) $(TESTBIN_C)
 
-$(TESTOBJ): 
-	$(CC) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.cpp,$@) $(INCLUDE) $(LIBS)
+$(TESTBIN_CPP) : 
+	$(CXX) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.cpp,$@)  $(INCLUDE) $(LIBS)
 
+$(TESTBIN_C) :
+	$(CC) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.c,$@)  $(INCLUDE) $(LIBS)
 
 .PHONY : clean
-clean : 
+cleantest :
+	rm -rf bin/*
+clean : cleantest
 	rm -rf lib bin $(TARGET) *.o
 
 
