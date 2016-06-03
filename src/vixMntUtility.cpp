@@ -109,22 +109,22 @@ void*
 vixMntIPC_run(void* arg)
 {
     VixMntMsgQue* vixmntmsg = VixMntMsgQue::getMsgQueInstance();
-
+    pthread_t run_tid = pthread_self();
     while(true){
 
         VixMntMsgOp msg_op;
         vixmntmsg->receiveMsgOp(&msg_op);
 
         if(msg_op == VixMntMsgOp::ERROR){
-            ILog("receive error, breaking");
+            ILog("thread ID %u, receive error, breaking",run_tid);
         }
         else if(msg_op == VixMntMsgOp::HALT){
-            ILog("stop listening, breaking");
+            ILog("thread ID %u, stop listening, breaking",run_tid);
             break;
 
         }
         else
-            ILog("receive %s",getOpValue(msg_op));
+            ILog("thread ID %u, receive %s",run_tid,getOpValue(msg_op));
 
     }
     // instance is not belong to this thread

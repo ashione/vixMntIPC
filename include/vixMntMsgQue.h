@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <mqueue.h>
+#include <semaphore.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <cstdlib>
@@ -35,9 +36,10 @@ class VixMntMsgQue {
         explicit VixMntMsgQue(const char* msg_name=NULL,bool readOnly = false);
         explicit VixMntMsgQue(mqd_t msg_id);
 
-        static VixMntMsgQue* getMsgQueInstance();
+        static VixMntMsgQue* getMsgQueInstance(sem_t* sem = NULL);
 
-        static void releaseMsgQueInstance();
+        static void releaseMsgQueInstance(sem_t* sem = NULL);
+
 
         inline mqd_t getVixMntMsgID() const {
          return this->vixMntMsgID;

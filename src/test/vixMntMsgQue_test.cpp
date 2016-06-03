@@ -139,16 +139,16 @@ main(int argc,char** argv){
         VixMntMsgData* msgre_data = new VixMntMsgData();
         myque.receiveMsg(msgre_data);
 
-        cout<<"message 1 : "<<getOpValue(msgre_data->msg_op)<<endl;
+        ILog("message 1 : %s",getOpValue(msgre_data->msg_op));
         testMsgInfo result;
-        cout<<"msg_data size : "<<msgre_data->msg_datasize<<endl;
+        ILog("msg_data size : %u",msgre_data->msg_datasize);
         memcpy(&result,msgre_data->msg_buff,sizeof(testMsgInfo));
         result.buff[result.offsize] = '\0';
-        cout<<" receiver : "<<result.offsize<<" "<<result.buff<<endl;
+        ILog(" receiver : %u %s",result.offsize,result.buff);
 
         myque.receiveMsg(msgre_data);
 
-        cout<<"message 2 : "<<getOpValue(msgre_data->msg_op)<<endl;
+        ILog("message 2 : %s",getOpValue(msgre_data->msg_op));
 
         delete msgre_data;
         VixMntMsgQue::unlink();
@@ -161,7 +161,7 @@ main(int argc,char** argv){
     ILog("msgsize : %d, maxmsg %d",tempAttr.mq_msgsize,tempAttr.mq_maxmsg);
 
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
-    char pmsg[] = "fkfdf 2 3\n";
+    char pmsg[] = "fkfdf 2 3xx 23 @#$^&*^$&%h";
     char msg[0xff];
     testMsgInfo info;
     info.offsize=strlen(pmsg);
@@ -178,7 +178,7 @@ main(int argc,char** argv){
     assert(myque.sendMsg(msgdata));
     msgdata->msg_op = VixMntMsgOp::MntInit;
     assert( myque.sendMsg(msgdata) );
-    cout<<"sender :  sizeof VixMntMsgData : "<<sizeof(VixMntMsgData)<<" msg_datasize : "<<msgdata->msg_datasize <<endl;
+    ILog("sender :  sizeof VixMntMsgData : %u  msg_datasize : ",sizeof(VixMntMsgData),msgdata->msg_datasize);
     delete msgdata;
 
     return 0;

@@ -12,35 +12,30 @@
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
-pthread_mutex_t VixMntMsgQue::vixMntMsgLock;
-
+pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
 /*
- * this static pthread_mutex_t lock maybe not work in different threads
+ * abort - > this static pthread_mutex_t lock maybe not work in different threads
  *  TODO :
- *      add mutex in share memory
+ *      add semaphore in share memory
  */
 VixMntMsgQue*
-VixMntMsgQue::getMsgQueInstance(){
-    try
-    {
-    VixMntMutex vixMutexLock(&vixMntMsgLock);
-    vixMutexLock.lock();
+VixMntMsgQue::getMsgQueInstance(sem_t *sem){
 
-        if( !vixMntMsgInstance ){
-            ILog("first init instance");
-            vixMntMsgInstance = new VixMntMsgQue();
-        }
-        else{
-            ILog("already init instance");
-        }
+    if(sem)
+        sem_wait(sem);
 
-    vixMutexLock.unlock();
+    if( vixMntMsgInstance  == NULL){
+        ILog("first init instance, thread ID %u",pthread_self());
+        ILog("mutex lock add %x",&vixMntMsgLock);
+        vixMntMsgInstance = new VixMntMsgQue();
+    }
+    else{
+        ILog("already init instance");
     }
 
-    catch ( VixMntException& e ){
+    if(sem)
+        sem_post(sem);
 
-        ELog("%s",e.what());
-    }
     return vixMntMsgInstance;
 }
 
@@ -56,30 +51,19 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     this->readOnly = readOnly;
 
     if(!msg_name){
-        //strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName);
-        //Str_Strcpy(this->vixMntMsgMapFileName , VixMntMsgQue::vixMntMsgName,Str_Strlen(VixMntMsgQue::vixMntMsgName,0x100));
         this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
     }
     else{
-        //Str_Strcpy(this->vixMntMsgMapFileName , msg_name,Str_Strlen(msg_name,0x100));
-        //strcpy(this->vixMntMsgMapFileName , msg_name);
         this->vixMntMsgMapFileName = msg_name;
     }
 
     ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
 
-    //if(!readOnly){
         this->vixMntMsgID =
             mq_open(
             this->vixMntMsgMapFileName.c_str(),
             O_CREAT | O_RDWR ,
             0644,NULL);
-    //}
-    //else{
-    //    this->vixMntMsgID =
-    //        mq_open(
-    //        this->vixMntMsgMapFileName,O_RDONLY);
-    //}
 
     if( this->vixMntMsgID < 0){
         if(errno == EEXIST){
@@ -92,7 +76,16 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
 
     assert(this->vixMntMsgID > 0);
     VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
-    ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
+
+    VixMntMutex lock(&vixMntMsgLock);
+    try{
+        lock.lock();
+        ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
+        lock.unlock();
+    }
+    catch ( VixMntException& e ){
+         ELog("%s",e.what());
+    }
 
 }
 
@@ -131,23 +124,18 @@ VixMntMsgQue::~VixMntMsgQue(){
 }
 
 void
-VixMntMsgQue::releaseMsgQueInstance(){
-    try{
+VixMntMsgQue::releaseMsgQueInstance(sem_t* sem){
+    if(sem)
+        sem_wait(sem);
 
-    VixMntMutex vixMutexLock(&vixMntMsgLock);
-    vixMutexLock.lock();
-
-        if(vixMntMsgInstance){
-            delete vixMntMsgInstance;
-            mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
-        }
-        vixMntMsgInstance = NULL;
-
-    vixMutexLock.unlock();
+    if(vixMntMsgInstance){
+        delete vixMntMsgInstance;
+        mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
     }
-    catch( VixMntException& e ){
-         ELog("%s",e.what());
-    }
+    vixMntMsgInstance = NULL;
+
+    if(sem)
+        sem_post(sem);
 
 }
 

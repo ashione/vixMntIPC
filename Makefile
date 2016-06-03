@@ -1,4 +1,4 @@
-CFLAGS = -c -g -Wall fPIC 
+CFLAGS = -g -Wall -fPIC 
 CXX = g++ -std=c++0x
 CC = gcc
 
@@ -10,38 +10,58 @@ LDFLAGS = -shared
 LIBS = -L./lib -lfuseipc -lpthread -lrt
 
 BINDIR  = bin
+OBJDIR = bin/obj
 TESTDIR = src/test
-TESTSRC = $(wildcard $(TESTDIR)/*.cpp)
-TESTSRC += $(wildcard $(TESTDIR)/*.c)
+
+TESTSRC_CPP = $(wildcard $(TESTDIR)/*.cpp)
+TESTSRC_C = $(wildcard $(TESTDIR)/*.c)
+TESTSRC = $(TESTSRC_CPP) $(TESTSRC_C)
+
+TESTOBJ_CPP = $(patsubst $(TESTDIR)/%.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(TESTSRC)))
+TESTOBJ_C = $(patsubst $(TESTDIR)/%.c,$(OBJDIR)/%.o,$(filter %.c,$(TESTSRC)))
+
+TESTOBJ = $(TESTOBJ_CPP) $(TESTOBJ_C)
 
 TESTBIN_CPP = $(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(filter %.cpp,$(TESTSRC)))
 TESTBIN_C   = $(patsubst $(TESTDIR)/%.c,$(BINDIR)/%.bin,$(filter %.c,$(TESTSRC)))
 
+TESTEXE = $(TESTBIN_CPP) $(TESTBIN_C)
+
 
 all : $(TARGET) 
-
-$(TARGET) :
-	test -d lib || ( mkdir lib && sh vixlink )
-	$(CXX) $(CCSTD) -o $(TARGET) $(SRC)  $(LDFLAGS) $(INCLUDE)
+	
+$(TARGET) : pre
+	$(CXX) $(CFLAGS) -o $(TARGET) $(SRC)  $(LDFLAGS) $(INCLUDE)
 	@cp $(TARGET) ~/lib/
-	@echo generate share library
+	@echo "generate share library"
 
-ctest :
-	test -d bin || mkdir bin
+pre :
+	test -d lib ||  mkdir lib 
+	test -d bin || ( mkdir -p bin/obj)
 
-test : ctest $(TESTBIN_CPP) $(TESTBIN_C)
+test : $(TESTEXE)
 
-$(TESTBIN_CPP) : 
-	$(CXX) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.cpp,$@)  $(INCLUDE) $(LIBS)
+$(BINDIR)/%.bin : $(OBJDIR)/%.o
+	$(CXX) $(CFLAGS) -o $@ $<  $(INCLUDE) $(LIBS)
 
-$(TESTBIN_C) :
-	$(CC) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.c,$@)  $(INCLUDE) $(LIBS)
+$(OBJDIR)/%.o : $(TESTDIR)/%.cpp
+	$(CXX) $(CFLAGS) -o $@ -c $^ $(INCLUDE) $(LIBS)
 
-.PHONY : clean
+$(OBJDIR)/%.o : $(TESTDIR)/%.c
+	$(CC) $(CFLAGS) -o $@ -c $^ $(INCLUDE) $(LIBS)
+
+
+.PHONY : clean vddk vddkclean
+
+vddk :
+	@sh vixlink
+
+vddkclean :
+	@find ./ -name \".cpp\" -type l | xargs -n1 -I{} unlink {}
 
 cleantest : 
 	rm -rf bin
 
 clean :  cleantest
-	rm -rf lib  $(TARGET) *.o
+	rm -rf lib  $(TARGET) 
 
