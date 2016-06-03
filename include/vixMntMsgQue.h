@@ -15,6 +15,7 @@
 #include <memory>
 #include <assert.h>
 #include <map>
+#include <pthread.h>
 
 #define MSG_FILENAME_LEN_MAX 256
 
@@ -33,6 +34,7 @@ class VixMntMsgQue {
     public :
         explicit VixMntMsgQue(const char* msg_name=NULL,bool readOnly = false);
         explicit VixMntMsgQue(mqd_t msg_id);
+
         static VixMntMsgQue* getMsgQueInstance();
 
         static void releaseMsgQueInstance();
@@ -62,6 +64,7 @@ class VixMntMsgQue {
         static VixMntMsgQue* vixMntMsgInstance;
         static const std::string vixMntMsgName;
         static std::map<std::string,mqd_t> vixMntMsgMap;
+        static pthread_mutex_t vixMntMsgLock;
 
     public :
         mqd_t vixMntMsgID;

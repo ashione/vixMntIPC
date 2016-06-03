@@ -1,5 +1,4 @@
-CCSTD= -g  -DVIXIPCTEST -fPIC
-CFLAGS = -c -Wall $(CCSTD)
+CFLAGS = -c -g -Wall fPIC 
 CXX = g++ -std=c++0x
 CC = gcc
 
@@ -8,7 +7,7 @@ SRC = $(wildcard src/*.cpp)
 
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
-LIBS = -lrt -L$(dir $(TARGET)) -lfuseipc
+LIBS = -L./lib -lfuseipc -lpthread -lrt
 
 BINDIR  = bin
 TESTDIR = src/test
@@ -19,7 +18,7 @@ TESTBIN_CPP = $(patsubst $(TESTDIR)/%.cpp,$(BINDIR)/%.bin,$(filter %.cpp,$(TESTS
 TESTBIN_C   = $(patsubst $(TESTDIR)/%.c,$(BINDIR)/%.bin,$(filter %.c,$(TESTSRC)))
 
 
-all : $(TARGET)
+all : $(TARGET) 
 
 $(TARGET) :
 	test -d lib || ( mkdir lib && sh vixlink )
@@ -39,9 +38,10 @@ $(TESTBIN_C) :
 	$(CC) $(CCSTD) -o $@ $(patsubst $(BINDIR)/%.bin,$(TESTDIR)/%.c,$@)  $(INCLUDE) $(LIBS)
 
 .PHONY : clean
-cleantest :
-	rm -rf bin/*
-clean : cleantest
-	rm -rf lib bin $(TARGET) *.o
 
+cleantest : 
+	rm -rf bin
+
+clean :  cleantest
+	rm -rf lib  $(TARGET) *.o
 

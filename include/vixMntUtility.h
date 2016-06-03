@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <pthread.h>
 
 
 #ifdef __cplusplus
@@ -55,6 +56,12 @@ vixMntIPC_ReadMmap(
         char* buf,
         size_t read_pos,
         size_t read_size);
+
+void*
+vixMntIPC_run(void*);
+
+pthread_t
+listening();
 
 #ifdef __cplusplus
 }

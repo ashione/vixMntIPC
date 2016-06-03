@@ -1,4 +1,7 @@
 #include <vixMntUtility.h>
+#include <vixMntMsgQue.h>
+#include <vixMntMsgOp.h>
+
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -43,9 +46,37 @@ main(){
     vixMntIPC_CleanMmap();
 
     ILog("buf len %d  -- (%s)",msg_len,buf);
-    printf("%s\n",buf);
 
-    delete buf;
+    delete[] buf;
 
+    pthread_t pid_t = listening();
+
+    VixMntMsgQue* msgque = VixMntMsgQue::getMsgQueInstance();
+    VixMntMsgQue* msgque2 = VixMntMsgQue::getMsgQueInstance();
+    VixMntMsgQue* msgque3 = VixMntMsgQue::getMsgQueInstance();
+
+    if(!pid_t){
+        ELog("error goto clean");
+        goto clean;
+    }
+
+    /*
+     * TODO :
+     *  will received ERROR when send HALT
+     */
+
+    msgque->sendMsgOp(VixMntMsgOp::MntInit);
+    msgque->sendMsgOp(VixMntMsgOp::MntWrite);
+    msgque->sendMsgOp(VixMntMsgOp::MntRead);
+
+    msgque->sendMsgOp(VixMntMsgOp::HALT);
+
+    //sleep(4);
+    pthread_join(pid_t,NULL);
+    msgque->unlink();
+
+    VixMntMsgQue::releaseMsgQueInstance();
+clean:
+    ILog("end all");
     return 0;
 }

@@ -1,6 +1,7 @@
 #include <vixMntUtility.h>
 #include <vixMntMsgQue.h>
 #include <vixMntMmap.h>
+#include <vixMntMsgOp.h>
 
 
 static VixMntMmap *mmap_instance = NULL;
@@ -27,7 +28,7 @@ vixMntLog(short level,
     va_list args;
     va_start(args,format);
     char buffer[0x100];
-    char timebuf[80];
+    char timebuf[80]="NOW";
 
     getnow(timebuf);
 
@@ -104,3 +105,45 @@ vixMntIPC_ReadMmap(
     mmap_instance->mntReadMmap(buf,read_pos,read_size);
 }
 
+void*
+vixMntIPC_run(void* arg)
+{
+    VixMntMsgQue* vixmntmsg = VixMntMsgQue::getMsgQueInstance();
+
+    while(true){
+
+        VixMntMsgOp msg_op;
+        vixmntmsg->receiveMsgOp(&msg_op);
+
+        if(msg_op == VixMntMsgOp::ERROR){
+            ILog("receive error, breaking");
+        }
+        else if(msg_op == VixMntMsgOp::HALT){
+            ILog("stop listening, breaking");
+            break;
+
+        }
+        else
+            ILog("receive %s",getOpValue(msg_op));
+
+    }
+    // instance is not belong to this thread
+    //VixMntMsgQue::releaseMsgQueInstance();
+
+    return NULL;
+}
+
+pthread_t
+listening(){
+
+    pthread_t pt_id;
+    int err = pthread_create(&pt_id,NULL,vixMntIPC_run,NULL);
+
+    if(err){
+      ELog("can't create thread");
+      return 0;
+    }
+
+    ILog("thread running, %u",pt_id);
+    return pt_id;
+}

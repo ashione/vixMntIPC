@@ -1,25 +1,47 @@
 #include <vixMntMsgQue.h>
 #include <vixMntMsgOp.h>
+#include <vixMntLock.h>
+#include <vixMntException.h>
+
 #include <assert.h>
 #include <cstdlib>
-//#include <str.h>
+#include <pthread.h>
 
-using namespace std;
 
 
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
+pthread_mutex_t VixMntMsgQue::vixMntMsgLock;
+
+/*
+ * this static pthread_mutex_t lock maybe not work in different threads
+ *  TODO :
+ *      add mutex in share memory
+ */
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(){
+    try
+    {
+    VixMntMutex vixMutexLock(&vixMntMsgLock);
+    vixMutexLock.lock();
 
-        if( vixMntMsgInstance ){
-            return vixMntMsgInstance;
+        if( !vixMntMsgInstance ){
+            ILog("first init instance");
+            vixMntMsgInstance = new VixMntMsgQue();
+        }
+        else{
+            ILog("already init instance");
         }
 
-        vixMntMsgInstance = new VixMntMsgQue();
+    vixMutexLock.unlock();
+    }
 
-        return vixMntMsgInstance;
+    catch ( VixMntException& e ){
+
+        ELog("%s",e.what());
+    }
+    return vixMntMsgInstance;
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
@@ -110,11 +132,22 @@ VixMntMsgQue::~VixMntMsgQue(){
 
 void
 VixMntMsgQue::releaseMsgQueInstance(){
-    if(vixMntMsgInstance){
-        delete vixMntMsgInstance;
-        mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
+    try{
+
+    VixMntMutex vixMutexLock(&vixMntMsgLock);
+    vixMutexLock.lock();
+
+        if(vixMntMsgInstance){
+            delete vixMntMsgInstance;
+            mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
+        }
+        vixMntMsgInstance = NULL;
+
+    vixMutexLock.unlock();
     }
-    vixMntMsgInstance = NULL;
+    catch( VixMntException& e ){
+         ELog("%s",e.what());
+    }
 
 }
 
@@ -142,6 +175,10 @@ bool
 VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
         unsigned msg_prio)
 {
+    /*
+     * bug : if op equal to ERROR
+     */
+    assert(msg_op != VixMntMsgOp::ERROR);
     const char* msg_str = getOpValue(msg_op);
     return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
 }
@@ -153,23 +190,34 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
      this->getattr(&this->vixMntMsgAttr);
 
      char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
+    // if not memeset, it may be old value
+     memset(buf,0,this->vixMntMsgAttr.mq_msgsize);
 
      if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) < 0 )
          *msg_op = VixMntMsgOp::ERROR;
      else
          *msg_op = getOpIndex(buf);
 
-     delete buf;
+     delete[] buf;
 
 }
 
+/*
+ * @input parma : msg_data
+ * @input parma : msg_prio
+ * @ouput bool : send msg is ok if return true
+ *
+ */
 bool
 VixMntMsgQue::sendMsg(VixMntMsgData* msg_data,
                       unsigned msg_prio)
 {
     char *buf = new char[sizeof(VixMntMsgData)];
     memcpy(buf,msg_data,sizeof(VixMntMsgData));
-    return send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+    bool flag = send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+    delete[] buf;
+
+    return flag;
 
 }
 
@@ -198,6 +246,6 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
         memcpy(msg_data,buf,sizeof(VixMntMsgData));
     }
 
-    delete buf;
+    delete[] buf;
 
 }
