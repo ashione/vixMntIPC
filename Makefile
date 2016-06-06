@@ -1,13 +1,14 @@
-CFLAGS = -g -Wall -fPIC 
+CFLAGS = -g -Wall -fPIC -D_FILE_OFFSET_BITS=64
 CXX = g++ -std=c++0x
 CC = gcc
 
-INCLUDE=-I./include
+FUSEROOT=/mts/home4/nzuo/workspace/download/libfuse
+INCLUDE=-I./include  -I$(FUSEROOT)/include
 SRC = $(wildcard src/*.cpp)
 
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
-LIBS = -L./lib -lfuseipc -lpthread -lrt
+LIBS = -L./lib -L$(FUSEROOT)/lib/.libs -lfuseipc -lpthread -lrt -lfuse3
 
 BINDIR  = bin
 OBJDIR = bin/obj
