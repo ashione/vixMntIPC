@@ -3,13 +3,8 @@
 
 //static VixMntMmap *mmap_instance = NULL;
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <sys/types.h>
-#include <string.h>
-#include <time.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <pthread.h>
 
 
@@ -24,6 +19,12 @@ extern "C" {
 #define ELog(format,...) vixMntLog(2,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
 #define FLog(format,...) vixMntLog(3,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
+
+int
+isDirectoryExist(const char* path);
+
+int
+makeDirectoryHierarchy(const char *path);
 
 void
 vixMntLog(short level,

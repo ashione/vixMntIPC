@@ -6,16 +6,29 @@
 
 
 int
-VixMntFuseMount(const char* mountpoint){
-    int argc = 5;
+VixMntFuseMount(const char *mountpoint){
+    int argc = 7;
+    /*
+     * usage : mountpoint [-d] [-o xxxx]
+     */
     char* argv[] = {
         FAKE_FUSE_PROGRAM_NAME,
-        //mountpoint,
-        "/mnt",
+        FUSE_VAR_DIR,
         "-d",
-        "-o allow_other",
-        "-o nonempty",
+        "-o",
+        "allow_other",
+        "-o",
+        "nonempty",
     };
+
+    //makeDirectoryHierarchy(FUSE_VAR_DIR);
+    if(isDirectoryExist(mountpoint)){
+        ILog("mounpoint %s is exist",mountpoint);
+    }
+    else{
+        ILog("create directory %s",mountpoint);
+        makeDirectoryHierarchy(mountpoint);
+    }
 /*
     struct fuse *fuse;
     int res;

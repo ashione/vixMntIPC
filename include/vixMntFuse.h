@@ -9,7 +9,10 @@
 extern "C" {
 #endif
 
-#define FAKE_FUSE_PROGRAM_NAME "fusemountIPClib"
+#define FAKE_FUSE_PROGRAM_NAME  "fusemountIPClib"
+#define FUSE_VAR_DIR            "/var/run/vmware/fuse"
+#define FALT_FILE_FILE_NAME     "flat"
+#define METADATA_EXTN_STR       "info"
 
 
 //int

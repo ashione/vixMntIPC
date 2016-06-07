@@ -3,6 +3,13 @@
 #include <vixMntMmap.h>
 #include <vixMntMsgOp.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <time.h>
+#include <string>
 
 static VixMntMmap *mmap_instance = NULL;
 /*
@@ -146,4 +153,50 @@ listening(){
 
     ILog("thread running, %u",pt_id);
     return pt_id;
+}
+
+int
+isDirectoryExist(const char* path){
+
+   struct stat info;
+
+   if( stat(path,&info) )
+       return false;
+
+   return ( info.st_mode & S_IFDIR ) !=0;
+
+}
+
+int makeDirectoryHierarchy( const char *path ){
+
+     mode_t mode = 0666;
+     std::string spath(path);
+
+     int status = mkdir(spath.c_str(),mode);
+
+     if (!status )
+         return true;
+
+     switch ( errno ){
+         case ENOENT :
+           {
+               size_t pos = spath.find_last_of('/');
+               if(pos == std::string::npos)
+                   pos = spath.find_last_of('\\');
+
+               if(pos == std::string::npos)
+                    return false;
+
+               if(!makeDirectoryHierarchy(spath.substr(0,pos).c_str()))
+                   return false;
+
+           }
+        case EEXIST :
+           return isDirectoryExist(path);
+
+        default :
+           return false;
+     }
+
+
 }
