@@ -190,6 +190,9 @@ int makeDirectoryHierarchy( const char *path ){
                if(!makeDirectoryHierarchy(spath.substr(0,pos).c_str()))
                    return false;
 
+               int status = mkdir(spath.c_str(),mode);
+               return !status;
+
            }
         case EEXIST :
            return isDirectoryExist(path);
