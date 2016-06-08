@@ -5,8 +5,10 @@
 #include <sys/types.h>
 #include <cstring>
 #include <memory>
-//#include "fuse_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define VIXMNT_FILENAME_MAXLEN 256
 #define VIXMNT_TRANSPORT_BUF_MAXLEN 4096
@@ -25,9 +27,6 @@
 
 #define def_SHARE(classname,inst) std::shared_ptr<classname> inst
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 class VixMntOpBase{
 
@@ -49,7 +48,7 @@ class VixMntOpBase{
 class VixMntOpRead : public VixMntOpBase{
 
     public :
-        explicit VixMntOpRead(const char*,char* ,size_t,off_t);
+        explicit VixMntOpRead( const char*, size_t, off_t);
         explicit VixMntOpRead(){};
         BREW_CONVERTOR(VixMntOpRead)
 
@@ -58,13 +57,26 @@ class VixMntOpRead : public VixMntOpBase{
         //def_SHARE(char*, buf);
         char fileName[VIXMNT_FILENAME_MAXLEN];
         //char buf[VIXMNT_TRANSPORT_BUF_MAXLEN];
-        char* buf;
+        //char* buf;
         size_t bufsize;
         off_t offsize;
 };
 
+class VixMntOpWrite : public VixMntOpBase{
+
+    public :
+        explicit VixMntOpWrite( const char*, size_t, off_t);
+        explicit VixMntOpWrite(){};
+        BREW_CONVERTOR(VixMntOpWrite)
+
+    public :
+        char fileName[VIXMNT_FILENAME_MAXLEN];
+        size_t bufsize;
+        off_t offsize;
+};
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif // VIXMNT_OPERATION_H

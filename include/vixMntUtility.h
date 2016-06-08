@@ -6,10 +6,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pthread.h>
+//#include <string>
+
+#define MAX_RANDOM_LEN 10
+#define STR_RANDOM_NUM_LEN 62
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 #define ILog(format,...) vixMntLog(0,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
@@ -18,6 +23,7 @@ extern "C" {
 #define ELog(format,...) vixMntLog(2,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
 
 #define FLog(format,...) vixMntLog(3,getpid(),__LINE__,__func__,__FILE__,format,##__VA_ARGS__)
+
 
 int
 isDirectoryExist(const char* path);
@@ -60,6 +66,10 @@ vixMntIPC_ReadMmap(
 void*
 vixMntIPC_run(void*);
 
+const char*
+getRandomFileName(
+        const char*,
+        size_t max_random_len);
 
 pthread_t
 listening();
@@ -67,5 +77,6 @@ listening();
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif //VIXMNTUTILITY_H

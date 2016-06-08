@@ -100,7 +100,7 @@ main(int argc,char** args){
 
     for(int i=0 ; i <testNum ; ++i){
         ILog("shm p_addr : %x",testmap->getDataAddr());
-        memset(msg,random_str[rand()%MMAP_MAX_RANDOM],msg_len);
+        memset(msg,random_str[rand()%STR_RANDOM_NUM_LEN],msg_len);
         gettimeofday(&startTime,NULL);
 
         testmap->mntWriteMmap(msg);

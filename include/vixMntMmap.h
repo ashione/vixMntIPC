@@ -9,7 +9,6 @@
 #include <memory>
 #include <string>
 
-#define MMAP_MAX_RANDOM 10
 #define MMAP_PAGE_SIZE sysconf(_SC_PAGESIZE)
 
 /*
@@ -54,10 +53,6 @@ class VixMntMmap{
 
 };
 
-std::string
-getRandomFileName(
-        std::string rootPath,
-        size_t max_random_len = MMAP_MAX_RANDOM);
 
 #ifdef __cplusplus
 }

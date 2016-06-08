@@ -17,9 +17,6 @@ extern "C" {
 #define METADATA_EXTN_STR       "info"
 
 
-//int
-//vixmntfusemount(int argc, char* argv[]);
-
 int
 VixMntFuseMount(const char*);
 
@@ -29,18 +26,12 @@ FuseMntInit(fuse_conn_info*);
 int
 FuseMntGetattr(
         const char *path,
-        struct stat *stbuf)
-{
-    return 0;
-}
+        struct stat *stbuf);
 
 int
 FuseMntAccess(
         const char *path,
-        int mask)
-{
-     return 0;;
-}
+        int mask);
 
 int
 FuseMntReaddir(
@@ -48,19 +39,14 @@ FuseMntReaddir(
          void *buf,
          fuse_fill_dir_t filler,
          off_t offset,
-         struct fuse_file_info *fi)
-{
-    return 0;
-}
+         struct fuse_file_info *fi,
+         fuse_readdir_flags);
 
 int
 FuseMntFsync(
          const char *path,
          int isdatasync,
-         struct fuse_file_info *fi)
-{
-    return 0;
-}
+         struct fuse_file_info *fi);
 
 int
 FuseMntRead(
@@ -68,10 +54,7 @@ FuseMntRead(
          char *buf,
          size_t size,
          off_t offset,
-         struct fuse_file_info *fi = NULL)
-{
-    return size;
-}
+         struct fuse_file_info *fi = NULL);
 
 int
 FuseMntWrite(
@@ -79,10 +62,7 @@ FuseMntWrite(
         const char *buf,
         size_t size,
         off_t offset,
-        struct fuse_file_info *fi = NULL)
-{
-     return size;
-}
+        struct fuse_file_info *fi = NULL);
 
 VixError
 FuseMnt_DiskLib_Read(
@@ -103,8 +83,8 @@ struct fuse_mntIPC_operations :  fuse_operations
     fuse_mntIPC_operations(){
         init = FuseMntInit;
         getattr = FuseMntGetattr;
-        //access = FuseMntAccess;
-        //readdir = FuseMntReaddir;
+        access = FuseMntAccess;
+        readdir = FuseMntReaddir;
         read = FuseMntRead;
         write = FuseMntWrite;
         fsync = FuseMntFsync;

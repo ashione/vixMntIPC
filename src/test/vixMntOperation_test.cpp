@@ -18,7 +18,7 @@ main(int argc,char** argv){
     if( pid == 0  ){
 
         char buf[] = "ashione";
-        VixMntOpRead t("/tmp",buf,3,2);
+        VixMntOpRead t("/tmp",3,2);
         ILog("OpRead struct size : %ld %d %ld",sizeof(VixMntOpRead),t.size(),sizeof(t));
         ILog("buf addr : %x %s\n",( long )buf,buf);
         VixMntMsgQue* msgQue = new VixMntMsgQue("/op");
@@ -43,7 +43,7 @@ main(int argc,char** argv){
 
     VixMntOpRead* rt = new VixMntOpRead();
     rt->convertFromBytes(msgdata->msg_buff);
-    ILog("%s %x %s\n",rt->fileName,rt->buf,rt->buf);
+    ILog("%s\n",rt->fileName);
     delete msgQue;
     VixMntMsgQue::unlink();
 

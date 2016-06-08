@@ -9,7 +9,9 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <time.h>
-#include <string>
+
+const char* random_str =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 static VixMntMmap *mmap_instance = NULL;
 /*
@@ -216,4 +218,16 @@ int makeDirectoryHierarchy( const char *path ){
      }
 
 
+}
+
+const char*
+getRandomFileName(const char* rootPath,size_t max_random_len){
+    srand((unsigned) time(NULL));
+
+    std::string rfile_name = rootPath;
+    for(size_t i = 0 ; i < max_random_len - 1 ; ++i){
+        rfile_name+= random_str[rand()%STR_RANDOM_NUM_LEN];
+    }
+    rfile_name += '\0';
+    return rfile_name.c_str();
 }
