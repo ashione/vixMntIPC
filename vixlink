@@ -1,4 +1,46 @@
 #!/bin/bash
-for i in `ls src/*.cpp`; do
-    ln -sf $i `basename $i`
-done
+
+function link()
+{
+    for i in `ls src/*.cpp`; do
+        ln -sf $i `basename $i`
+    done
+
+    for i in `ls include/*.h`; do
+        ln -sf $i `basename $i`
+    done
+}
+
+function un_link()
+{
+    for i in `find ./ -name "vix*" -type l`; do
+        unlink $i
+    done
+}
+
+function help()
+{
+    echo "usage : xx [ -l -u ] [ -h ]"
+    echo " -h : show help information"
+    echo " -l : link all files"
+    echo " -u : unlink all sources and include files"
+}
+
+if [ $# -gt 0 ]  
+then
+    if [ $1 == "-u" ] 
+    then
+        un_link
+        echo "unlink all sources and include files"
+    elif  [ $1 == "-l" ]
+    then
+        link
+        echo "link all sources"
+    else
+        help
+    fi
+else
+    help
+fi
+    
+
