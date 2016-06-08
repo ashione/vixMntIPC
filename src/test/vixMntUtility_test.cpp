@@ -76,13 +76,19 @@ main(){
      *  will received ERROR when send HALT
      */
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
     msgque->sendMsgOp(VixMntMsgOp::MntInit);
     msgque->sendMsgOp(VixMntMsgOp::MntWrite);
     msgque->sendMsgOp(VixMntMsgOp::MntRead);
-
     msgque->sendMsgOp(VixMntMsgOp::HALT);
-
     msgque->sendMsgOp(VixMntMsgOp::HALT);
+#else
+    msgque->sendMsgOp(MntInit);
+    msgque->sendMsgOp(MntWrite);
+    msgque->sendMsgOp(MntRead);
+    msgque->sendMsgOp(HALT);
+    msgque->sendMsgOp(HALT);
+#endif
 
     //sleep(4);
     pthread_join(pid_t,NULL);

@@ -166,7 +166,11 @@ VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
     /*
      * bug : if op equal to ERROR
      */
+#if defined(__cplusplus) && __cplusplus >= 201103L
     assert(msg_op != VixMntMsgOp::ERROR);
+#else
+    assert(msg_op != ERROR);
+#endif
     const char* msg_str = getOpValue(msg_op);
     return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
 }
@@ -182,7 +186,11 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp* msg_op,
      memset(buf,0,this->vixMntMsgAttr.mq_msgsize);
 
      if( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) < 0 )
+#if defined(__cplusplus) && __cplusplus >= 201103L
          *msg_op = VixMntMsgOp::ERROR;
+#else
+         *msg_op = ERROR;
+#endif
      else
          *msg_op = getOpIndex(buf);
 
@@ -228,7 +236,11 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
     if( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ){
         ELog("receive error");
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
         msg_data->msg_op = VixMntMsgOp::ERROR;
+#else
+        msg_data->msg_op = ERROR;
+#endif
     }
     else{
         memcpy(msg_data,buf,sizeof(VixMntMsgData));

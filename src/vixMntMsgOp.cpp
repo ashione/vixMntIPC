@@ -17,7 +17,11 @@ VIXMNT_MSG_OP_STR[OP_MODE_NUM] = {
 bool
 operator== (VixMntMsgOp op, const char* cstr_op){
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
     if(op != VixMntMsgOp::ERROR)
+#else
+    if( op != ERROR )
+#endif
         return !strcmp(cstr_op,getOpValue(op));
     return false;
 }
@@ -30,7 +34,11 @@ operator== (VixMntMsgOp op, std::string str_op) {
 const char*
 getOpValue(VixMntMsgOp op){
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
     if( op == VixMntMsgOp::ERROR )
+#else
+    if( op == ERROR )
+#endif
         return NULL;
     return VIXMNT_MSG_OP_STR[(short)op];
 }
@@ -39,6 +47,7 @@ VixMntMsgOp
 getOpIndex(const char* str_op){
 
     VixMntMsgOp test_op[OP_MODE_NUM] = {
+#if defined(__cplusplus) && __cplusplus >= 201103L
         VixMntMsgOp::MntInit,
         VixMntMsgOp::MntInitDone,
         VixMntMsgOp::MntWrite,
@@ -46,15 +55,29 @@ getOpIndex(const char* str_op){
         VixMntMsgOp::MntRead,
         VixMntMsgOp::MntReadDone,
         VixMntMsgOp::HALT
+#else
+        MntInit,
+        MntInitDone,
+        MntWrite,
+        MntWriteDone,
+        MntRead,
+        MntReadDone,
+        HALT
+#endif
 
     };
+
 
     for(int i = 0 ; i < OP_MODE_NUM ; ++i){
         if(test_op[i] == str_op)
             return test_op[i];
     }
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
     return VixMntMsgOp::ERROR;
+#else
+    return ERROR;
+#endif
 
 }
 

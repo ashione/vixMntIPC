@@ -3,8 +3,6 @@
 
 #include <cassert>
 
-
-
 int
 VixMntFuseMount(const char *mountpoint){
     int argc = 7;
@@ -66,4 +64,32 @@ VixMntFuseMount(const char *mountpoint){
 */
     fuse_main(argc,argv,&fuse_oper,NULL);
     return 0;
+}
+
+void*
+FuseMntInit(fuse_conn_info* fi){
+    return NULL;
+}
+VixError
+FuseMnt_DiskLib_Read(
+        VixDiskLibHandle vixHandle,
+        VixDiskLibSectorType startSector,
+        VixDiskLibSectorType numSectors,
+        uint8 *readBuffer)
+{
+
+    return VixDiskLib_Read(vixHandle,startSector,
+                    numSectors,readBuffer);
+}
+
+VixError
+FuseMnt_DiskLib_Write(
+        VixDiskLibHandle vixHandle,
+        VixDiskLibSectorType startSector,
+        VixDiskLibSectorType numSectors,
+        uint8 *readBuffer)
+{
+
+    return VixDiskLib_Write(vixHandle,startSector,
+                    numSectors,readBuffer);
 }

@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +59,7 @@ vixMntIPC_ReadMmap(
 
 void*
 vixMntIPC_run(void*);
+
 
 pthread_t
 listening();

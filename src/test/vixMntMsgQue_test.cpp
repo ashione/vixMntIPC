@@ -162,7 +162,7 @@ main(int argc,char** argv){
 
     //VixMntMsgQue* myque= VixMntMsgQue::getMsgQueInstance();
     char pmsg[] = "fkfdf 2 3xx 23 @#$^&*^$&%h";
-    char msg[0xff];
+    //char msg[0xff];
     testMsgInfo info;
     info.offsize=strlen(pmsg);
 
@@ -170,13 +170,22 @@ main(int argc,char** argv){
 
     VixMntMsgData* msgdata = new VixMntMsgData();
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
     msgdata->msg_op = VixMntMsgOp::MntWrite;
+#else
+    msgdata->msg_op = MntWrite;
+#endif
+
     msgdata->msg_datasize = sizeof(testMsgInfo);
 
     memcpy(msgdata->msg_buff,&info,sizeof(testMsgInfo));
 
     assert(myque.sendMsg(msgdata));
+#if defined(__cplusplus) && __cplusplus >= 201103L
     msgdata->msg_op = VixMntMsgOp::MntInit;
+#else
+    msgdata->msg_op = MntInit;
+#endif
     assert( myque.sendMsg(msgdata) );
     ILog("sender :  sizeof VixMntMsgData : %u  msg_datasize : ",sizeof(VixMntMsgData),msgdata->msg_datasize);
     delete msgdata;

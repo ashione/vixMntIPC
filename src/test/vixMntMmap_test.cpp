@@ -52,7 +52,11 @@ child_receiver(){
         ILog("receiver change buff[0] to %c",buff[0]);
         testmap->mntWriteMmap(buff);
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
         if(resultMsgQSender->sendMsgOp(VixMntMsgOp::MntWriteDone))
+#else
+        if(resultMsgQSender->sendMsgOp(MntWriteDone))
+#endif
         {
             ILog("send msgOp writedone OK");
         }
@@ -111,7 +115,11 @@ main(int argc,char** args){
         memcpy(buf,&startTime,sizeof(struct timeval));
         mqd_t resultMsgQId = resultMsgQ->getVixMntMsgID();
         memcpy(buf+sizeof(struct timeval),msg_name,strlen(msg_name));
+#if defined(__cplusplus) && __cplusplus >= 201103L
         VixMntMsgData* timeMsg = new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof(struct timeval)+strlen(msg_name),buf);
+#else
+        VixMntMsgData* timeMsg = new VixMntMsgData(MntWrite,sizeof(struct timeval)+strlen(msg_name),buf);
+#endif
 
         myque->sendMsg(timeMsg);
 
@@ -119,7 +127,12 @@ main(int argc,char** args){
         VixMntMsgOp* resultOp = new VixMntMsgOp();
         resultMsgQ->receiveMsgOp(resultOp);
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
         if(*resultOp != VixMntMsgOp::ERROR){
+#else
+        if(*resultOp != ERROR){
+#endif
+
             ILog("op %s\n",getOpValue(*resultOp));
             testmap->mntReadMmap(msg);
             ILog("share memory show changed bit %c",msg[0]);
@@ -128,7 +141,7 @@ main(int argc,char** args){
              ILog("vixMntMsgOp : Error\n");
         }
 
-        delete buf;
+        delete[] buf;
         delete resultOp;
         delete resultMsgQ;
     }

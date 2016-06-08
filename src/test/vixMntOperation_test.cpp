@@ -22,7 +22,11 @@ main(int argc,char** argv){
         ILog("OpRead struct size : %ld %d %ld",sizeof(VixMntOpRead),t.size(),sizeof(t));
         ILog("buf addr : %x %s\n",( long )buf,buf);
         VixMntMsgQue* msgQue = new VixMntMsgQue("/op");
+#if defined(__cplusplus) && __cplusplus >= 201103L
         VixMntMsgData* msgdata = new VixMntMsgData(VixMntMsgOp::MntInit,sizeof(t),(char *)&t);
+#else
+        VixMntMsgData* msgdata = new VixMntMsgData(MntInit,sizeof(t),(char *)&t);
+#endif
         msgQue->sendMsg(msgdata);
         ILog("send ok\n");
         delete msgQue;

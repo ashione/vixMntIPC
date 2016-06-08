@@ -122,10 +122,19 @@ vixMntIPC_run(void* arg)
         VixMntMsgOp msg_op;
         vixmntmsg->receiveMsgOp(&msg_op);
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
         if(msg_op == VixMntMsgOp::ERROR){
+#else
+        if(msg_op == ERROR){
+#endif
             ILog("thread ID %u, receive error, breaking",run_tid);
         }
+#if defined(__cplusplus) && __cplusplus >= 201103L
         else if(msg_op == VixMntMsgOp::HALT){
+#else
+        else if(msg_op == HALT) {
+#endif
+
             ILog("thread ID %u, stop listening, breaking",run_tid);
             break;
 
@@ -166,6 +175,11 @@ isDirectoryExist(const char* path){
    return ( info.st_mode & S_IFDIR ) !=0;
 
 }
+
+/*
+ * check path was created.
+ * If it's not, create whole path by hierarchy
+ */
 
 int makeDirectoryHierarchy( const char *path ){
 

@@ -1,9 +1,11 @@
 #ifndef VIXMNTFUSE_H
 #define VIXMNTFUSE_H
 
+
 #define FUSE_USE_VERSION 30
 #include <fuse.h>
 #include <stdlib.h>
+#include <vixDiskLib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,10 +24,7 @@ int
 VixMntFuseMount(const char*);
 
 void*
-FuseMntInit(void){
-
-    return NULL;
-};
+FuseMntInit(fuse_conn_info*);
 
 int
 FuseMntGetattr(
@@ -85,10 +84,24 @@ FuseMntWrite(
      return size;
 }
 
+VixError
+FuseMnt_DiskLib_Read(
+        VixDiskLibHandle vixHandle,
+        VixDiskLibSectorType startSector,
+        VixDiskLibSectorType numSectors,
+        uint8 *readBuffer);
+
+VixError
+FuseMnt_DiskLib_Write(
+        VixDiskLibHandle vixHandle,
+        VixDiskLibSectorType startSector,
+        VixDiskLibSectorType numSectors,
+        uint8 *readBuffer);
+
 struct fuse_mntIPC_operations :  fuse_operations
 {
     fuse_mntIPC_operations(){
-        //init = FuseMntInit;
+        init = FuseMntInit;
         getattr = FuseMntGetattr;
         //access = FuseMntAccess;
         //readdir = FuseMntReaddir;
