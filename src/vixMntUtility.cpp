@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/time.h>
 
 const char* random_str =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -58,7 +59,11 @@ void getnow(char* buffer){
     struct tm* timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,80,"%X|%F",timeinfo);
+    strftime(buffer,40,"%F %H:%M:%S",timeinfo);
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    float us = tp.tv_usec;
+    snprintf(buffer+strlen(buffer),10,":%06.f",us);
 
 }
 

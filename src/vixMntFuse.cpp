@@ -99,8 +99,26 @@ FuseMntRead(
 #endif
     fuseMsgQue->sendMsg(opReadMsgData);
 
+    const char* readMsgQName = getRandomFileName("/read",10);
+    VixMntMsgQue readMsgQ(readMsgQName);
     delete opReadMsgData;
-    return size;
+
+    VixMntMsgData readMsgResult;
+    readMsgQ.receiveMsg(&readMsgResult);
+    // the received result data containing result op msg and result size
+#if defined(__cplusplus) && __cplusplus >= 201103L
+    if ( readMsgResult.msg_op == VixMntMsgOp::MntReadDone ){
+#else
+    if ( readMsgResult.msg_op  == MntReadDone ){
+#endif
+        size_t sizeResult;
+        memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
+        vixMntIPC_ReadMmap(buf,0,sizeResult);
+
+        return sizeResult;
+    }
+    WLog("addr %u, size %u,read %s error",offset,size,path);
+    return 0;
 }
 
 int
@@ -111,7 +129,36 @@ FuseMntWrite(
         off_t offset,
         struct fuse_file_info *fi )
 {
-     return size;
+
+    vixMntIPC_WriteMmap(buf,0,size);
+
+    VixMntOpWrite opWrite(path,size,offset);
+    VixMntMsgData *opWriteMsgData =
+#if defined(__cplusplus) && __cplusplus >= 201103L
+        new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof opWrite,&opWrite);
+#else
+        new VixMntMsgData(MntWrite,sizeof opWrite,(char *)&opWrite);
+#endif
+    fuseMsgQue->sendMsg(opWriteMsgData);
+
+    const char* writeMsgQName = getRandomFileName("/write",10);
+    VixMntMsgQue writeMsgQ(writeMsgQName);
+    delete opWriteMsgData;
+
+    VixMntMsgData writeMsgResult;
+    writeMsgQ.receiveMsg(&writeMsgResult);
+    // the received result data containing result op msg and result size
+#if defined(__cplusplus) && __cplusplus >= 201103L
+    if ( writeMsgResult.msg_op == VixMntMsgOp::MntWriteDone ){
+#else
+    if ( writeMsgResult.msg_op  == MntWriteDone ){
+#endif
+        size_t sizeResult;
+        memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
+        return sizeResult;
+    }
+    WLog("addr %u, size %u,write %s error",offset,size,path);
+    return 0;
 }
 
 VixError
