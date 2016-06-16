@@ -2,6 +2,7 @@
 #define VIXMNTUTILITY_H
 
 //static VixMntMmap *mmap_instance = NULL;
+#include <vixDiskLib.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -66,10 +67,25 @@ vixMntIPC_ReadMmap(
 void*
 vixMntIPC_run(void*);
 
+int
+vixMntIPC_DiskRead(
+        VixDiskLibHandle vixHandle,
+        VixMntMsgData* msg_data);
+int
+vixMntIPC_DiskWrite(
+        VixDiskLibHandle vixHandle,
+        VixMntMsgData* msg_data);
+
+int
+vixMntIPC_DiskGetInfo(VixDiskLibHandle vixHandle);
+
 const char*
 getRandomFileName(
         const char*,
         size_t max_random_len);
+
+pthread_t
+vixMntIPC_listen(VixDiskLibHandle vixHandle);
 
 pthread_t
 listening();

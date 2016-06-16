@@ -123,11 +123,20 @@ void*
 vixMntIPC_run(void* arg)
 {
     VixMntMsgQue* vixmntmsg = VixMntMsgQue::getMsgQueInstance();
+    VixDiskLibHandle vixHandle = (VixDiskLibHandle) arg;
+
+    assert(vixHandle);
+    ILog("tranfer arg to vixHandle");
+
     pthread_t run_tid = pthread_self();
     while(true){
 
         VixMntMsgOp msg_op;
-        vixmntmsg->receiveMsgOp(&msg_op);
+        VixMntMsgData msg_data;
+        vixmntmsg->receiveMsg(&msg_data);
+        msg_op = msg_data.msg_op;
+
+        //vixmntmsg->receiveMsgOp(&msg_op);
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
         if(msg_op == VixMntMsgOp::ERROR){
@@ -161,6 +170,21 @@ listening(){
 
     pthread_t pt_id;
     int err = pthread_create(&pt_id,NULL,vixMntIPC_run,NULL);
+
+    if(err){
+      ELog("can't create thread");
+      return 0;
+    }
+
+    ILog("thread running, %u",pt_id);
+    return pt_id;
+}
+
+pthread_t
+vixMntIPC_listen(VixDiskLibHandle vixHandle){
+
+    pthread_t pt_id;
+    int err = pthread_create(&pt_id,NULL,vixMntIPC_run,(void *)vixHandle);
 
     if(err){
       ELog("can't create thread");
