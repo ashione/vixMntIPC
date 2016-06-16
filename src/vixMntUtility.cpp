@@ -260,3 +260,10 @@ getRandomFileName(const char* rootPath,size_t max_random_len){
     rfile_name += '\0';
     return rfile_name.c_str();
 }
+
+std::string getErrorMsg(VixError vixError){
+    char* msg = VixDiskLib_GetErrorText(vixError,NULL);
+    std::string descp = msg;
+    VixDiskLib_FreeErrorText(msg);
+    return descp;
+}

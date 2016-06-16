@@ -7,7 +7,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pthread.h>
-//#include <string>
+
+#include <string>
 
 #define MAX_RANDOM_LEN 10
 #define STR_RANDOM_NUM_LEN 62
@@ -67,17 +68,6 @@ vixMntIPC_ReadMmap(
 void*
 vixMntIPC_run(void*);
 
-int
-vixMntIPC_DiskRead(
-        VixDiskLibHandle vixHandle,
-        VixMntMsgData* msg_data);
-int
-vixMntIPC_DiskWrite(
-        VixDiskLibHandle vixHandle,
-        VixMntMsgData* msg_data);
-
-int
-vixMntIPC_DiskGetInfo(VixDiskLibHandle vixHandle);
 
 const char*
 getRandomFileName(
@@ -90,9 +80,11 @@ vixMntIPC_listen(VixDiskLibHandle vixHandle);
 pthread_t
 listening();
 
+
 #ifdef __cplusplus
 }
 #endif
 
+std::string getErrorMsg(VixError vixError);
 
 #endif //VIXMNTUTILITY_H

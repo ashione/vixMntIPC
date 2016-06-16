@@ -81,7 +81,8 @@ getOpIndex(const char* str_op){
 
 }
 
-VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+VixMntMsgData::VixMntMsgData(
+        VixMntMsgOp msg_op,
         size_t msg_datasize,
         char* msg_buff)
 {
@@ -91,9 +92,20 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
 }
 
 // using this only when msg_buff is string
-VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+VixMntMsgData::VixMntMsgData(
+        VixMntMsgOp msg_op,
         char* msg_buff)
 {
     size_t msg_len = strlen(msg_buff);
     VixMntMsgData(msg_op,msg_len,msg_buff);
+}
+
+VixMntMsgData::VixMntMsgData(
+        VixMntMsgOp msg_op,
+        size_t msg_datasize,
+        const char* msg_q_name,
+        char* msg_buff)
+{
+    strncpy(msg_response_q,msg_q_name,strlen(msg_q_name));
+    VixMntMsgData(msg_op,msg_datasize,msg_buff);
 }

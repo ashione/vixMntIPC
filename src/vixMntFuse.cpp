@@ -91,17 +91,18 @@ FuseMntRead(
          struct fuse_file_info *fi )
 {
     VixMntOpRead opRead(path,size,offset);
+    const char* readMsgQName = getRandomFileName("/read",10);
     VixMntMsgData *opReadMsgData =
 #if defined(__cplusplus) && __cplusplus >= 201103L
-        new VixMntMsgData(VixMntMsgOp::MntRead,sizeof opRead,&opRead);
+        new VixMntMsgData(VixMntMsgOp::MntRead,sizeof opRead,readMsgQName,&opRead);
 #else
-        new VixMntMsgData(MntRead,sizeof opRead,(char *)&opRead);
+        new VixMntMsgData(MntRead,sizeof opRead,readMsgQName,(char *)&opRead);
 #endif
     fuseMsgQue->sendMsg(opReadMsgData);
 
-    const char* readMsgQName = getRandomFileName("/read",10);
-    VixMntMsgQue readMsgQ(readMsgQName);
     delete opReadMsgData;
+
+    VixMntMsgQue readMsgQ(readMsgQName);
 
     VixMntMsgData readMsgResult;
     readMsgQ.receiveMsg(&readMsgResult);
@@ -133,15 +134,15 @@ FuseMntWrite(
     vixMntIPC_WriteMmap(buf,0,size);
 
     VixMntOpWrite opWrite(path,size,offset);
+    const char* writeMsgQName = getRandomFileName("/write",10);
     VixMntMsgData *opWriteMsgData =
 #if defined(__cplusplus) && __cplusplus >= 201103L
-        new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof opWrite,&opWrite);
+        new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof opWrite,writeMsgQName,&opWrite);
 #else
-        new VixMntMsgData(MntWrite,sizeof opWrite,(char *)&opWrite);
+        new VixMntMsgData(MntWrite,sizeof opWrite,writeMsgQName,(char *)&opWrite);
 #endif
     fuseMsgQue->sendMsg(opWriteMsgData);
 
-    const char* writeMsgQName = getRandomFileName("/write",10);
     VixMntMsgQue writeMsgQ(writeMsgQName);
     delete opWriteMsgData;
 

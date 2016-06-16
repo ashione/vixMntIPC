@@ -10,6 +10,7 @@ extern "C" {
 
 #define OP_MODE_NUM 7
 #define OP_DATA_MAX_SIZE 0x400
+#define OP_RESPONSE_Q_SIZE 0x40
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
 enum
@@ -41,6 +42,7 @@ class VixMntMsgData {
         VixMntMsgOp msg_op;
         size_t msg_datasize;
         char msg_buff[OP_DATA_MAX_SIZE];
+        char msg_response_q[OP_RESPONSE_Q_SIZE];
 
     public :
         VixMntMsgData(){
@@ -53,6 +55,7 @@ class VixMntMsgData {
 
         VixMntMsgData(VixMntMsgOp, size_t, char*);
         VixMntMsgData(VixMntMsgOp, char*);
+        VixMntMsgData(VixMntMsgOp, size_t,const char*, char*);
 };
 
 
