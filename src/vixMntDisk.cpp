@@ -16,7 +16,7 @@ VixMntDiskHandle::VixMntDiskHandle(
         uint32 flag)
 {
     _vixHandle = NULL;
-
+    ILog("open disklib");
     VixError vixError = VixDiskLib_Open(connection,path,flag,&_vixHandle);
 
     SHOW_ERROR_INFO(vixError);
@@ -68,6 +68,7 @@ VixMntDiskHandle::listen(void *args){
             write(&msg_data);
         }
     }
+    return NULL;
 
 }
 
@@ -88,7 +89,7 @@ VixMntDiskHandle::read(VixMntMsgData* msg_data){
      // TODO : write readed buf to mmap
      VixMntOpRead opReadData;
      opReadData.convertFromBytes(msg_data->msg_buff);
-    uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+    uint64 sizeResult = opReadData.bufsize;
 
      uint8 buf[sizeResult];
 
@@ -127,7 +128,7 @@ VixMntDiskHandle::write(VixMntMsgData* msg_data){
      // TODO : write writed buf to mmap
      VixMntOpRead opWriteData;
      opWriteData.convertFromBytes(msg_data->msg_buff);
-     uint64 sizeResult = opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+     uint64 sizeResult = opWriteData.bufsize;
 
      uint8 buf[sizeResult];
      // first read buf data from mmap area
@@ -150,10 +151,10 @@ VixMntDiskHandle::write(VixMntMsgData* msg_data){
 }
 
 VixError
-VixMntDiskHandle::getDiskInfo(VixDiskLibInfo *info){
+VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info){
      // TODO :
      //VixDiskLibInfo *info = NULL;
-     VixError vixError = VixDiskLib_GetInfo(_vixHandle,&info);
+     VixError vixError = VixDiskLib_GetInfo(_vixHandle,info);
 
      return vixError;
 

@@ -34,7 +34,7 @@ class VixMntDiskHandle{
 
         VixError write(uint8* buf,uint64 offset,uint64 numberSector);
 
-        VixError getDiskInfo(VixDiskLibInfo* info);
+        VixError getDiskInfo(VixDiskLibInfo** info);
 
         static std::string getErrorMsg(VixError vixError);
 

@@ -2,6 +2,7 @@
 #include <vixMntMsgQue.h>
 #include <vixMntMmap.h>
 #include <vixMntMsgOp.h>
+#include <vixMntDisk.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -11,10 +12,14 @@
 #include <time.h>
 #include <sys/time.h>
 
+
 const char* random_str =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 static VixMntMmap *mmap_instance = NULL;
+static VixMntMsgQue *msgQ_instance = NULL;
+static VixMntDiskHandle *diskHandle_instance = NULL;
+
 /*
  * Init mmap instance
  */
@@ -119,11 +124,62 @@ vixMntIPC_ReadMmap(
     mmap_instance->mntReadMmap((uint8*)buf,read_pos,read_size);
 }
 
+void
+vixMntIPC_InitMsgQue() {
+
+    if(!msgQ_instance){
+        msgQ_instance = VixMntMsgQue::getMsgQueInstance();
+        ILog("msgQ_instance init ok");
+    }
+    else
+        ILog("msgQ_instance is already inited");
+}
+
+void
+vixMntIPC_CleanMsgQue(){
+
+    if(msgQ_instance){
+        VixMntMsgQue::releaseMsgQueInstance();
+        ILog("release msgQ_instance");
+        msgQ_instance = NULL;
+    }
+}
+
+void
+vixMntIPC_InitDiskHandle(
+        VixDiskLibConnection connection,
+        const char* path,
+        uint32 flag)
+{
+    vixMntIPC_InitMmap(MMAP_MEMORY_SIZE,0);
+    vixMntIPC_InitMsgQue();
+    diskHandle_instance = new VixMntDiskHandle(connection,path,flag);
+    diskHandle_instance->prepare(msgQ_instance,mmap_instance);
+
+}
+
+void
+vixMntIPC_CleanDiskHandle(){
+    ILog("Clean DiskHandle");
+    delete diskHandle_instance;
+
+    vixMntIPC_CleanMmap();
+    msgQ_instance->unlink();
+    vixMntIPC_CleanMsgQue();
+}
+
+VixError
+vixMntIPC_GetDiskInfo(VixDiskLibInfo **info){
+    ILog("get vixdisklibinfo ");
+   return diskHandle_instance->getDiskInfo(info);
+};
+
+
 void*
 vixMntIPC_run(void* arg)
 {
     VixMntMsgQue* vixmntmsg = VixMntMsgQue::getMsgQueInstance();
-    VixDiskLibHandle vixHandle = (VixDiskLibHandle) arg;
+    //VixDiskLibHandle vixHandle = (VixDiskLibHandle) arg;
 
     //assert(vixHandle);
     ILog("tranfer arg to vixHandle");
@@ -172,11 +228,17 @@ listening(){
     return pt_id;
 }
 
-pthread_t
-vixMntIPC_listen(VixDiskLibHandle vixHandle){
+void*
+vixMntIPC_listen(void* args){
+    return diskHandle_instance->listen(args);
+}
+
+int
+vixMntIPC_main(){
 
     pthread_t pt_id;
-    int err = pthread_create(&pt_id,NULL,vixMntIPC_run,(void *)vixHandle);
+    //int err = pthread_create(&pt_id,NULL,vixMntIPC_run,(void *)vixHandle);
+    int err = pthread_create(&pt_id,NULL,vixMntIPC_listen,NULL);
 
     if(err){
       ELog("can't create thread");
@@ -237,7 +299,6 @@ int makeDirectoryHierarchy( const char *path ){
         default :
            return false;
      }
-
 
 }
 

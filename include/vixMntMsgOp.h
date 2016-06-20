@@ -66,7 +66,7 @@ bool operator== (VixMntMsgOp op, const char* cstr_op);
 
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-    #define VixMntOp(op) VixMntMsgOp::##(op)
+    #define VixMntOp(op) getOpIndex(#op)
 #else
     #define VixMntOp(op) (op)
 #endif

@@ -93,11 +93,8 @@ FuseMntRead(
     VixMntOpRead opRead(path,size,offset);
     const char* readMsgQName = getRandomFileName("/read",10);
     VixMntMsgData *opReadMsgData =
-#if defined(__cplusplus) && __cplusplus >= 201103L
-        new VixMntMsgData(VixMntMsgOp::MntRead,sizeof opRead,readMsgQName,&opRead);
-#else
-        new VixMntMsgData(MntRead,sizeof opRead,readMsgQName,(char *)&opRead);
-#endif
+        new VixMntMsgData(VixMntOp( MntRead ),sizeof opRead,readMsgQName,(char *)&opRead);
+
     fuseMsgQue->sendMsg(opReadMsgData);
 
     delete opReadMsgData;
@@ -107,11 +104,7 @@ FuseMntRead(
     VixMntMsgData readMsgResult;
     readMsgQ.receiveMsg(&readMsgResult);
     // the received result data containing result op msg and result size
-#if defined(__cplusplus) && __cplusplus >= 201103L
-    if ( readMsgResult.msg_op == VixMntMsgOp::MntReadDone ){
-#else
-    if ( readMsgResult.msg_op  == MntReadDone ){
-#endif
+    if ( readMsgResult.msg_op  == VixMntOp( MntReadDone ) ){
         uint64 sizeResult;
         memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
         vixMntIPC_ReadMmap(buf,0,sizeResult);
@@ -136,11 +129,8 @@ FuseMntWrite(
     VixMntOpWrite opWrite(path,size,offset);
     const char* writeMsgQName = getRandomFileName("/write",10);
     VixMntMsgData *opWriteMsgData =
-#if defined(__cplusplus) && __cplusplus >= 201103L
-        new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof opWrite,writeMsgQName,&opWrite);
-#else
-        new VixMntMsgData(MntWrite,sizeof opWrite,writeMsgQName,(char *)&opWrite);
-#endif
+        new VixMntMsgData(VixMntOp(MntWrite),sizeof opWrite,writeMsgQName,(char *)&opWrite);
+
     fuseMsgQue->sendMsg(opWriteMsgData);
 
     VixMntMsgQue writeMsgQ(writeMsgQName);
@@ -149,11 +139,7 @@ FuseMntWrite(
     VixMntMsgData writeMsgResult;
     writeMsgQ.receiveMsg(&writeMsgResult);
     // the received result data containing result op msg and result size
-#if defined(__cplusplus) && __cplusplus >= 201103L
-    if ( writeMsgResult.msg_op == VixMntMsgOp::MntWriteDone ){
-#else
-    if ( writeMsgResult.msg_op  == MntWriteDone ){
-#endif
+    if ( writeMsgResult.msg_op  == VixMntOp(MntWriteDone )){
         uint64 sizeResult;
         memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
         return sizeResult;
@@ -162,26 +148,3 @@ FuseMntWrite(
     return 0;
 }
 
-VixError
-FuseMnt_DiskLib_Read(
-        VixDiskLibHandle vixHandle,
-        VixDiskLibSectorType startSector,
-        VixDiskLibSectorType numSectors,
-        uint8 *readBuffer)
-{
-
-    return VixDiskLib_Read(vixHandle,startSector,
-                    numSectors,readBuffer);
-}
-
-VixError
-FuseMnt_DiskLib_Write(
-        VixDiskLibHandle vixHandle,
-        VixDiskLibSectorType startSector,
-        VixDiskLibSectorType numSectors,
-        uint8 *readBuffer)
-{
-
-    return VixDiskLib_Write(vixHandle,startSector,
-                    numSectors,readBuffer);
-}

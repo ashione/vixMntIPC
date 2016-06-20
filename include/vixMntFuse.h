@@ -64,20 +64,6 @@ FuseMntWrite(
         off_t offset,
         struct fuse_file_info *fi = NULL);
 
-VixError
-FuseMnt_DiskLib_Read(
-        VixDiskLibHandle vixHandle,
-        VixDiskLibSectorType startSector,
-        VixDiskLibSectorType numSectors,
-        uint8 *readBuffer);
-
-VixError
-FuseMnt_DiskLib_Write(
-        VixDiskLibHandle vixHandle,
-        VixDiskLibSectorType startSector,
-        VixDiskLibSectorType numSectors,
-        uint8 *readBuffer);
-
 struct fuse_mntIPC_operations :  fuse_operations
 {
     fuse_mntIPC_operations(){

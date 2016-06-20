@@ -14,6 +14,7 @@
 
 #define MAX_RANDOM_LEN 10
 #define STR_RANDOM_NUM_LEN 62
+#define MMAP_MEMORY_SIZE 0x1000
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,6 +68,24 @@ vixMntIPC_ReadMmap(
         size_t read_pos,
         size_t read_size);
 
+void
+vixMntIPC_InitMsgQue();
+
+void
+vixMntIpC_CleanMsgQue();
+
+void
+vixMntIPC_InitDiskHandle(
+        VixDiskLibConnection connection,
+        const char* path,
+        uint32 flag);
+
+void
+vixMntIPC_CleanDiskHandle();
+
+VixError
+vixMntIPC_GetDiskInfo(VixDiskLibInfo **info);
+
 void*
 vixMntIPC_run(void*);
 
@@ -77,11 +96,13 @@ getRandomFileName(
         size_t max_random_len);
 
 pthread_t
-vixMntIPC_listen(VixDiskLibHandle vixHandle);
+vixMntIPC_listen();
 
 pthread_t
 listening();
 
+int
+vixMntIPC_main();
 
 #ifdef __cplusplus
 }
