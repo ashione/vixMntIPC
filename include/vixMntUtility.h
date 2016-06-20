@@ -2,13 +2,15 @@
 #define VIXMNTUTILITY_H
 
 //static VixMntMmap *mmap_instance = NULL;
+//#include <vixMntMsgOp.h>
 #include <vixDiskLib.h>
 
 #include <sys/types.h>
 #include <unistd.h>
 #include <pthread.h>
 
-#include <string>
+
+//#include <string>
 
 #define MAX_RANDOM_LEN 10
 #define STR_RANDOM_NUM_LEN 62
@@ -85,6 +87,5 @@ listening();
 }
 #endif
 
-std::string getErrorMsg(VixError vixError);
 
 #endif //VIXMNTUTILITY_H

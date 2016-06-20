@@ -1,6 +1,7 @@
 #include <vixMntMsgOp.h>
+#include <vixMntUtility.h>
+
 #include <string.h>
-#include <string>
 #include <memory>
 
 const char*

@@ -59,12 +59,12 @@ main(){
     pthread_t pid_t2 = listening();
 
     ILog("size of msgque instance %u",sizeof(*msgque));
-    VixMntMsgQue* msgque2 = new VixMntMsgQue("/test2");
-    VixMntMsgQue* msgque3 = new VixMntMsgQue("/test3");
+//    VixMntMsgQue* msgque2 = new VixMntMsgQue("/test2");
+//    VixMntMsgQue* msgque3 = new VixMntMsgQue("/test3");
 
     ILog("size of msgque instance %u",sizeof(VixMntMsgQue));
-    delete msgque3;
-    delete msgque2;
+//    delete msgque3;
+//    delete msgque2;
 
     if(!pid_t){
         ELog("error goto clean");
@@ -76,19 +76,12 @@ main(){
      *  will received ERROR when send HALT
      */
 
-#if defined(__cplusplus) && __cplusplus >= 201103L
-    msgque->sendMsgOp(VixMntMsgOp::MntInit);
-    msgque->sendMsgOp(VixMntMsgOp::MntWrite);
-    msgque->sendMsgOp(VixMntMsgOp::MntRead);
-    msgque->sendMsgOp(VixMntMsgOp::HALT);
-    msgque->sendMsgOp(VixMntMsgOp::HALT);
-#else
-    msgque->sendMsgOp(MntInit);
-    msgque->sendMsgOp(MntWrite);
-    msgque->sendMsgOp(MntRead);
-    msgque->sendMsgOp(HALT);
-    msgque->sendMsgOp(HALT);
-#endif
+    msgque->sendMsgOp(VixMntOp( MntInit ));
+    msgque->sendMsgOp(VixMntOp( MntWrite ));
+    msgque->sendMsgOp(VixMntOp( MntReadDone ));
+    msgque->sendMsgOp(VixMntOp( MntRead ));
+    msgque->sendMsgOp(VixMntOp( HALT ));
+    msgque->sendMsgOp(VixMntOp( HALT ));
 
     //sleep(4);
     pthread_join(pid_t,NULL);

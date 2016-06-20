@@ -1,16 +1,17 @@
 #ifndef VIXMNT_MSG_OP_H
 #define VIXMNT_MSG_OP_H
 
+#ifdef __cplusplus
 
 #include <string>
-
-#ifdef __cplusplus
 extern "C" {
+
 #endif
 
 #define OP_MODE_NUM 7
 #define OP_DATA_MAX_SIZE 0x400
 #define OP_RESPONSE_Q_SIZE 0x40
+
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
 enum
@@ -64,11 +65,19 @@ VixMntMsgOp getOpIndex(const char* str_op);
 bool operator== (VixMntMsgOp op, const char* cstr_op);
 
 
-
-#ifdef __cplusplus
-}
+#if defined(__cplusplus) && __cplusplus >= 201103L
+    #define VixMntOp(op) VixMntMsgOp::##(op)
+#else
+    #define VixMntOp(op) (op)
 #endif
 
+#ifdef __cplusplus
+
+}
+
 bool operator== (VixMntMsgOp op, std::string str_op);
+
+#endif
+
 
 #endif //end vixMNT_MSG_OP_H

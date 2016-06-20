@@ -112,7 +112,7 @@ FuseMntRead(
 #else
     if ( readMsgResult.msg_op  == MntReadDone ){
 #endif
-        size_t sizeResult;
+        uint64 sizeResult;
         memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
         vixMntIPC_ReadMmap(buf,0,sizeResult);
 
@@ -154,7 +154,7 @@ FuseMntWrite(
 #else
     if ( writeMsgResult.msg_op  == MntWriteDone ){
 #endif
-        size_t sizeResult;
+        uint64 sizeResult;
         memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
         return sizeResult;
     }

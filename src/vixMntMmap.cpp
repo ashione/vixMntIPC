@@ -69,7 +69,8 @@ VixMntMmap::VixMntMmap(
 
 void
 VixMntMmap::mntWriteMmap(
-        const char* buf,
+//        const char* buf,
+        const uint8* buf,
         size_t write_pos,
         size_t write_size)
 {
@@ -80,7 +81,8 @@ VixMntMmap::mntWriteMmap(
 
 void
 VixMntMmap::mntReadMmap(
-        char* buf,
+        //char* buf,
+        uint8* buf,
         size_t read_pos,
         size_t read_size)
 {

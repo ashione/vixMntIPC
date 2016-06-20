@@ -102,7 +102,7 @@ vixMntIPC_WriteMmap(
         FLog("mmap instance never init");
         return;
     }
-    mmap_instance->mntWriteMmap(buf,write_pos,write_size);
+    mmap_instance->mntWriteMmap((uint8*)buf,write_pos,write_size);
 }
 
 void
@@ -116,7 +116,7 @@ vixMntIPC_ReadMmap(
         return;
     }
 
-    mmap_instance->mntReadMmap(buf,read_pos,read_size);
+    mmap_instance->mntReadMmap((uint8*)buf,read_pos,read_size);
 }
 
 void*
@@ -125,31 +125,23 @@ vixMntIPC_run(void* arg)
     VixMntMsgQue* vixmntmsg = VixMntMsgQue::getMsgQueInstance();
     VixDiskLibHandle vixHandle = (VixDiskLibHandle) arg;
 
-    assert(vixHandle);
+    //assert(vixHandle);
     ILog("tranfer arg to vixHandle");
 
     pthread_t run_tid = pthread_self();
     while(true){
 
         VixMntMsgOp msg_op;
-        VixMntMsgData msg_data;
-        vixmntmsg->receiveMsg(&msg_data);
-        msg_op = msg_data.msg_op;
+        //VixMntMsgData msg_data;
+        //vixmntmsg->receiveMsg(&msg_data);
+        //msg_op = msg_data.msg_op;
 
-        //vixmntmsg->receiveMsgOp(&msg_op);
+        vixmntmsg->receiveMsgOp(&msg_op);
 
-#if defined(__cplusplus) && __cplusplus >= 201103L
-        if(msg_op == VixMntMsgOp::ERROR){
-#else
-        if(msg_op == ERROR){
-#endif
+        if(msg_op == VixMntOp(ERROR)){
             ILog("thread ID %u, receive error, breaking",run_tid);
         }
-#if defined(__cplusplus) && __cplusplus >= 201103L
-        else if(msg_op == VixMntMsgOp::HALT){
-#else
-        else if(msg_op == HALT) {
-#endif
+        else if(msg_op == VixMntOp(HALT)) {
 
             ILog("thread ID %u, stop listening, breaking",run_tid);
             break;
@@ -261,9 +253,3 @@ getRandomFileName(const char* rootPath,size_t max_random_len){
     return rfile_name.c_str();
 }
 
-std::string getErrorMsg(VixError vixError){
-    char* msg = VixDiskLib_GetErrorText(vixError,NULL);
-    std::string descp = msg;
-    VixDiskLib_FreeErrorText(msg);
-    return descp;
-}

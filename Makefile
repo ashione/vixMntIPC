@@ -8,7 +8,7 @@ SRC = $(wildcard src/*.cpp)
 
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
-LIBS = -L./lib -L$(FUSEROOT)/lib/.libs  -L${VDDK_HOME}/lib64 -lfuseipc -lpthread -lrt -lfuse3 -lvixDiskLib 
+LIBS = -L./lib -L$(FUSEROOT)/lib/.libs  -L${VDDK_HOME}/lib64 -lfuseipc -lpthread -lrt -lfuse3 -lvixDiskLib -lstdc++
 
 BINDIR  = bin
 OBJDIR = bin/obj

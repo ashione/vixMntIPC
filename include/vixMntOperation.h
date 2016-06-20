@@ -1,6 +1,7 @@
 #ifndef VIXMNT_OPEARTION_H
 #define VIXMNT_OPEARTION_H
 
+#include <vixDiskLib.h>
 
 #include <sys/types.h>
 #include <cstring>
@@ -45,10 +46,15 @@ class VixMntOpBase{
 
 };
 
+/*
+ * warning : bufsize is sector number in vixdisklib
+ *
+ */
+
 class VixMntOpRead : public VixMntOpBase{
 
     public :
-        explicit VixMntOpRead( const char*, size_t, off_t);
+        explicit VixMntOpRead( const char*, uint64, uint64);
         explicit VixMntOpRead(){};
         BREW_CONVERTOR(VixMntOpRead)
 
@@ -58,21 +64,21 @@ class VixMntOpRead : public VixMntOpBase{
         char fileName[VIXMNT_FILENAME_MAXLEN];
         //char buf[VIXMNT_TRANSPORT_BUF_MAXLEN];
         //char* buf;
-        size_t bufsize;
-        off_t offsize;
+        uint64 bufsize;
+        uint64  offsize;
 };
 
 class VixMntOpWrite : public VixMntOpBase{
 
     public :
-        explicit VixMntOpWrite( const char*, size_t, off_t);
+        explicit VixMntOpWrite( const char*, uint64, uint64);
         explicit VixMntOpWrite(){};
         BREW_CONVERTOR(VixMntOpWrite)
 
     public :
         char fileName[VIXMNT_FILENAME_MAXLEN];
-        size_t bufsize;
-        off_t offsize;
+        uint64 bufsize;
+        uint64 offsize;
 };
 
 #ifdef __cplusplus

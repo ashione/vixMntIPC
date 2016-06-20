@@ -6,7 +6,7 @@
 
 #define SHOW_ERROR_INFO(vixError) \
     if(VIX_FAILED(vixError)){\
-        std::string errorMsg = getErrorMsg(vixError); \
+        std::string errorMsg = VixMntDiskHandle::getErrorMsg(vixError); \
         ELog("%s",errorMsg.c_str()); \
     }
 
@@ -30,19 +30,96 @@ VixMntDiskHandle::~VixMntDiskHandle(){
     _vixHandle = NULL;
 }
 
+void
+VixMntDiskHandle::prepare(VixMntMsgQue* msgQ_,
+        VixMntMmap* mmap_){
+    _msgQ = msgQ_;
+    _mmap = mmap_;
+}
+
+void*
+VixMntDiskHandle::listen(void *args){
+
+    if( !_vixHandle || !_msgQ || !_mmap ){
+        ELog("no preparation before listening");
+        return (void*)NULL;
+    }
+
+    while(true){
+        VixMntMsgOp msg_op;
+        VixMntMsgData msg_data;
+        _msgQ->receiveMsg(&msg_data);
+        msg_op = msg_data.msg_op;
+
+        if(msg_op == VixMntOp(ERROR)){
+            ILog("receive error, breaking");
+            break;
+        }
+        else if(msg_op == VixMntOp(HALT)) {
+            ILog(" stop listening, breaking");
+            break;
+        }
+        else if(msg_op == VixMntOp(MntRead)){
+            ILog("receive %s",getOpValue(msg_op));
+            read(&msg_data);
+        }
+        else if(msg_op == VixMntOp(MntWrite)){
+            ILog("receive %s",getOpValue(msg_op));
+            write(&msg_data);
+        }
+    }
+
+}
+
+VixError
+VixMntDiskHandle::read(
+        uint8* buf,
+        uint64 offset,
+        uint64 numberSector)
+{
+
+     VixError vixError = VixDiskLib_Read(_vixHandle,offset,numberSector,buf);
+     return vixError;
+}
+
 VixError
 VixMntDiskHandle::read(VixMntMsgData* msg_data){
      assert(_vixHandle);
      // TODO : write readed buf to mmap
      VixMntOpRead opReadData;
      opReadData.convertFromBytes(msg_data->msg_buff);
-     uint8 buf[opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE];
+    uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
 
+     uint8 buf[sizeResult];
 
-     VixError vixError = VixDiskLib_Read(_vixHandle,opReadData.offsize,opReadData.bufsize,buf);
+     VixError vixError = read(buf,opReadData.offsize,opReadData.bufsize);
 
+     // write buf data for IPC terminal
+     //
+     _mmap->mntWriteMmap(buf,0,sizeResult);
+
+    VixMntMsgData readMsgResult;
+    readMsgResult.msg_op = VixMntOp(MntReadDone);
+    readMsgResult.msg_datasize = sizeof(uint64);
+    memcpy(readMsgResult.msg_buff,&sizeResult,readMsgResult.msg_datasize);
+    VixMntMsgQue* readMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
+    readMsgQ->sendMsg(&readMsgResult);
+
+    delete readMsgQ;
+
+    return vixError;
+
+}
+
+VixError
+VixMntDiskHandle::write(
+        uint8* buf,
+        uint64 offset,
+        uint64 numberSector)
+{
+
+     VixError vixError = VixDiskLib_Write(_vixHandle,offset,numberSector,buf);
      return vixError;
-
 }
 
 VixError
@@ -50,20 +127,41 @@ VixMntDiskHandle::write(VixMntMsgData* msg_data){
      // TODO : write writed buf to mmap
      VixMntOpRead opWriteData;
      opWriteData.convertFromBytes(msg_data->msg_buff);
-     uint8 buf[opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE];
+     uint64 sizeResult = opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+
+     uint8 buf[sizeResult];
+     // first read buf data from mmap area
+     _mmap->mntReadMmap(buf,0,sizeResult);
 
 
-     VixError vixError = VixDiskLib_Write(_vixHandle,opWriteData.offsize,opWriteData.bufsize,buf);
 
-     return vixError;
+     VixError vixError = write(buf,opWriteData.offsize,opWriteData.bufsize);
+
+    VixMntMsgData writeMsgResult;
+    writeMsgResult.msg_op = VixMntOp(MntWriteDone);
+    writeMsgResult.msg_datasize = sizeof(uint64);
+    memcpy(writeMsgResult.msg_buff,&sizeResult,writeMsgResult.msg_datasize);
+    VixMntMsgQue* writeMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
+    writeMsgQ->sendMsg(&writeMsgResult);
+
+    delete writeMsgQ;
+
+    return vixError;
 }
 
 VixError
-VixMntDiskHandle::getDiskInfo(VixMntMsgData* msg_data){
+VixMntDiskHandle::getDiskInfo(VixDiskLibInfo *info){
      // TODO :
-     VixDiskLibInfo *info = NULL;
+     //VixDiskLibInfo *info = NULL;
      VixError vixError = VixDiskLib_GetInfo(_vixHandle,&info);
 
      return vixError;
 
+}
+
+std::string VixMntDiskHandle::getErrorMsg(VixError vixError){
+    char* msg = VixDiskLib_GetErrorText(vixError,NULL);
+    std::string descp = msg;
+    VixDiskLib_FreeErrorText(msg);
+    return descp;
 }

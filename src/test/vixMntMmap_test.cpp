@@ -29,7 +29,7 @@ child_receiver(){
         //printf("op %s\n",getOpValue(*receivedOp));
         ILog("op %s",getOpValue(receiveMsg->msg_op));
         char* buff = new char[msg_len];
-        testmap->mntReadMmap(buff);
+        testmap->mntReadMmap((uint8*)buff);
         gettimeofday(&endTime,NULL);
         ILog("receive : %x , %c",buff,buff[0]);
         struct timeval carried_time;
@@ -50,7 +50,7 @@ child_receiver(){
 
         buff[0] = 'A'+milliseconds%10;
         ILog("receiver change buff[0] to %c",buff[0]);
-        testmap->mntWriteMmap(buff);
+        testmap->mntWriteMmap((uint8*)buff);
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
         if(resultMsgQSender->sendMsgOp(VixMntMsgOp::MntWriteDone))
@@ -103,7 +103,7 @@ main(int argc,char** args){
         memset(msg,random_str[rand()%STR_RANDOM_NUM_LEN],msg_len);
         gettimeofday(&startTime,NULL);
 
-        testmap->mntWriteMmap(msg);
+        testmap->mntWriteMmap((uint8*)msg);
 
         const char msg_name[10] = "/result";
         char* buf = new char[sizeof(struct timeval)+strlen(msg_name)];
@@ -114,7 +114,7 @@ main(int argc,char** args){
 
         memcpy(buf,&startTime,sizeof(struct timeval));
         mqd_t resultMsgQId = resultMsgQ->getVixMntMsgID();
-        memcpy(buf+sizeof(struct timeval),msg_name,strlen(msg_name));
+        memcpy((uint8*)buf+sizeof(struct timeval),msg_name,strlen(msg_name));
 #if defined(__cplusplus) && __cplusplus >= 201103L
         VixMntMsgData* timeMsg = new VixMntMsgData(VixMntMsgOp::MntWrite,sizeof(struct timeval)+strlen(msg_name),buf);
 #else
@@ -134,7 +134,7 @@ main(int argc,char** args){
 #endif
 
             ILog("op %s\n",getOpValue(*resultOp));
-            testmap->mntReadMmap(msg);
+            testmap->mntReadMmap((uint8*)msg);
             ILog("share memory show changed bit %c",msg[0]);
         }
         else{
