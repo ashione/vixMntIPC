@@ -98,7 +98,7 @@ VixMntMsgData::VixMntMsgData(
         char* msg_buff)
 {
     size_t msg_len = strlen(msg_buff);
-    VixMntMsgData(msg_op,msg_len,msg_buff);
+    new(this) VixMntMsgData(msg_op,msg_len,msg_buff);
 }
 
 VixMntMsgData::VixMntMsgData(
@@ -108,5 +108,6 @@ VixMntMsgData::VixMntMsgData(
         char* msg_buff)
 {
     strncpy(msg_response_q,msg_q_name,strlen(msg_q_name));
-    VixMntMsgData(msg_op,msg_datasize,msg_buff);
+    msg_response_q [  strlen(msg_q_name) ] = '\0';
+    new(this) VixMntMsgData(msg_op,msg_datasize,msg_buff);
 }

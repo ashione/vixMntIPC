@@ -302,15 +302,17 @@ int makeDirectoryHierarchy( const char *path ){
 
 }
 
-const char*
-getRandomFileName(const char* rootPath,size_t max_random_len){
+void
+getRandomFileName(const char* rootPath,size_t max_random_len,char *destination){
     srand((unsigned) time(NULL));
 
     std::string rfile_name = rootPath;
     for(size_t i = 0 ; i < max_random_len - 1 ; ++i){
         rfile_name+= random_str[rand()%STR_RANDOM_NUM_LEN];
     }
-    rfile_name += '\0';
-    return rfile_name.c_str();
+    //rfile_name += '\0';
+    //char *ptr = new char[rfile_name.size() +1 ];
+    strncpy(destination,rfile_name.c_str(),rfile_name.size());
+ //   return rfile_name.c_str();
 }
 

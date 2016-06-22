@@ -91,13 +91,17 @@ FuseMntRead(
          struct fuse_file_info *fi )
 {
     VixMntOpRead opRead(path,size,offset);
-    const char* readMsgQName = getRandomFileName("/read",10);
+    char readMsgQName[32] = {"/input"};
+    //readMsgQName[strlen(readMsgQName)] = '\0';
+    //getRandomFileName("/read",0,readMsgQName);
+    ILog("randomly generate msgQ : %s",readMsgQName);
     VixMntMsgData *opReadMsgData =
         new VixMntMsgData(VixMntOp( MntRead ),sizeof opRead,readMsgQName,(char *)&opRead);
 
     fuseMsgQue->sendMsg(opReadMsgData);
 
     delete opReadMsgData;
+
 
     VixMntMsgQue readMsgQ(readMsgQName);
 
@@ -109,9 +113,15 @@ FuseMntRead(
         memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
         vixMntIPC_ReadMmap(buf,0,sizeResult);
 
+        //readMsgQ.unlink();
+        //mq_unlink(readMsgQName);
+
         return sizeResult;
     }
     WLog("addr %u, size %u,read %s error",offset,size,path);
+
+    //readMsgQ.unlink();
+    //mq_unlink(readMsgQName);
     return 0;
 }
 
@@ -127,11 +137,15 @@ FuseMntWrite(
     vixMntIPC_WriteMmap(buf,0,size);
 
     VixMntOpWrite opWrite(path,size,offset);
-    const char* writeMsgQName = getRandomFileName("/write",10);
+    char writeMsgQName[32] = {"/result"};
+    //getRandomFileName("/write",0,writeMsgQName);
+    ILog("randomly generate msgQ : %s",writeMsgQName);
     VixMntMsgData *opWriteMsgData =
         new VixMntMsgData(VixMntOp(MntWrite),sizeof opWrite,writeMsgQName,(char *)&opWrite);
 
     fuseMsgQue->sendMsg(opWriteMsgData);
+
+    mq_unlink(writeMsgQName);
 
     VixMntMsgQue writeMsgQ(writeMsgQName);
     delete opWriteMsgData;
@@ -142,9 +156,11 @@ FuseMntWrite(
     if ( writeMsgResult.msg_op  == VixMntOp(MntWriteDone )){
         uint64 sizeResult;
         memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
+        //writeMsgQ.unlink();
         return sizeResult;
     }
     WLog("addr %u, size %u,write %s error",offset,size,path);
+    //writeMsgQ.unlink();
     return 0;
 }
 

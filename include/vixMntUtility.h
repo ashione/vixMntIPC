@@ -14,7 +14,7 @@
 
 #define MAX_RANDOM_LEN 10
 #define STR_RANDOM_NUM_LEN 62
-#define MMAP_MEMORY_SIZE 0x1000
+#define MMAP_MEMORY_SIZE 1<<21
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,10 +90,11 @@ void*
 vixMntIPC_run(void*);
 
 
-const char*
+void
 getRandomFileName(
         const char*,
-        size_t max_random_len);
+        size_t max_random_len,
+        char*);
 
 pthread_t
 vixMntIPC_listen();

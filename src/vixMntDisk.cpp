@@ -45,9 +45,10 @@ VixMntDiskHandle::listen(void *args){
         return (void*)NULL;
     }
 
+    VixMntMsgOp msg_op;
+    VixMntMsgData msg_data;
+
     while(true){
-        VixMntMsgOp msg_op;
-        VixMntMsgData msg_data;
         _msgQ->receiveMsg(&msg_data);
         msg_op = msg_data.msg_op;
 
@@ -61,13 +62,17 @@ VixMntDiskHandle::listen(void *args){
         }
         else if(msg_op == VixMntOp(MntRead)){
             ILog("receive %s",getOpValue(msg_op));
-            read(&msg_data);
+            SHOW_ERROR_INFO(read(&msg_data));
         }
         else if(msg_op == VixMntOp(MntWrite)){
             ILog("receive %s",getOpValue(msg_op));
-            write(&msg_data);
+            SHOW_ERROR_INFO(write(&msg_data));
+        }
+        else{
+            ELog("receive exception");
         }
     }
+
     return NULL;
 
 }
@@ -89,9 +94,9 @@ VixMntDiskHandle::read(VixMntMsgData* msg_data){
      // TODO : write readed buf to mmap
      VixMntOpRead opReadData;
      opReadData.convertFromBytes(msg_data->msg_buff);
-    uint64 sizeResult = opReadData.bufsize;
+    uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
 
-     uint8 buf[sizeResult];
+     uint8 buf[sizeResult ];
 
      VixError vixError = read(buf,opReadData.offsize,opReadData.bufsize);
 
@@ -128,7 +133,7 @@ VixMntDiskHandle::write(VixMntMsgData* msg_data){
      // TODO : write writed buf to mmap
      VixMntOpRead opWriteData;
      opWriteData.convertFromBytes(msg_data->msg_buff);
-     uint64 sizeResult = opWriteData.bufsize;
+     uint64 sizeResult = opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE;
 
      uint8 buf[sizeResult];
      // first read buf data from mmap area
