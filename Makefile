@@ -2,13 +2,14 @@ CFLAGS = -g -Wall -fPIC -D_FILE_OFFSET_BITS=64
 CXX = g++ 
 CC = gcc
 
-FUSEROOT=/mts/home4/nzuo/workspace/download/libfuse
+#FUSEROOT=/mts/home4/nzuo/workspace/download/libfuse
+FUSEROOT=/bldmnt/toolchain/lin64/fuse-2.7.4
 INCLUDE=-I./include  -I$(FUSEROOT)/include -I${VDDK_HOME}/include
 SRC = $(wildcard src/*.cpp)
 
 TARGET = ./lib/libfuseipc.so
 LDFLAGS = -shared
-LIBS = -L./lib -L$(FUSEROOT)/lib/.libs  -L${VDDK_HOME}/lib64 -lfuseipc -lpthread -lrt -lfuse3 -lvixDiskLib -lstdc++
+LIBS = -L./lib -L$(FUSEROOT)/lib/.libs  -L${VDDK_HOME}/lib64 -lfuseipc -lpthread -lrt -lfuse -lvixDiskLib -lstdc++
 
 BINDIR  = bin
 OBJDIR = bin/obj

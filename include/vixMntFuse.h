@@ -2,7 +2,7 @@
 #define VIXMNTFUSE_H
 
 
-#define FUSE_USE_VERSION 30
+#define FUSE_USE_VERSION 25
 #include <fuse.h>
 #include <stdlib.h>
 #include <vixDiskLib.h>
@@ -11,17 +11,27 @@
 extern "C" {
 #endif
 
+#define FAKE_FUSE_IPC_PROGRAM_NAME  "fusemountIPClib"
+
+#ifndef FAKE_FUSE_PROGRAM_NAME
 #define FAKE_FUSE_PROGRAM_NAME  "fusemountIPClib"
+#endif
+
 #define FUSE_VAR_DIR            "/var/run/vmware/fuse"
 #define FALT_FILE_FILE_NAME     "flat"
 #define METADATA_EXTN_STR       "info"
 
+#define FUSE_DEBUG
 
+
+#ifndef FUSE_DEBUG
 int
 VixMntFuseMount(const char*);
 
+/*
 void*
 FuseMntInit(fuse_conn_info*);
+*/
 
 int
 FuseMntGetattr(
@@ -32,7 +42,7 @@ int
 FuseMntAccess(
         const char *path,
         int mask);
-
+/*
 int
 FuseMntReaddir(
          const char*path,
@@ -41,6 +51,7 @@ FuseMntReaddir(
          off_t offset,
          struct fuse_file_info *fi,
          fuse_readdir_flags);
+*/
 
 int
 FuseMntFsync(
@@ -48,36 +59,39 @@ FuseMntFsync(
          int isdatasync,
          struct fuse_file_info *fi);
 
+#endif
+
 int
-FuseMntRead(
+FuseMntIPC_Read(
          const char *path,
          char *buf,
          size_t size,
          off_t offset,
-         struct fuse_file_info *fi = NULL);
+         struct fuse_file_info *fi);
 
 int
-FuseMntWrite(
+FuseMntIPC_Write(
         const char *path,
         const char *buf,
         size_t size,
         off_t offset,
-        struct fuse_file_info *fi = NULL);
+        struct fuse_file_info *fi);
 
+#ifndef FUSE_DEBUG
 struct fuse_mntIPC_operations :  fuse_operations
 {
     fuse_mntIPC_operations(){
-        init = FuseMntInit;
+//        init = FuseMntInit;
         getattr = FuseMntGetattr;
         access = FuseMntAccess;
-        readdir = FuseMntReaddir;
-        read = FuseMntRead;
-        write = FuseMntWrite;
+//        readdir = FuseMntReaddir;
+        read = FuseMntIPC_Read;
+        write = FuseMntIPC_Write;
         fsync = FuseMntFsync;
 
     }
 } fuse_oper;
-
+#endif
 
 #ifdef __cplusplus
 }

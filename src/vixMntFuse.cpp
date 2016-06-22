@@ -10,6 +10,7 @@
 // get stanlone msgque instance
 static VixMntMsgQue* fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
 
+#ifndef FUSE_DEBUG
 int
 VixMntFuseMount(const char *mountpoint){
     int argc = 7;
@@ -34,15 +35,18 @@ VixMntFuseMount(const char *mountpoint){
         ILog("create directory %s",mountpoint);
         makeDirectoryHierarchy(mountpoint);
     }
-
-    fuse_main(argc,argv,&fuse_oper,NULL);
+// delete for fuse version 25
+    //fuse_main(argc,argv,&fuse_oper,NULL);
+    fuse_main(argc,argv,&fuse_oper);
     return 0;
 }
 
+/*
 void*
 FuseMntInit(fuse_conn_info* fi){
     return NULL;
 }
+*/
 
 int
 FuseMntGetattr(
@@ -59,7 +63,7 @@ FuseMntAccess(
 {
      return 0;;
 }
-
+/*
 int
 FuseMntReaddir(
          const char*path,
@@ -71,7 +75,7 @@ FuseMntReaddir(
 {
     return 0;
 }
-
+*/
 
 int
 FuseMntFsync(
@@ -82,8 +86,10 @@ FuseMntFsync(
     return 0;
 }
 
+#endif
+
 int
-FuseMntRead(
+FuseMntIPC_Read(
          const char *path,
          char *buf,
          size_t size,
@@ -126,7 +132,7 @@ FuseMntRead(
 }
 
 int
-FuseMntWrite(
+FuseMntIPC_Write(
         const char *path,
         const char *buf,
         size_t size,
