@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <pthread.h>
 
-
-
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
@@ -223,10 +221,10 @@ VixMntMsgQue::receiveMsg(VixMntMsgData* msg_data,
 {
     mq_attr tempAttr;
     this->getattr(&tempAttr);
-    ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
-            vixMntMsgAttr.mq_msgsize,
-            vixMntMsgAttr.mq_curmsgs,
-            tempAttr.mq_msgsize);
+    //ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
+    //        vixMntMsgAttr.mq_msgsize,
+    //        vixMntMsgAttr.mq_curmsgs,
+    //        tempAttr.mq_msgsize);
 
     assert( 8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
 

@@ -96,7 +96,7 @@ VixMntDiskHandle::read(VixMntMsgData* msg_data){
      opReadData.convertFromBytes(msg_data->msg_buff);
     uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
 
-     uint8 buf[sizeResult ];
+     uint8 buf[sizeResult];
 
      VixError vixError = read(buf,opReadData.offsize,opReadData.bufsize);
 
