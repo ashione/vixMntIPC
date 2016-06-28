@@ -55,7 +55,18 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
         this->vixMntMsgMapFileName = msg_name;
     }
 
-    ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
+    /*
+     * return mq_id without open it again
+     * if mq exist
+     *
+    std::map<std::string, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.find(this->vixMntMsgMapFileName);
+    if(itr != VixMntMsgQue::vixMntMsgMap.end()){
+        this->vixMntMsgID = itr->second;
+        return;
+    }
+    */
+
+    //ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
 
         this->vixMntMsgID =
             mq_open(
@@ -73,12 +84,13 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     }
 
     assert(this->vixMntMsgID > 0);
+    //ILog("original %u, new %u",VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName],this->vixMntMsgID);
     VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
 
     VixMntMutex lock(&vixMntMsgLock);
     try{
         lock.lock();
-        ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
+        //ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
         lock.unlock();
     }
     catch ( VixMntException& e ){
