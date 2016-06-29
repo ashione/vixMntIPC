@@ -3,38 +3,54 @@
 #include <vixMntLock.h>
 #include <vixMntException.h>
 
-#include <assert.h>
-#include <cstdlib>
-#include <pthread.h>
-
 VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
-pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
+//pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
 /*
  * abort - > this static pthread_mutex_t lock maybe not work in different threads
  *  TODO :
  *      add semaphore in share memory
+ *      add pthread_once for multithread safe
  */
 VixMntMsgQue*
 VixMntMsgQue::getMsgQueInstance(sem_t *sem){
 
     if(sem)
         sem_wait(sem);
-
+/*
     if( vixMntMsgInstance  == NULL){
-        ILog("first init instance, thread ID %u",pthread_self());
-        ILog("mutex lock add %x",&vixMntMsgLock);
-        vixMntMsgInstance = new VixMntMsgQue();
+        VixMntMutex lock(&vixMntMsgLock);
+        try{
+            lock.lock();
+
+            ILog("first init instance, thread ID %u",pthread_self());
+            ILog("mutex lock add %x",&vixMntMsgLock);
+            vixMntMsgInstance = new VixMntMsgQue();
+
+            lock.unlock();
+        }
+        catch ( VixMntException& e ){
+             ELog("%s",e.what());
+        }
+
     }
     else{
         ILog("already init instance");
     }
-
+*/
+    pthread_once(&ponce,&VixMntMsgQue::initInstance);
     if(sem)
         sem_post(sem);
 
+    assert(vixMntMsgInstance != NULL);
     return vixMntMsgInstance;
+}
+
+void
+VixMntMsgQue::initInstance(){
+    vixMntMsgInstance = new VixMntMsgQue();
 }
 
 VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
@@ -87,15 +103,7 @@ VixMntMsgQue::VixMntMsgQue(const char* msg_name,bool readOnly){
     //ILog("original %u, new %u",VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName],this->vixMntMsgID);
     VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
 
-    VixMntMutex lock(&vixMntMsgLock);
-    try{
-        lock.lock();
-        //ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
-        lock.unlock();
-    }
-    catch ( VixMntException& e ){
-         ELog("%s",e.what());
-    }
+    //ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
 
 }
 

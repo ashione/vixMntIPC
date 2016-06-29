@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <cstdlib>
 #include <errno.h>
+#include <string.h>
 
 
 VixMntMutex::VixMntMutex(
@@ -37,8 +38,11 @@ VixMntMutex::lock()
 void
 VixMntMutex::unlock()
 {
-    if( pthread_mutex_unlock( (pthread_mutex_t*)_handle ) ){
+    int result = ( pthread_mutex_unlock( (pthread_mutex_t*)_handle ) );
+    if(result){
         throw VixMntException("Unable to unlock mutex");
+        //throw VixMntException(strerror(result));
+
     }
 }
 

@@ -37,7 +37,7 @@ class VixMntMsgQue {
         explicit VixMntMsgQue(mqd_t msg_id);
 
         static VixMntMsgQue* getMsgQueInstance(sem_t* sem = NULL);
-
+        static void initInstance();
         static void releaseMsgQueInstance(sem_t* sem = NULL);
 
 
@@ -66,7 +66,8 @@ class VixMntMsgQue {
         static VixMntMsgQue* vixMntMsgInstance;
         static const std::string vixMntMsgName;
         static std::map<std::string,mqd_t> vixMntMsgMap;
-        static pthread_mutex_t vixMntMsgLock;
+        //static pthread_mutex_t vixMntMsgLock;
+        static pthread_once_t ponce;
 
     public :
         mqd_t vixMntMsgID;

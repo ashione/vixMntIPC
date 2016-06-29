@@ -9,6 +9,7 @@
 #define const_str(str) const_cast<char *>(str)
 // get stanlone msgque instance
 static VixMntMsgQue* fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
+//static VixMntMsgQue* fuseMsgQue = NULL;
 
 #ifndef FUSE_DEBUG
 int
@@ -97,7 +98,7 @@ FuseMntIPC_Read(
          struct fuse_file_info *fi )
 {
     VixMntOpRead opRead(path,size,offset);
-    char readMsgQName[32] = {"/input"};
+    char readMsgQName[32] = {"/readMsgQ"};
     //readMsgQName[strlen(readMsgQName)] = '\0';
     //getRandomFileName("/read",0,readMsgQName);
     ILog("randomly generate msgQ : %s",readMsgQName);
@@ -143,7 +144,7 @@ FuseMntIPC_Write(
     vixMntIPC_WriteMmap(buf,0,size);
 
     VixMntOpWrite opWrite(path,size,offset);
-    char writeMsgQName[32] = {"/result"};
+    char writeMsgQName[32] = {"/writeMsgQ"};
     //getRandomFileName("/write",0,writeMsgQName);
     ILog("randomly generate msgQ : %s",writeMsgQName);
     VixMntMsgData *opWriteMsgData =

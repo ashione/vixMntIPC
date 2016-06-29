@@ -52,19 +52,19 @@ main(){
 
     delete[] buf;
 
+
     pthread_t pid_t = listening();
+    pthread_t pid_t2 = listening();
 
     VixMntMsgQue* msgque = VixMntMsgQue::getMsgQueInstance();
 
-    pthread_t pid_t2 = listening();
-
     ILog("size of msgque instance %u",sizeof(*msgque));
-//    VixMntMsgQue* msgque2 = new VixMntMsgQue("/test2");
-//    VixMntMsgQue* msgque3 = new VixMntMsgQue("/test3");
+    VixMntMsgQue* msgque2 = new VixMntMsgQue("/test2");
+    VixMntMsgQue* msgque3 = new VixMntMsgQue("/test3");
 
     ILog("size of msgque instance %u",sizeof(VixMntMsgQue));
-//    delete msgque3;
-//    delete msgque2;
+    delete msgque3;
+    delete msgque2;
 
     if(!pid_t){
         ELog("error goto clean");
