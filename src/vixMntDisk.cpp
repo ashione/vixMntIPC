@@ -98,7 +98,7 @@ VixMntDiskHandle::read(VixMntMsgData* msg_data){
 
      uint8 buf[sizeResult];
 
-     VixError vixError = read(buf,opReadData.offsize,opReadData.bufsize);
+     VixError vixError = read(buf,opReadData.offset,opReadData.bufsize);
 
      // write buf data for IPC terminal
      //
@@ -141,7 +141,7 @@ VixMntDiskHandle::write(VixMntMsgData* msg_data){
 
 
 
-     VixError vixError = write(buf,opWriteData.offsize,opWriteData.bufsize);
+     VixError vixError = write(buf,opWriteData.offset,opWriteData.bufsize);
 
     VixMntMsgData writeMsgResult;
     writeMsgResult.msg_op = VixMntOp(MntWriteDone);

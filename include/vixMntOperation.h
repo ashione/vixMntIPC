@@ -65,7 +65,7 @@ class VixMntOpRead : public VixMntOpBase{
         //char buf[VIXMNT_TRANSPORT_BUF_MAXLEN];
         //char* buf;
         uint64 bufsize;
-        uint64  offsize;
+        uint64  offset;
 };
 
 class VixMntOpWrite : public VixMntOpBase{
@@ -78,7 +78,7 @@ class VixMntOpWrite : public VixMntOpBase{
     public :
         char fileName[VIXMNT_FILENAME_MAXLEN];
         uint64 bufsize;
-        uint64 offsize;
+        uint64 offset;
 };
 
 #ifdef __cplusplus
