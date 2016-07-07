@@ -3,6 +3,7 @@ An IPC tool
 ## simple implementation 
 * __Message Queue__
 * __Share Memory & Memory Map__
+* __Socket with epoll__
 * __Simple Log__
 
 ## usage ( on \*inx )
@@ -17,3 +18,7 @@ An IPC tool
 ## Resouces 
 * vixlink : link source files for whole project in subdirectory root
 * _mksg_ : unused now
+
+## Dependency
+* vixDiskLib
+* fuse
