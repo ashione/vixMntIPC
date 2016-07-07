@@ -27,8 +27,9 @@ VixMntSocketServer::~VixMntSocketServer(){
 }
 
 void
-VixMntSocketServer::serverListen(){
+VixMntSocketServer::serverListen(VixMntDiskHandle* vixdh){
     listen(listenfd,SOCKET_LISTENQ);
+    this->vixdh = vixdh;
     doEpoll();
 
 }
@@ -42,9 +43,11 @@ VixMntSocketServer::doEpoll(){
     epollfd = epoll_create(SOCKET_FD_MAX_SIZE);
     addEvent(listenfd,EPOLLIN);
     while(true){
+
        ret = epoll_wait(epollfd,events,SOCKET_EPOLLEVENTS,-1);
 
        handleEvents(events,ret,buf);
+       if(ret <=0 ) return;
     }
     close(epollfd);
 
@@ -82,6 +85,7 @@ VixMntSocketServer::handleAccept(){
      else{
           ILog("Accept a new client : %s : %d",inet_ntoa(clientAddr.sin_addr),clientAddr.sin_port);
           addEvent(clientFd,EPOLLIN);
+          clientMap4Write[clientFd] = 0;
      }
 }
 
@@ -89,8 +93,9 @@ VixMntSocketServer::handleAccept(){
 void
 VixMntSocketServer::doRead(int fd, char* buf,int maxLen){
      maxLen = maxLen>0?maxLen:SOCKET_BUF_MAX_SIZE;
-     int nread = read(fd,buf,maxLen);
-
+     //int nread = read(fd,buf,maxLen);
+     int nread = recv(fd,buf,maxLen,0);
+    //ILog("doread fd : %d, maxLen : %d",fd,maxLen);
      if(nread == -1){
          ELog("Read Error");
          //perror("read error");
@@ -98,19 +103,39 @@ VixMntSocketServer::doRead(int fd, char* buf,int maxLen){
      }
      else if(nread == 0){
           ILog("Client Close");
+          clientMap4Write.erase(fd);
           close(fd);
           deleteEvent(fd,EPOLLIN);
      }
      else{
-         ILog("Read msg is : %s",buf);
-         modifyEvent(fd,EPOLLOUT);
+         //VixMntOpRead opReadData;
+         //opReadData.convertFromBytes(buf);
+         //uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+
+         //VixError vixError = vixdh->read((uint8*)buf,opReadData.offset,opReadData.bufsize);
+         //deleteEvent(fd,EPOLLIN);
+         uint64 offset,bufsize;
+         uint64 token;
+         memcpy(&offset,buf,sizeof(offset));
+         memcpy(&bufsize,buf+sizeof(offset),sizeof(bufsize));
+         memcpy(&token,buf+2*sizeof(offset),sizeof(bufsize));
+         VixError vixError = vixdh->read((uint8*)buf,offset,bufsize);
+         SHOW_ERROR_INFO(vixError);
+         ILog("Read offset %u , bufsize %u,token %u",offset,bufsize,token);
+         /* mark client needed buffer size for next write operation*/
+         clientMap4Write[fd] = bufsize * VIXDISKLIB_SECTOR_SIZE;
+        modifyEvent(fd,EPOLLOUT);
+        // addEvent(fd,EPOLLIN);
      }
 }
 
 void
 VixMntSocketServer::doWrite(int fd, char* buf,int maxLen){
-    maxLen =  maxLen>0?maxLen:strlen(buf);
-    int nwrite = write(fd,buf,maxLen);
+    //maxLen =  maxLen>0?maxLen:strlen(buf);
+    ILog("dowrite fd : %d, maxLen : %d",fd,clientMap4Write[fd]);
+    //int nwrite = write(fd,buf,maxLen);
+    //int nwrite = write(fd,buf,clientMap4Write[fd]);
+    int nwrite = send(fd,buf,clientMap4Write[fd],0);
     if ( nwrite == -1 ){
          ELog("Write Error");
          close(fd);
@@ -118,7 +143,7 @@ VixMntSocketServer::doWrite(int fd, char* buf,int maxLen){
     }
     else
         modifyEvent(fd,EPOLLIN);
-    memset(buf,0,maxLen);
+    //memset(buf,0,maxLen);
 }
 
 void
@@ -183,6 +208,8 @@ VixMntSocketClient::handleConnect(){
     while(true){
          ret = epoll_wait(epollfd,events,SOCKET_EPOLLEVENTS,-1);
          handleEvents(events,ret,buf);
+
+         if(ret <=0 ) return;
     }
 
     close(epollfd);
@@ -199,11 +226,23 @@ VixMntSocketClient::handleEvents(epoll_event* events,int num,char* buf){
     }
 }
 
+/*
+ * read whole needed sectors
+ * if not do this, client receiver will get incomplete data
+ */
+
 int
 VixMntSocketClient::rawRead(char *buf,int bufsize){
-    return read(sockfd,buf,bufsize);
+    int recvSize = read(sockfd,buf,bufsize);
+    if(recvSize <=0 ) return recvSize;
+    while(recvSize<bufsize){
+         int tempRecvSize = read(sockfd,buf+recvSize,bufsize-recvSize);
+         recvSize+=tempRecvSize;
+    }
+    return recvSize;
 }
 int
 VixMntSocketClient::rawWrite(char *buf,int bufsize){
-    return write(sockfd,buf,bufsize);
+    //return write(sockfd,buf,bufsize);
+    return send(sockfd,buf,bufsize,0);
 }

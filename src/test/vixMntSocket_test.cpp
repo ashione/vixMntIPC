@@ -17,10 +17,10 @@ int main(){
         char result[0xff];
         while(scanf("%s",buf)!=EOF){
 
+            memset(result,0,0xff);
             vclt->rawWrite(buf,strlen(buf));
             vclt->rawRead(result,0xff);
             ILog(" msg : %s ",result);
-            memset(result,0,0xff);
         }
         delete vclt;
     }

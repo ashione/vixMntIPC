@@ -10,6 +10,12 @@
 extern "C"{
 #endif
 
+#define SHOW_ERROR_INFO(vixError) \
+    if(VIX_FAILED(vixError)){\
+        std::string errorMsg = VixMntDiskHandle::getErrorMsg(vixError); \
+        ELog("%s",errorMsg.c_str()); \
+    }
+
 class VixMntDiskHandle{
 
     private :
@@ -39,6 +45,7 @@ class VixMntDiskHandle{
         static std::string getErrorMsg(VixError vixError);
 
 };
+
 
 
 #ifdef __cplusplus

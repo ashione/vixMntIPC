@@ -1,7 +1,10 @@
 #ifndef VIXMNTSOCKET_H
 
 #include <vixMntUtility.h>
+#include <vixMntDisk.h>
+#include <vixMntOperation.h>
 
+#include <map>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -47,7 +50,7 @@ class VixMntSocketServer : public VixMntSocket{
         VixMntSocketServer();
         ~VixMntSocketServer();
 
-        void serverListen();
+        void serverListen(VixMntDiskHandle*);
     private :
         void doEpoll();
         void handleEvents(epoll_event*,int,char*);
@@ -63,6 +66,8 @@ class VixMntSocketServer : public VixMntSocket{
 
     private :
         int listenfd;
+        VixMntDiskHandle* vixdh;
+        std::map<int,uint64> clientMap4Write;
 
 };
 
