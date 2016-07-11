@@ -4,11 +4,6 @@
 
 #include <string>
 
-#define SHOW_ERROR_INFO(vixError) \
-    if(VIX_FAILED(vixError)){\
-        std::string errorMsg = VixMntDiskHandle::getErrorMsg(vixError); \
-        ELog("%s",errorMsg.c_str()); \
-    }
 
 VixMntDiskHandle::VixMntDiskHandle(
         VixDiskLibConnection connection,
@@ -163,6 +158,11 @@ VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info){
 
      return vixError;
 
+}
+
+void
+VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info){
+     VixDiskLib_FreeInfo(info);
 }
 
 std::string VixMntDiskHandle::getErrorMsg(VixError vixError){

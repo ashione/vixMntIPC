@@ -86,6 +86,9 @@ vixMntIPC_CleanDiskHandle();
 VixError
 vixMntIPC_GetDiskInfo(VixDiskLibInfo **info);
 
+void
+vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info);
+
 void*
 vixMntIPC_run(void*);
 

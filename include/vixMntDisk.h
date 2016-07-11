@@ -42,6 +42,8 @@ class VixMntDiskHandle{
 
         VixError getDiskInfo(VixDiskLibInfo** info);
 
+        void freeDiskInfo(VixDiskLibInfo* info);
+
         static std::string getErrorMsg(VixError vixError);
 
 };

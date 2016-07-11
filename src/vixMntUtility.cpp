@@ -174,6 +174,12 @@ vixMntIPC_GetDiskInfo(VixDiskLibInfo **info){
    return diskHandle_instance->getDiskInfo(info);
 };
 
+void
+vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info){
+    ILog("free vixdisklibinfo");
+    diskHandle_instance->freeDiskInfo(info);
+}
+
 
 void*
 vixMntIPC_run(void* arg)
