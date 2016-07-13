@@ -2,6 +2,7 @@
 #include <vixMntUtility.h>
 #include <vixMntOperation.h>
 #include <vixMntMsgQue.h>
+#include <vixMntSocket.h>
 
 #include <cassert>
 
@@ -9,7 +10,6 @@
 #define const_str(str) const_cast<char *>(str)
 // get stanlone msgque instance
 static VixMntMsgQue* fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
-//static VixMntMsgQue* fuseMsgQue = NULL;
 
 #ifndef FUSE_DEBUG
 int
@@ -97,38 +97,50 @@ FuseMntIPC_Read(
          off_t offset,
          struct fuse_file_info *fi )
 {
-    VixMntOpRead opRead(path,size,offset);
-    char readMsgQName[32] = {"/readMsgQ"};
-    //readMsgQName[strlen(readMsgQName)] = '\0';
-    //getRandomFileName("/read",0,readMsgQName);
-    ILog("randomly generate msgQ : %s",readMsgQName);
-    VixMntMsgData *opReadMsgData =
-        new VixMntMsgData(VixMntOp( MntRead ),sizeof opRead,readMsgQName,(char *)&opRead);
+    uint8 IPCType_ = getVixMntIPCType();
+    if( IPCType_ == VIXMNTIPC_MMAP){
+        VixMntOpRead opRead(path,size,offset);
+        char readMsgQName[32] = {"/readMsgQ"};
+        //readMsgQName[strlen(readMsgQName)] = '\0';
+        //getRandomFileName("/read",0,readMsgQName);
+        ILog("randomly generate msgQ : %s",readMsgQName);
+        VixMntMsgData *opReadMsgData =
+            new VixMntMsgData(VixMntOp( MntRead ),sizeof opRead,readMsgQName,(char *)&opRead);
 
-    fuseMsgQue->sendMsg(opReadMsgData);
+        fuseMsgQue->sendMsg(opReadMsgData);
 
-    delete opReadMsgData;
+        delete opReadMsgData;
 
 
-    VixMntMsgQue readMsgQ(readMsgQName);
+        VixMntMsgQue readMsgQ(readMsgQName);
 
-    VixMntMsgData readMsgResult;
-    readMsgQ.receiveMsg(&readMsgResult);
-    // the received result data containing result op msg and result size
-    if ( readMsgResult.msg_op  == VixMntOp( MntReadDone ) ){
-        uint64 sizeResult;
-        memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
-        vixMntIPC_ReadMmap(buf,0,sizeResult);
+        VixMntMsgData readMsgResult;
+        readMsgQ.receiveMsg(&readMsgResult);
+        // the received result data containing result op msg and result size
+        if ( readMsgResult.msg_op  == VixMntOp( MntReadDone ) ){
+            uint64 sizeResult;
+            memcpy(&sizeResult,readMsgResult.msg_buff,readMsgResult.msg_datasize);
+            vixMntIPC_ReadMmap(buf,0,sizeResult);
+
+            //readMsgQ.unlink();
+            //mq_unlink(readMsgQName);
+
+            return sizeResult;
+        }
+        WLog("addr %u, size %u,read %s error",offset,size,path);
 
         //readMsgQ.unlink();
         //mq_unlink(readMsgQName);
-
-        return sizeResult;
     }
-    WLog("addr %u, size %u,read %s error",offset,size,path);
+    else{
+       VixMntOpSocketRead fuseOpSocketRead(size,offset,offset+size);
+       VixMntSocketClient* fuseSocketClient = new VixMntSocketClient();
+       fuseSocketClient->rawWrite((char*)(&fuseOpSocketRead),sizeof(VixMntOpSocketRead));
+       fuseSocketClient->rawRead(buf,size * VIXDISKLIB_SECTOR_SIZE);
+       delete fuseSocketClient;
 
-    //readMsgQ.unlink();
-    //mq_unlink(readMsgQName);
+       return size;
+    }
     return 0;
 }
 
@@ -140,34 +152,43 @@ FuseMntIPC_Write(
         off_t offset,
         struct fuse_file_info *fi )
 {
+    uint8 IPCType_ = getVixMntIPCType();
+    if( IPCType_ == VIXMNTIPC_MMAP){
+        vixMntIPC_WriteMmap(buf,0,size);
 
-    vixMntIPC_WriteMmap(buf,0,size);
+        VixMntOpWrite opWrite(path,size,offset);
+        char writeMsgQName[32] = {"/writeMsgQ"};
+        //getRandomFileName("/write",0,writeMsgQName);
+        ILog("randomly generate msgQ : %s",writeMsgQName);
+        VixMntMsgData *opWriteMsgData =
+            new VixMntMsgData(VixMntOp(MntWrite),sizeof opWrite,writeMsgQName,(char *)&opWrite);
 
-    VixMntOpWrite opWrite(path,size,offset);
-    char writeMsgQName[32] = {"/writeMsgQ"};
-    //getRandomFileName("/write",0,writeMsgQName);
-    ILog("randomly generate msgQ : %s",writeMsgQName);
-    VixMntMsgData *opWriteMsgData =
-        new VixMntMsgData(VixMntOp(MntWrite),sizeof opWrite,writeMsgQName,(char *)&opWrite);
+        fuseMsgQue->sendMsg(opWriteMsgData);
 
-    fuseMsgQue->sendMsg(opWriteMsgData);
+        mq_unlink(writeMsgQName);
 
-    mq_unlink(writeMsgQName);
+        VixMntMsgQue writeMsgQ(writeMsgQName);
+        delete opWriteMsgData;
 
-    VixMntMsgQue writeMsgQ(writeMsgQName);
-    delete opWriteMsgData;
-
-    VixMntMsgData writeMsgResult;
-    writeMsgQ.receiveMsg(&writeMsgResult);
-    // the received result data containing result op msg and result size
-    if ( writeMsgResult.msg_op  == VixMntOp(MntWriteDone )){
-        uint64 sizeResult;
-        memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
+        VixMntMsgData writeMsgResult;
+        writeMsgQ.receiveMsg(&writeMsgResult);
+        // the received result data containing result op msg and result size
+        if ( writeMsgResult.msg_op  == VixMntOp(MntWriteDone )){
+            uint64 sizeResult;
+            memcpy(&sizeResult,writeMsgResult.msg_buff,writeMsgResult.msg_datasize);
+            //writeMsgQ.unlink();
+            return sizeResult;
+        }
+        WLog("addr %u, size %u,write %s error",offset,size,path);
         //writeMsgQ.unlink();
-        return sizeResult;
     }
-    WLog("addr %u, size %u,write %s error",offset,size,path);
-    //writeMsgQ.unlink();
+    else
+    {
+    //   uint64 parameters[3] = {offset,size,offset+size};
+    //   VixMntSocketClient* fuseSocketClient = new VixMntSocketClient();
+       // TODO :
+       //fuseSocketClient->rawWrite
+    }
     return 0;
 }
 

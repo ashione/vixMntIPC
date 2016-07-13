@@ -3,6 +3,7 @@
 #include <vixMntMmap.h>
 #include <vixMntMsgOp.h>
 #include <vixMntDisk.h>
+#include <vixMntSocket.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,7 @@ const char* random_str =
 static VixMntMmap *mmap_instance = NULL;
 static VixMntMsgQue *msgQ_instance = NULL;
 static VixMntDiskHandle *diskHandle_instance = NULL;
+static uint8 IPCTYPE_FLAG = 0;
 
 /*
  * Init mmap instance
@@ -149,13 +151,17 @@ void
 vixMntIPC_InitDiskHandle(
         VixDiskLibConnection connection,
         const char* path,
-        uint32 flag)
+        uint32 flag,
+        uint8 IPCType)
 {
-    vixMntIPC_InitMmap(MMAP_MEMORY_SIZE,0);
-    vixMntIPC_InitMsgQue();
+    IPCTYPE_FLAG = IPCType;
     diskHandle_instance = new VixMntDiskHandle(connection,path,flag);
-    diskHandle_instance->prepare(msgQ_instance,mmap_instance);
 
+    if( IPCTYPE_FLAG == VIXMNTIPC_MMAP ){
+        vixMntIPC_InitMmap(MMAP_MEMORY_SIZE,0);
+        vixMntIPC_InitMsgQue();
+        diskHandle_instance->prepare(msgQ_instance,mmap_instance);
+    }
 }
 
 void
@@ -163,9 +169,11 @@ vixMntIPC_CleanDiskHandle(){
     ILog("Clean DiskHandle");
     delete diskHandle_instance;
 
-    vixMntIPC_CleanMmap();
-    msgQ_instance->unlink();
-    vixMntIPC_CleanMsgQue();
+    if(IPCTYPE_FLAG == VIXMNTIPC_MMAP){
+        vixMntIPC_CleanMmap();
+        msgQ_instance->unlink();
+        vixMntIPC_CleanMsgQue();
+    }
 }
 
 VixError
@@ -236,7 +244,14 @@ listening(){
 
 void*
 vixMntIPC_listen(void* args){
-    return diskHandle_instance->listen(args);
+    if (IPCTYPE_FLAG == VIXMNTIPC_MMAP)
+        return diskHandle_instance->listen(args);
+    else{
+        VixMntSocketServer* socketServer_instance = new VixMntSocketServer();
+        socketServer_instance->serverListen(diskHandle_instance);
+        return NULL;
+
+    }
 }
 
 int
@@ -322,3 +337,7 @@ getRandomFileName(const char* rootPath,size_t max_random_len,char *destination){
  //   return rfile_name.c_str();
 }
 
+uint8
+getVixMntIPCType(){
+    return IPCTYPE_FLAG;
+}

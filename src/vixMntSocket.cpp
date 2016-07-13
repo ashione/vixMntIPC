@@ -1,4 +1,5 @@
 #include <vixMntSocket.h>
+#include <vixMntOperation.h>
 
 VixMntSocketServer::VixMntSocketServer() : VixMntSocket(){
     sockaddr_in servaddr;
@@ -114,16 +115,20 @@ VixMntSocketServer::doRead(int fd, char* buf,int maxLen){
 
          //VixError vixError = vixdh->read((uint8*)buf,opReadData.offset,opReadData.bufsize);
          //deleteEvent(fd,EPOLLIN);
+        /*
          uint64 offset,bufsize;
          uint64 token;
          memcpy(&offset,buf,sizeof(offset));
          memcpy(&bufsize,buf+sizeof(offset),sizeof(bufsize));
          memcpy(&token,buf+2*sizeof(offset),sizeof(bufsize));
-         VixError vixError = vixdh->read((uint8*)buf,offset,bufsize);
+         */
+         VixMntOpSocketRead vixskop;
+         vixskop.convertFromBytes(buf);
+         VixError vixError = vixdh->read((uint8*)buf,vixskop.offset,vixskop.bufsize);
          SHOW_ERROR_INFO(vixError);
-         ILog("Read offset %u , bufsize %u,token %u",offset,bufsize,token);
+         ILog("Read offset %u , bufsize %u,token %u",vixskop.offset,vixskop.bufsize,vixskop.token);
          /* mark client needed buffer size for next write operation*/
-         clientMap4Write[fd] = bufsize * VIXDISKLIB_SECTOR_SIZE;
+         clientMap4Write[fd] = vixskop.bufsize * VIXDISKLIB_SECTOR_SIZE;
         modifyEvent(fd,EPOLLOUT);
         // addEvent(fd,EPOLLIN);
      }

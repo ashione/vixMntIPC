@@ -2,6 +2,7 @@
 #define VIXMNT_OPEARTION_H
 
 #include <vixDiskLib.h>
+#include <vixMntMsgOp.h>
 
 #include <sys/types.h>
 #include <cstring>
@@ -79,6 +80,59 @@ class VixMntOpWrite : public VixMntOpBase{
         char fileName[VIXMNT_FILENAME_MAXLEN];
         uint64 bufsize;
         uint64 offset;
+};
+
+class VixMntOpSocketBase{
+    public :
+        VixMntOpSocketBase(){};
+        explicit VixMntOpSocketBase(
+                uint64 carriedBufSize_,
+                uint64 token_,
+                VixMntMsgOp carriedOp_):
+            carriedBufSize(carriedBufSize_),
+            token(token_),
+            carriedOp(carriedOp_){}
+
+    public :
+        uint64 carriedBufSize;
+        uint64 token;
+        VixMntMsgOp carriedOp;
+
+
+};
+
+class VixMntOpSocketRead : public VixMntOpRead, public VixMntOpSocketBase{
+    public :
+        VixMntOpSocketRead(){};
+        explicit VixMntOpSocketRead(
+                uint64 bufsize,
+                uint64 offset,
+                uint64 token = 0,
+                uint64 carriedBufSize = 0) :
+            VixMntOpRead("/fakeReadToken",bufsize,offset),
+            VixMntOpSocketBase(carriedBufSize,token,VixMntOp(MntRead))
+    {
+
+    }
+        BREW_CONVERTOR(VixMntOpSocketRead)
+
+};
+
+class VixMntOpSocketWrite : public VixMntOpWrite, public VixMntOpSocketBase{
+    public :
+        VixMntOpSocketWrite();
+        explicit VixMntOpSocketWrite(
+                uint64 bufsize,
+                uint64 offset,
+                uint64 token =0,
+                uint64 carriedBufSize = 0) :
+            VixMntOpWrite("/fakeWriteToken",bufsize,offset),
+            VixMntOpSocketBase(carriedBufSize,token,VixMntOp(MntWrite))
+    {
+
+    }
+        BREW_CONVERTOR(VixMntOpSocketWrite)
+
 };
 
 #ifdef __cplusplus

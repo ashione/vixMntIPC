@@ -16,6 +16,9 @@
 #define STR_RANDOM_NUM_LEN 62
 #define MMAP_MEMORY_SIZE 1<<21
 
+#define VIXMNTIPC_MMAP 0
+#define VIXMNTIPC_SOCKET 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,11 +77,17 @@ vixMntIPC_InitMsgQue();
 void
 vixMntIpC_CleanMsgQue();
 
+/*
+ * initialization for IPC module
+ * use memory map + share memory when IPCType =0
+ * otherwise socket server
+ */
 void
 vixMntIPC_InitDiskHandle(
         VixDiskLibConnection connection,
         const char* path,
-        uint32 flag);
+        uint32 flag,
+        uint8  IPCType);
 
 void
 vixMntIPC_CleanDiskHandle();
@@ -107,6 +116,9 @@ listening();
 
 int
 vixMntIPC_main();
+
+uint8
+getVixMntIPCType();
 
 #ifdef __cplusplus
 }
