@@ -137,11 +137,20 @@ VixMntSocketServer::doRead(int fd, char* buf,int maxLen){
                  }
             }
             uint64 leftSector = vixskop.bufsize - i*eachSectorSize;
-            if(leftSector){
+
+            if( leftSector >0 ){
 
                  /* mark client needed buffer size for next write operation*/
-                clientMap4Write[fd] = leftSector * VIXDISKLIB_SECTOR_SIZE;
-                modifyEvent(fd,EPOLLOUT);
+                //clientMap4Write[fd] = leftSector * VIXDISKLIB_SECTOR_SIZE;
+                 VixError vixError = vixdh->read((uint8*)buf,vixskop.offset+i*eachSectorSize,leftSector);
+                 SHOW_ERROR_INFO(vixError);
+                 //ILog("Read offset %u , bufsize %u,token %u",vixskop.offset+i*eachSectorSize,eachSectorSize,vixskop.token);
+                 int nwrite = rawWrite(fd,buf,leftSector * VIXDISKLIB_SECTOR_SIZE);
+
+                 if(nwrite <= 0 ){
+                      ELog("Reminded Write Error.");
+                 }
+                //modifyEvent(fd,EPOLLOUT);
             }
          }
          else if( vixskop.carriedOp == VixMntOp(MntWrite) ){
