@@ -33,7 +33,8 @@ extern "C" {
 class VixMntOpBase{
 
     public :
-
+        VixMntOpBase(const char*, uint64, uint64 );
+        VixMntOpBase(){};
         virtual void convertToBytes(char* buf) {
             memcpy(buf,this,sizeof(*this));
         }
@@ -43,6 +44,10 @@ class VixMntOpBase{
         virtual inline size_t size()  {
             return sizeof(*this);
         }
+    public :
+        char fileName[VIXMNT_FILENAME_MAXLEN];
+        uint64 bufsize;
+        uint64  offset;
         //virtual ~VixMntOpBase();
 
 };
@@ -59,14 +64,6 @@ class VixMntOpRead : public VixMntOpBase{
         explicit VixMntOpRead(){};
         BREW_CONVERTOR(VixMntOpRead)
 
-    public :
-        //def_SHARE(const char*, fileName);
-        //def_SHARE(char*, buf);
-        char fileName[VIXMNT_FILENAME_MAXLEN];
-        //char buf[VIXMNT_TRANSPORT_BUF_MAXLEN];
-        //char* buf;
-        uint64 bufsize;
-        uint64  offset;
 };
 
 class VixMntOpWrite : public VixMntOpBase{
@@ -76,22 +73,24 @@ class VixMntOpWrite : public VixMntOpBase{
         explicit VixMntOpWrite(){};
         BREW_CONVERTOR(VixMntOpWrite)
 
-    public :
-        char fileName[VIXMNT_FILENAME_MAXLEN];
-        uint64 bufsize;
-        uint64 offset;
 };
 
-class VixMntOpSocketBase{
+class VixMntOpSocket : public VixMntOpBase{
     public :
-        VixMntOpSocketBase(){};
-        explicit VixMntOpSocketBase(
+        VixMntOpSocket(){};
+        explicit VixMntOpSocket(
+                const char* fileName_,
+                uint64 bufsize_,
+                uint64 offset_,
                 uint64 carriedBufSize_,
                 uint64 token_,
                 VixMntMsgOp carriedOp_):
+            VixMntOpBase(fileName_,bufsize_,offset_),
             carriedBufSize(carriedBufSize_),
             token(token_),
             carriedOp(carriedOp_){}
+
+        BREW_CONVERTOR(VixMntOpSocket)
 
     public :
         uint64 carriedBufSize;
@@ -101,7 +100,8 @@ class VixMntOpSocketBase{
 
 };
 
-class VixMntOpSocketRead : public VixMntOpRead, public VixMntOpSocketBase{
+/*
+class VixMntOpSocketRead : public VixMntOpSocketBase{
     public :
         VixMntOpSocketRead(){};
         explicit VixMntOpSocketRead(
@@ -118,7 +118,7 @@ class VixMntOpSocketRead : public VixMntOpRead, public VixMntOpSocketBase{
 
 };
 
-class VixMntOpSocketWrite : public VixMntOpWrite, public VixMntOpSocketBase{
+class VixMntOpSocketWrite :  public VixMntOpSocketBase{
     public :
         VixMntOpSocketWrite();
         explicit VixMntOpSocketWrite(
@@ -134,6 +134,7 @@ class VixMntOpSocketWrite : public VixMntOpWrite, public VixMntOpSocketBase{
         BREW_CONVERTOR(VixMntOpSocketWrite)
 
 };
+*/
 
 #ifdef __cplusplus
 }

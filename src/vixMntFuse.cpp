@@ -133,10 +133,11 @@ FuseMntIPC_Read(
         //mq_unlink(readMsgQName);
     }
     else{
-       VixMntOpSocketRead fuseOpSocketRead(size,offset,offset+size);
+       VixMntOpSocket fuseOpSocket(path,size,offset,0,offset+size,VixMntOp(MntRead));
        VixMntSocketClient* fuseSocketClient = new VixMntSocketClient();
-       fuseSocketClient->rawWrite((char*)(&fuseOpSocketRead),sizeof(VixMntOpSocketRead));
+       fuseSocketClient->rawWrite((char*)(&fuseOpSocket),sizeof(VixMntOpSocket));
        fuseSocketClient->rawRead(buf,size * VIXDISKLIB_SECTOR_SIZE);
+       //ILog("fuse mnt read %d",nread);
        delete fuseSocketClient;
 
        return size;
@@ -184,10 +185,20 @@ FuseMntIPC_Write(
     }
     else
     {
-    //   uint64 parameters[3] = {offset,size,offset+size};
-    //   VixMntSocketClient* fuseSocketClient = new VixMntSocketClient();
-       // TODO :
-       //fuseSocketClient->rawWrite
+
+       VixMntOpSocket fuseOpSocket(path,size,offset,0,offset+size,VixMntOp(MntWrite));
+       VixMntSocketClient* fuseSocketClient = new VixMntSocketClient()      ;
+       // socket client send raw data after notification
+       fuseSocketClient->rawWrite((char*)(&fuseOpSocket),sizeof(VixMntOpSocket));
+       fuseSocketClient->rawWrite(buf,size * VIXDISKLIB_SECTOR_SIZE);
+
+       delete fuseSocketClient;
+
+       VixMntOpSocket fuseOpSocketResult;
+       fuseSocketClient->rawRead((char *)&fuseOpSocketResult,sizeof(VixMntOpSocket));
+      if(fuseOpSocketResult.carriedOp == VixMntOp(MntWriteDone))
+           return size;
+
     }
     return 0;
 }

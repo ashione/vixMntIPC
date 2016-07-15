@@ -20,7 +20,7 @@ extern "C"{
 
 #define SOCKET_IPADDRESS    "127.0.0.1"
 #define SOCKET_PORT         45541
-#define SOCKET_BUF_MAX_SIZE 1<<20
+#define SOCKET_BUF_MAX_SIZE (1<<20)
 #define SOCKET_FD_MAX_SIZE  1000
 #define SOCKET_EPOLLEVENTS  100
 #define SOCKET_LISTENQ      50
@@ -34,6 +34,8 @@ class VixMntSocket{
         virtual void doRead(int fd,char* buf,int maxLen = 0) = 0;
         virtual void doWrite(int fd,char* buf,int maxLen = 0) = 0;
         virtual void handleEvents(epoll_event*,int,char*) = 0;
+        virtual int rawRead(int fd,char* buf, int maxLen);
+        virtual int rawWrite(int fd,const char* buf, int maxLen);
 
         void addEvent(int fd,int state);
         void deleteEvent(int fd,int state);
@@ -78,7 +80,7 @@ class VixMntSocketClient : public VixMntSocket{
 
         void clientConnect();
         int rawRead(char *buf,int bufsize);
-        int rawWrite(char *buf,int bufsize);
+        int rawWrite(const char *buf,int bufsize);
 
     private :
         void handleConnect();

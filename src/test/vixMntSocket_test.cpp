@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 int main(){
+    /*
     if(fork() == 0){
 
         VixMntSocketServer* vser = new VixMntSocketServer();
@@ -24,5 +25,6 @@ int main(){
         }
         delete vclt;
     }
+    */
     return 0;
 }
