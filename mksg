@@ -1,5 +1,0 @@
-#!/bin/bash
-make clean
-if [ $# -eq 1 ] ; then
-    make $@
-fi
