@@ -18,78 +18,78 @@
 extern "C"{
 #endif
 
-#define SOCKET_IPADDRESS    "127.0.0.1"
-#define SOCKET_PORT         45541
+#define SOCKET_IPADDRESS   "127.0.0.1"
+#define SOCKET_PORT      45541
 #define SOCKET_BUF_MAX_SIZE (1<<20)
 #define SOCKET_FD_MAX_SIZE  1000
 #define SOCKET_EPOLLEVENTS  100
-#define SOCKET_LISTENQ      50
+#define SOCKET_LISTENQ    50
 
 class VixMntSocket{
-    public :
-        VixMntSocket(int epollfd_ = -1): epollfd(epollfd_){};
-        virtual ~VixMntSocket(){ if(epollfd>0) close(epollfd); }
+   public :
+     VixMntSocket(int epollfd_ = -1): epollfd(epollfd_){};
+     virtual ~VixMntSocket(){ if(epollfd>0) close(epollfd); }
 
-    protected :
-        virtual void doRead(int fd,char* buf,int maxLen = 0) = 0;
-        virtual void doWrite(int fd,char* buf,int maxLen = 0) = 0;
-        virtual void handleEvents(epoll_event*,int,char*) = 0;
-        virtual int rawRead(int fd,char* buf, int maxLen);
-        virtual int rawWrite(int fd,const char* buf, int maxLen);
+   protected :
+     virtual void doRead(int fd,char* buf,int maxLen = 0) = 0;
+     virtual void doWrite(int fd,char* buf,int maxLen = 0) = 0;
+     virtual void handleEvents(epoll_event*,int,char*) = 0;
+     virtual int rawRead(int fd,char* buf, int maxLen);
+     virtual int rawWrite(int fd,const char* buf, int maxLen);
 
-        void addEvent(int fd,int state);
-        void deleteEvent(int fd,int state);
-        void modifyEvent(int fd,int state);
+     void addEvent(int fd,int state);
+     void deleteEvent(int fd,int state);
+     void modifyEvent(int fd,int state);
 
-    protected :
-        int epollfd;
+   protected :
+     int epollfd;
 
 };
 
 class VixMntSocketServer : public VixMntSocket{
 
-    public :
-        VixMntSocketServer();
-        ~VixMntSocketServer();
+   public :
+     VixMntSocketServer();
+     ~VixMntSocketServer();
 
-        void serverListen(VixMntDiskHandle*);
-    private :
-        void doEpoll();
-        void handleEvents(epoll_event*,int,char*);
-        void handleAccept();
-        void doRead(int fd,char* buf,int maxLen = 0);
-        void doWrite(int fd,char* buf,int maxLen = 0);
+     void serverListen(VixMntDiskHandle*);
+   private :
+     void doEpoll();
+     void handleEvents(epoll_event*,int,char*);
+     void handleAccept();
+     void doRead(int fd,char* buf,int maxLen = 0);
+     void doWrite(int fd,char* buf,int maxLen = 0);
 
-        /*
-        void addEvent(int fd,int state);
-        void deleteEvent(int fd,int state);
-        void modifyEvent(int fd,int state);
-        */
+     /*
+     void addEvent(int fd,int state);
+     void deleteEvent(int fd,int state);
+     void modifyEvent(int fd,int state);
+     */
 
-    private :
-        int listenfd;
-        VixMntDiskHandle* vixdh;
-        std::map<int,uint64> clientMap4Write;
+   private :
+     int listenfd;
+     VixMntDiskHandle* vixdh;
+     std::map<int,uint64> clientMap4Write;
 
 };
 
 class VixMntSocketClient : public VixMntSocket{
-    public :
-        VixMntSocketClient();
-        ~VixMntSocketClient();
+   public :
+     VixMntSocketClient();
+     ~VixMntSocketClient();
 
-        void clientConnect();
-        int rawRead(char *buf,int bufsize);
-        int rawWrite(const char *buf,int bufsize);
+     void clientConnect();
+     int rawRead(char *buf,int bufsize);
+     int rawWrite(const char *buf,int bufsize);
 
-    private :
-        void handleConnect();
-        void handleEvents(epoll_event*,int,char*);
-        void doRead(int fd,char* buf,int maxLen = 0);
-        void doWrite(int fd,char* buf,int maxLen = 0);
+   private :
+     void handleConnect();
+     void handleEvents(epoll_event*,int,char*);
+     void doRead(int fd,char* buf,int maxLen = 0);
+     void doWrite(int fd,char* buf,int maxLen = 0);
 
-    private :
-        int sockfd;
+   private :
+     int sockfd;
 
 };
 

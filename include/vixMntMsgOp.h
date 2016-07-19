@@ -16,47 +16,47 @@ extern "C" {
 #if defined(__cplusplus) && __cplusplus >= 201103L
 enum
 class VixMntMsgOp : short {
-    MntInit = 0,
-    MntInitDone,
-    MntWrite,
-    MntWriteDone,
-    MntRead,
-    MntReadDone,
-    HALT,
-    ERROR,
+   MntInit = 0,
+   MntInitDone,
+   MntWrite,
+   MntWriteDone,
+   MntRead,
+   MntReadDone,
+   HALT,
+   ERROR,
 };
 #else
 enum VixMntMsgOp {
-        MntInit = 0,
-        MntInitDone,
-        MntWrite,
-        MntWriteDone,
-        MntRead,
-        MntReadDone,
-        HALT,
-        ERROR,
+     MntInit = 0,
+     MntInitDone,
+     MntWrite,
+     MntWriteDone,
+     MntRead,
+     MntReadDone,
+     HALT,
+     ERROR,
 };
 #endif
 
 class VixMntMsgData {
-    public :
-        VixMntMsgOp msg_op;
-        size_t msg_datasize;
-        char msg_buff[OP_DATA_MAX_SIZE];
-        char msg_response_q[OP_RESPONSE_Q_SIZE];
+   public :
+     VixMntMsgOp msg_op;
+     size_t msg_datasize;
+     char msg_buff[OP_DATA_MAX_SIZE];
+     char msg_response_q[OP_RESPONSE_Q_SIZE];
 
-    public :
-        VixMntMsgData(){
+   public :
+     VixMntMsgData(){
 #if defined(__cplusplus) && __cplusplus >= 201103L
-            this->msg_op = VixMntMsgOp::ERROR;
+       this->msg_op = VixMntMsgOp::ERROR;
 #else
-            this->msg_op = ERROR;
+       this->msg_op = ERROR;
 #endif
-        }
+     }
 
-        VixMntMsgData(VixMntMsgOp, size_t, char*);
-        VixMntMsgData(VixMntMsgOp, char*);
-        VixMntMsgData(VixMntMsgOp, size_t,const char*, char*);
+     VixMntMsgData(VixMntMsgOp, size_t, char*);
+     VixMntMsgData(VixMntMsgOp, char*);
+     VixMntMsgData(VixMntMsgOp, size_t,const char*, char*);
 };
 
 
@@ -66,9 +66,9 @@ bool operator== (VixMntMsgOp op, const char* cstr_op);
 
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-    #define VixMntOp(op) getOpIndex(#op)
+   #define VixMntOp(op) getOpIndex(#op)
 #else
-    #define VixMntOp(op) (op)
+   #define VixMntOp(op) (op)
 #endif
 
 #ifdef __cplusplus

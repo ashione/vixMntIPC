@@ -8,17 +8,17 @@ extern "C" {
 
 class VixMntException : std::exception
 {
-    private :
-        const char* _info;
+   private :
+     const char* _info;
 
-    public :
-        VixMntException(const char* info){
-            _info = info;
-        }
+   public :
+     VixMntException(const char* info){
+       _info = info;
+     }
 
-        virtual const char* what() const throw(){
-             return _info;
-        }
+     virtual const char* what() const throw(){
+        return _info;
+     }
 
 
 };
