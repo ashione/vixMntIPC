@@ -21,9 +21,9 @@
  */
 
 VixMntDiskHandle::VixMntDiskHandle(
-   VixDiskLibConnection connection, \\ IN
-   const char* path,                \\ IN
-   uint32 flag) {                   \\ IN
+   VixDiskLibConnection connection, // IN
+   const char* path,                // IN
+   uint32 flag) {                   // IN
    _vixHandle = NULL;
    ILog("open disklib");
    VixError vixError = VixDiskLib_Open(connection,path,flag,&_vixHandle);
@@ -75,8 +75,8 @@ VixMntDiskHandle::~VixMntDiskHandle() {
 
 void
 VixMntDiskHandle::prepare (
-   VixMntMsgQue* msgQ_,   \\ IN
-   VixMntMmap* mmap_){    \\ IN
+   VixMntMsgQue* msgQ_,   // IN
+   VixMntMmap* mmap_){    // IN
    _msgQ = msgQ_;
    _mmap = mmap_;
 }
@@ -99,7 +99,7 @@ VixMntDiskHandle::prepare (
 
 void*
 VixMntDiskHandle::listen(
-   void *args){ \\ IN
+   void *args){ // IN
 
    if ( !_vixHandle || !_msgQ || !_mmap ) {
     ELog("no preparation before listening");
@@ -159,9 +159,9 @@ VixMntDiskHandle::listen(
 
 VixError
 VixMntDiskHandle::read(
-   uint8* buf,          \\IN
-   uint64 offset,       \\IN
-   uint64 numberSector) \\IN
+   uint8* buf,          // IN
+   uint64 offset,       // IN
+   uint64 numberSector) // IN
 {
 
    VixError vixError = VixDiskLib_Read(_vixHandle,offset,numberSector,buf);
@@ -186,7 +186,7 @@ VixMntDiskHandle::read(
 
 VixError
 VixMntDiskHandle::read(
-   VixMntMsgData* msg_data){ \\IN
+   VixMntMsgData* msg_data){ // IN
    assert(_vixHandle);
    // TODO : write readed buf to mmap
    VixMntOpRead opReadData;
@@ -260,7 +260,7 @@ VixMntDiskHandle::write(
 
 VixError
 VixMntDiskHandle::write(
-   VixMntMsgData* msg_data){ \\ IN
+   VixMntMsgData* msg_data){ // IN
    // TODO : write writed buf to mmap
    VixMntOpRead opWriteData;
    opWriteData.convertFromBytes(msg_data->msg_buff);
@@ -303,7 +303,7 @@ VixMntDiskHandle::write(
 
 VixError
 VixMntDiskHandle::getDiskInfo(
-   VixDiskLibInfo **info){ \\ IN/OUT
+   VixDiskLibInfo **info){ // IN/OUT
 
    VixError vixError = VixDiskLib_GetInfo(_vixHandle,info);
    return vixError;
@@ -328,7 +328,7 @@ VixMntDiskHandle::getDiskInfo(
 
 void
 VixMntDiskHandle::freeDiskInfo(
-   VixDiskLibInfo *info){ \\ IN
+   VixDiskLibInfo *info){ // IN
 
    VixDiskLib_FreeInfo(info);
 }

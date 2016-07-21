@@ -15,9 +15,11 @@ static VixMntMsgQue* fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
 
 /*
  ****************************************************************************
- * FunctionName
+ * VixMntFuseMount
+ * mount libfuse interface, deprectaed now
  * -------------------------------------------------------------------------
  * input parameters  :
+ * mountpoint, string of system directory
  * -------------------------------------------------------------------------
  * output paremeters :
  * -------------------------------------------------------------------------
@@ -27,7 +29,9 @@ static VixMntMsgQue* fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
  */
 
 int
-VixMntFuseMount(const char *mountpoint){
+VixMntFuseMount(
+   const char *mountpoint){  // IN
+
    int argc = 7;
    /*
    * usage : mountpoint [-d] [-o xxxx]
@@ -43,10 +47,10 @@ VixMntFuseMount(const char *mountpoint){
    };
 
    //makeDirectoryHierarchy(FUSE_VAR_DIR);
-   if(isDirectoryExist(mountpoint)){
+   if ( isDirectoryExist(mountpoint) ) {
      ILog("mounpoint %s is exist",mountpoint);
    }
-   else{
+   else {
      ILog("create directory %s",mountpoint);
      makeDirectoryHierarchy(mountpoint);
    }
@@ -65,11 +69,13 @@ FuseMntInit(fuse_conn_info* fi){
 
 /*
  ****************************************************************************
- * FunctionName
+ * FuseMntGetattr
  * -------------------------------------------------------------------------
  * input parameters  :
+ * path
  * -------------------------------------------------------------------------
  * output paremeters :
+ * stbuf
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -78,19 +84,21 @@ FuseMntInit(fuse_conn_info* fi){
 
 int
 FuseMntGetattr(
-     const char *path,
-     struct stat *stbuf)
+   const char *path,    // IN
+   struct stat *stbuf)  // OUT
 {
    return 0;
 }
 
 /*
  ****************************************************************************
- * FunctionName
+ * FuseMntAccess
  * -------------------------------------------------------------------------
  * input parameters  :
+ * path
  * -------------------------------------------------------------------------
  * output paremeters :
+ * mask
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -99,8 +107,8 @@ FuseMntGetattr(
 
 int
 FuseMntAccess(
-     const char *path,
-     int mask)
+   const char *path,
+   int mask)
 {
    return 0;
 }
@@ -120,11 +128,15 @@ FuseMntReaddir(
 
 /*
  ****************************************************************************
- * FunctionName
+ * FuseMntFsync
  * -------------------------------------------------------------------------
  * input parameters  :
+ * path
+ * isdatasync
+ * fi
  * -------------------------------------------------------------------------
  * output paremeters :
+ * No
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -133,9 +145,9 @@ FuseMntReaddir(
 
 int
 FuseMntFsync(
-      const char *path,
-      int isdatasync,
-      struct fuse_file_info *fi)
+   const char *path,            // IN
+   int isdatasync,              // IN
+   struct fuse_file_info *fi )  // IN
 {
    return 0;
 }
@@ -144,11 +156,22 @@ FuseMntFsync(
 
 /*
  ****************************************************************************
- * FunctionName
+ * FuseMntIPC_Read
+ * libfuse recall function
+ * If memory map & message solution : insert a message into
+ * system message queue, then waiting for the result after providing a
+ * response message queue name;
+ * If socket solution  : setup a socket client to connect socket server, then
+ * waiting for returing.
  * -------------------------------------------------------------------------
  * input parameters  :
+ * path,
+ * size,
+ * offset,
+ * fi
  * -------------------------------------------------------------------------
  * output paremeters :
+ * buf
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -157,11 +180,11 @@ FuseMntFsync(
 
 int
 FuseMntIPC_Read(
-      const char *path,
-      char *buf,
-      size_t size,
-      off_t offset,
-      struct fuse_file_info *fi )
+   const char *path,            // IN
+   char *buf,                   // OUT
+   size_t size,                 // IN
+   off_t offset,                // IN
+   struct fuse_file_info *fi )  // IN
 {
    uint8 IPCType_ = getVixMntIPCType();
    if( IPCType_ == VIXMNTIPC_MMAP){
@@ -213,11 +236,19 @@ FuseMntIPC_Read(
 
 /*
  ****************************************************************************
- * FunctionName
+ * FuseMntIPC_Write
+ * libfuse recall function,
+ * As same as read operation
  * -------------------------------------------------------------------------
  * input parameters  :
+ * path,
+ * buf,
+ * size,
+ * offset,
+ * fi
  * -------------------------------------------------------------------------
  * output paremeters :
+ * No
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -225,12 +256,12 @@ FuseMntIPC_Read(
  */
 
 int
-FuseMntIPC_Write(
-     const char *path,
-     const char *buf,
-     size_t size,
-     off_t offset,
-     struct fuse_file_info *fi )
+FuseMntIPC_Write(                   // IN
+     const char *path,              // IN
+     const char *buf,               // IN
+     size_t size,                   // IN
+     off_t offset,                  // IN
+     struct fuse_file_info *fi )    // IN
 {
    uint8 IPCType_ = getVixMntIPCType();
    if( IPCType_ == VIXMNTIPC_MMAP){

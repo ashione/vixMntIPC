@@ -33,8 +33,8 @@ extern "C" {
  */
 
 VixMntMmap::VixMntMmap(
-   size_t mmap_datasize,    \\ IN
-   bool isRoot)             \\ IN
+   size_t mmap_datasize,    // IN
+   bool isRoot)             // IN
 {
    try {
      if ( isRoot )
@@ -101,9 +101,9 @@ VixMntMmap::VixMntMmap(
 
 void
 VixMntMmap::mntWriteMmap(
-   const uint8* buf,          \\ IN
-   size_t write_pos,          \\ IN
-   size_t write_size)         \\ IN
+   const uint8* buf,          // IN
+   size_t write_pos,          // IN
+   size_t write_size)         // IN
 {
 
    memcpy(this->mmap_data+write_pos,buf,write_size>0?write_size:this->mmap_datasize);
@@ -130,9 +130,9 @@ VixMntMmap::mntWriteMmap(
 
 void
 VixMntMmap::mntReadMmap(
-     uint8* buf,          \\ IN/OUT
-     size_t read_pos,     \\ IN
-     size_t read_size)    \\ IN
+     uint8* buf,          // IN/OUT
+     size_t read_pos,     // IN
+     size_t read_size)    // IN
 {
    memcpy(buf,this->mmap_data+read_pos,read_size>0?read_size:this->mmap_datasize);
 }
