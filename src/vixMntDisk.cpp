@@ -1,6 +1,6 @@
 #include <vixMntDisk.h>
-#include <vixMntUtility.h>
 #include <vixMntOperation.h>
+#include <vixMntUtility.h>
 
 #include <string>
 
@@ -20,17 +20,14 @@
  ****************************************************************************
  */
 
-VixMntDiskHandle::VixMntDiskHandle(
-   VixDiskLibConnection connection, // IN
-   const char* path,                // IN
-   uint32 flag) {                   // IN
+VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection, // IN
+                                   const char *path,                // IN
+                                   uint32 flag) {                   // IN
    _vixHandle = NULL;
    ILog("open disklib");
-   VixError vixError = VixDiskLib_Open(connection,path,flag,&_vixHandle);
+   VixError vixError = VixDiskLib_Open(connection, path, flag, &_vixHandle);
 
    SHOW_ERROR_INFO(vixError);
-
-
 }
 
 /*
@@ -73,10 +70,8 @@ VixMntDiskHandle::~VixMntDiskHandle() {
  ****************************************************************************
  */
 
-void
-VixMntDiskHandle::prepare (
-   VixMntMsgQue* msgQ_,   // IN
-   VixMntMmap* mmap_){    // IN
+void VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_, // IN
+                               VixMntMmap *mmap_) { // IN
    _msgQ = msgQ_;
    _mmap = mmap_;
 }
@@ -97,45 +92,38 @@ VixMntDiskHandle::prepare (
  ****************************************************************************
  */
 
-void*
-VixMntDiskHandle::listen(
-   void *args){ // IN
+void *VixMntDiskHandle::listen(void *args) { // IN
 
-   if ( !_vixHandle || !_msgQ || !_mmap ) {
-    ELog("no preparation before listening");
-    return (void*)NULL;
+   if (!_vixHandle || !_msgQ || !_mmap) {
+      ELog("no preparation before listening");
+      return (void *)NULL;
    }
 
    VixMntMsgOp msg_op;
    VixMntMsgData msg_data;
 
    while (true) {
-    _msgQ->receiveMsg(&msg_data);
-    msg_op = msg_data.msg_op;
+      _msgQ->receiveMsg(&msg_data);
+      msg_op = msg_data.msg_op;
 
-    if ( msg_op == VixMntOp(ERROR) ) {
-      ILog("receive error, breaking");
-      break;
-    }
-    else if ( msg_op == VixMntOp(HALT) ) {
-      ILog(" stop listening, breaking");
-      break;
-    }
-    else if ( msg_op == VixMntOp(MntRead) ) {
-      //ILog("receive %s",getOpValue(msg_op));
-      SHOW_ERROR_INFO(read(&msg_data));
-    }
-    else if ( msg_op == VixMntOp(MntWrite)) {
-      //ILog("receive %s",getOpValue(msg_op));
-      SHOW_ERROR_INFO(write(&msg_data));
-    }
-    else {
-      ELog("receive exception");
-    }
+      if (msg_op == VixMntOp(ERROR)) {
+         ILog("receive error, breaking");
+         break;
+      } else if (msg_op == VixMntOp(HALT)) {
+         ILog(" stop listening, breaking");
+         break;
+      } else if (msg_op == VixMntOp(MntRead)) {
+         // ILog("receive %s",getOpValue(msg_op));
+         SHOW_ERROR_INFO(read(&msg_data));
+      } else if (msg_op == VixMntOp(MntWrite)) {
+         // ILog("receive %s",getOpValue(msg_op));
+         SHOW_ERROR_INFO(write(&msg_data));
+      } else {
+         ELog("receive exception");
+      }
    }
 
    return NULL;
-
 }
 
 /*
@@ -157,17 +145,14 @@ VixMntDiskHandle::listen(
  ****************************************************************************
  */
 
-VixError
-VixMntDiskHandle::read(
-   uint8* buf,          // IN
-   uint64 offset,       // IN
-   uint64 numberSector) // IN
+VixError VixMntDiskHandle::read(uint8 *buf,          // IN
+                                uint64 offset,       // IN
+                                uint64 numberSector) // IN
 {
 
-   VixError vixError = VixDiskLib_Read(_vixHandle,offset,numberSector,buf);
+   VixError vixError = VixDiskLib_Read(_vixHandle, offset, numberSector, buf);
    return vixError;
 }
-
 
 /*
  ****************************************************************************
@@ -184,9 +169,7 @@ VixMntDiskHandle::read(
  ****************************************************************************
  */
 
-VixError
-VixMntDiskHandle::read(
-   VixMntMsgData* msg_data){ // IN
+VixError VixMntDiskHandle::read(VixMntMsgData *msg_data) { // IN
    assert(_vixHandle);
    // TODO : write readed buf to mmap
    VixMntOpRead opReadData;
@@ -195,23 +178,22 @@ VixMntDiskHandle::read(
 
    uint8 buf[sizeResult];
 
-   VixError vixError = read(buf,opReadData.offset,opReadData.bufsize);
+   VixError vixError = read(buf, opReadData.offset, opReadData.bufsize);
 
    // write buf data for IPC terminal
    //
-   _mmap->mntWriteMmap(buf,0,sizeResult);
+   _mmap->mntWriteMmap(buf, 0, sizeResult);
 
    VixMntMsgData readMsgResult;
    readMsgResult.msg_op = VixMntOp(MntReadDone);
    readMsgResult.msg_datasize = sizeof(uint64);
-   memcpy(readMsgResult.msg_buff,&sizeResult,readMsgResult.msg_datasize);
-   VixMntMsgQue* readMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
+   memcpy(readMsgResult.msg_buff, &sizeResult, readMsgResult.msg_datasize);
+   VixMntMsgQue *readMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
    readMsgQ->sendMsg(&readMsgResult);
 
    delete readMsgQ;
 
    return vixError;
-
 }
 
 /*
@@ -232,14 +214,10 @@ VixMntDiskHandle::read(
  ****************************************************************************
  */
 
-VixError
-VixMntDiskHandle::write(
-    uint8* buf,
-    uint64 offset,
-    uint64 numberSector)
-{
+VixError VixMntDiskHandle::write(uint8 *buf, uint64 offset,
+                                 uint64 numberSector) {
 
-   VixError vixError = VixDiskLib_Write(_vixHandle,offset,numberSector,buf);
+   VixError vixError = VixDiskLib_Write(_vixHandle, offset, numberSector, buf);
    return vixError;
 }
 
@@ -258,9 +236,7 @@ VixMntDiskHandle::write(
  ****************************************************************************
  */
 
-VixError
-VixMntDiskHandle::write(
-   VixMntMsgData* msg_data){ // IN
+VixError VixMntDiskHandle::write(VixMntMsgData *msg_data) { // IN
    // TODO : write writed buf to mmap
    VixMntOpRead opWriteData;
    opWriteData.convertFromBytes(msg_data->msg_buff);
@@ -268,17 +244,15 @@ VixMntDiskHandle::write(
 
    uint8 buf[sizeResult];
    // first read buf data from mmap area
-   _mmap->mntReadMmap(buf,0,sizeResult);
+   _mmap->mntReadMmap(buf, 0, sizeResult);
 
-
-
-   VixError vixError = write(buf,opWriteData.offset,opWriteData.bufsize);
+   VixError vixError = write(buf, opWriteData.offset, opWriteData.bufsize);
 
    VixMntMsgData writeMsgResult;
    writeMsgResult.msg_op = VixMntOp(MntWriteDone);
    writeMsgResult.msg_datasize = sizeof(uint64);
-   memcpy(writeMsgResult.msg_buff,&sizeResult,writeMsgResult.msg_datasize);
-   VixMntMsgQue* writeMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
+   memcpy(writeMsgResult.msg_buff, &sizeResult, writeMsgResult.msg_datasize);
+   VixMntMsgQue *writeMsgQ = new VixMntMsgQue(msg_data->msg_response_q);
    writeMsgQ->sendMsg(&writeMsgResult);
 
    delete writeMsgQ;
@@ -301,13 +275,10 @@ VixMntDiskHandle::write(
  ****************************************************************************
  */
 
-VixError
-VixMntDiskHandle::getDiskInfo(
-   VixDiskLibInfo **info){ // IN/OUT
+VixError VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info) { // IN/OUT
 
-   VixError vixError = VixDiskLib_GetInfo(_vixHandle,info);
+   VixError vixError = VixDiskLib_GetInfo(_vixHandle, info);
    return vixError;
-
 }
 
 /*
@@ -326,13 +297,10 @@ VixMntDiskHandle::getDiskInfo(
  ****************************************************************************
  */
 
-void
-VixMntDiskHandle::freeDiskInfo(
-   VixDiskLibInfo *info){ // IN
+void VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info) { // IN
 
    VixDiskLib_FreeInfo(info);
 }
-
 
 /*
  ****************************************************************************
@@ -350,13 +318,11 @@ VixMntDiskHandle::freeDiskInfo(
  ****************************************************************************
  */
 
-std::string
-VixMntDiskHandle::getErrorMsg(VixError vixError){
+std::string VixMntDiskHandle::getErrorMsg(VixError vixError) {
 
-   char* msg = VixDiskLib_GetErrorText(vixError,NULL);
+   char *msg = VixDiskLib_GetErrorText(vixError, NULL);
    std::string descp = msg;
    VixDiskLib_FreeErrorText(msg);
 
    return descp;
-
 }

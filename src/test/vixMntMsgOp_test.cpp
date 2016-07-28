@@ -1,32 +1,32 @@
-#include <vixMntMsgOp.h>
-#include <iostream>
-#include <cstring>
 #include <assert.h>
+#include <cstring>
+#include <iostream>
+#include <vixMntMsgOp.h>
 
 using namespace std;
 
-int main(){
+int main() {
 #if defined(__cplusplus) && __cplusplus >= 201103L
-    VixMntMsgOp testop = VixMntMsgOp::MntInit;
+   VixMntMsgOp testop = VixMntMsgOp::MntInit;
 #else
-    VixMntMsgOp testop = MntInit;
+   VixMntMsgOp testop = MntInit;
 #endif
-    //cout<<(short)testop2<<endl;
-    assert(testop == "MntInit");
-    assert(!(testop == "MntWrite"));
-    assert(!(testop == "MntWrite22"));
-    assert(strcmp(getOpValue(testop),"MntInit") == 0);
-    assert(getOpIndex("MntInit") == testop);
-    assert(getOpIndex("MntWrite") != testop);
-    assert(getOpIndex("ffft") != testop);
+   // cout<<(short)testop2<<endl;
+   assert(testop == "MntInit");
+   assert(!(testop == "MntWrite"));
+   assert(!(testop == "MntWrite22"));
+   assert(strcmp(getOpValue(testop), "MntInit") == 0);
+   assert(getOpIndex("MntInit") == testop);
+   assert(getOpIndex("MntWrite") != testop);
+   assert(getOpIndex("ffft") != testop);
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-    testop = VixMntMsgOp::MntRead;
+   testop = VixMntMsgOp::MntRead;
 #else
-    testop = MntRead;
+   testop = MntRead;
 #endif
-    assert(getOpIndex("MntRead") == testop);
+   assert(getOpIndex("MntRead") == testop);
 
-    cout<<"Test successful"<<endl;
-    return 0;
+   cout << "Test successful" << endl;
+   return 0;
 }

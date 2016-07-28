@@ -1,51 +1,52 @@
-#include <vixMntOperation.h>
 #include <vixMntMsgOp.h>
 #include <vixMntMsgQue.h>
+#include <vixMntOperation.h>
 #include <vixMntUtility.h>
 
-#include <iostream>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <memory>
 
 using namespace std;
 
-int
-main(int argc,char** argv){
-    //mq_unlink("/operation");
-    pid_t pid = fork();
-    if( pid == 0  ){
+int main(int argc, char **argv) {
+   // mq_unlink("/operation");
+   pid_t pid = fork();
+   if (pid == 0) {
 
-        char buf[] = "ashione";
-        VixMntOpRead t("/tmp",3,2);
-        ILog("OpRead struct size : %ld %d %ld",sizeof(VixMntOpRead),t.size(),sizeof(t));
-        ILog("buf addr : %x %s\n",( long )buf,buf);
-        VixMntMsgQue* msgQue = new VixMntMsgQue("/op");
+      char buf[] = "ashione";
+      VixMntOpRead t("/tmp", 3, 2);
+      ILog("OpRead struct size : %ld %d %ld", sizeof(VixMntOpRead), t.size(),
+           sizeof(t));
+      ILog("buf addr : %x %s\n", (long)buf, buf);
+      VixMntMsgQue *msgQue = new VixMntMsgQue("/op");
 #if defined(__cplusplus) && __cplusplus >= 201103L
-        VixMntMsgData* msgdata = new VixMntMsgData(VixMntMsgOp::MntInit,sizeof(t),(char *)&t);
+      VixMntMsgData *msgdata =
+         new VixMntMsgData(VixMntMsgOp::MntInit, sizeof(t), (char *)&t);
 #else
-        VixMntMsgData* msgdata = new VixMntMsgData(MntInit,sizeof(t),(char *)&t);
+      VixMntMsgData *msgdata =
+         new VixMntMsgData(MntInit, sizeof(t), (char *)&t);
 #endif
-        msgQue->sendMsg(msgdata);
-        ILog("send ok\n");
-        delete msgQue;
-        exit(0);
+      msgQue->sendMsg(msgdata);
+      ILog("send ok\n");
+      delete msgQue;
+      exit(0);
+   }
 
-    }
+   // VixMntMsgQue* msgQue = VixMntMsgQue::getMsgQueInstance();
+   VixMntMsgQue *msgQue = new VixMntMsgQue("/op", true);
 
-    //VixMntMsgQue* msgQue = VixMntMsgQue::getMsgQueInstance();
-    VixMntMsgQue* msgQue = new VixMntMsgQue("/op",true);
+   VixMntMsgData *msgdata = new VixMntMsgData();
+   msgQue->receiveMsg(msgdata);
+   ILog("%s", getOpValue(msgdata->msg_op));
 
-    VixMntMsgData* msgdata = new VixMntMsgData();
-    msgQue->receiveMsg(msgdata);
-    ILog("%s",getOpValue(msgdata->msg_op));
+   VixMntOpRead *rt = new VixMntOpRead();
+   rt->convertFromBytes(msgdata->msg_buff);
+   ILog("%s\n", rt->fileName);
+   delete msgQue;
+   VixMntMsgQue::unlink();
 
-    VixMntOpRead* rt = new VixMntOpRead();
-    rt->convertFromBytes(msgdata->msg_buff);
-    ILog("%s\n",rt->fileName);
-    delete msgQue;
-    VixMntMsgQue::unlink();
-
-    return 0;
+   return 0;
 }

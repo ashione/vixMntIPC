@@ -1,51 +1,50 @@
-#include <vixMntUtility.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <vixMntUtility.h>
 
-int
-main(){
-    ILog("Info");
+int main() {
+   ILog("Info");
 
-    vixMntIPC_InitMmap(0x100,0);
+   vixMntIPC_InitMmap(0x100, 0);
 
-    const char msg[12] = "mmap test 1";
-    size_t msg_len = strlen(msg);
-    char *buf = (char *)malloc(msg_len);
+   const char msg[12] = "mmap test 1";
+   size_t msg_len = strlen(msg);
+   char *buf = (char *)malloc(msg_len);
 
-/*
- * test same process whether mmap is works
-    vixMntIPC_WriteMmap(msg,0,msg_len);
-    vixMntIPC_ReadMmap(buf,0,msg_len);
+   /*
+    * test same process whether mmap is works
+       vixMntIPC_WriteMmap(msg,0,msg_len);
+       vixMntIPC_ReadMmap(buf,0,msg_len);
 
-    vixMntIPC_CleanMmap();
+       vixMntIPC_CleanMmap();
 
-    ILog("buf len %d  -- (%s)",msg_len,buf);
-    printf("%s\n",buf);
+       ILog("buf len %d  -- (%s)",msg_len,buf);
+       printf("%s\n",buf);
 
-*/
+   */
 
-/*
- * test mmap between two processes
- */
+   /*
+    * test mmap between two processes
+    */
 
-    pid_t pid = fork();
+   pid_t pid = fork();
 
-    if(!pid){
-        vixMntIPC_WriteMmap(msg,10,msg_len);
+   if (!pid) {
+      vixMntIPC_WriteMmap(msg, 10, msg_len);
 
-        exit(0);
-    }
+      exit(0);
+   }
 
-    sleep(1);
-    vixMntIPC_ReadMmap(buf,10,msg_len);
+   sleep(1);
+   vixMntIPC_ReadMmap(buf, 10, msg_len);
 
-    vixMntIPC_CleanMmap();
+   vixMntIPC_CleanMmap();
 
-    ILog("buf len %d  -- (%s)",msg_len,buf);
-    printf("%s\n",buf);
+   ILog("buf len %d  -- (%s)", msg_len, buf);
+   printf("%s\n", buf);
 
-     free(buf);
+   free(buf);
 
-    return 0;
+   return 0;
 }

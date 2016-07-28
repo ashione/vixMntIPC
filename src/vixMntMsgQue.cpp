@@ -1,13 +1,13 @@
-#include <vixMntMsgQue.h>
-#include <vixMntMsgOp.h>
-#include <vixMntLock.h>
 #include <vixMntException.h>
+#include <vixMntLock.h>
+#include <vixMntMsgOp.h>
+#include <vixMntMsgQue.h>
 
-VixMntMsgQue* VixMntMsgQue::vixMntMsgInstance = NULL;
+VixMntMsgQue *VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
-std::map<std::string,mqd_t> VixMntMsgQue::vixMntMsgMap;
+std::map<std::string, mqd_t> VixMntMsgQue::vixMntMsgMap;
 pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
-//pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  ****************************************************************************
@@ -27,47 +27,45 @@ pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
  */
 
 /*
- * abort - > this static pthread_mutex_t lock maybe not work in different threads
+ * abort - > this static pthread_mutex_t lock maybe not work in different
+ * threads
  *  TODO :
  *    add semaphore in share memory
  *    add pthread_once for multithread safe
  */
 
-VixMntMsgQue*
-VixMntMsgQue::getMsgQueInstance(
-   sem_t *sem) { // IN
+VixMntMsgQue *VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
 
-   if(sem)
-     sem_wait(sem);
-/*
-   if( vixMntMsgInstance  == NULL){
-     VixMntMutex lock(&vixMntMsgLock);
-     try{
-       lock.lock();
+   if (sem)
+      sem_wait(sem);
+   /*
+      if( vixMntMsgInstance  == NULL){
+        VixMntMutex lock(&vixMntMsgLock);
+        try{
+          lock.lock();
 
-       ILog("first init instance, thread ID %u",pthread_self());
-       ILog("mutex lock add %x",&vixMntMsgLock);
-       vixMntMsgInstance = new VixMntMsgQue();
+          ILog("first init instance, thread ID %u",pthread_self());
+          ILog("mutex lock add %x",&vixMntMsgLock);
+          vixMntMsgInstance = new VixMntMsgQue();
 
-       lock.unlock();
-     }
-     catch ( VixMntException& e ){
-        ELog("%s",e.what());
-     }
+          lock.unlock();
+        }
+        catch ( VixMntException& e ){
+           ELog("%s",e.what());
+        }
 
-   }
-   else{
-     ILog("already init instance");
-   }
-*/
-   pthread_once(&ponce,&VixMntMsgQue::initInstance);
-   if(sem)
-     sem_post(sem);
+      }
+      else{
+        ILog("already init instance");
+      }
+   */
+   pthread_once(&ponce, &VixMntMsgQue::initInstance);
+   if (sem)
+      sem_post(sem);
 
    assert(vixMntMsgInstance != NULL);
    return vixMntMsgInstance;
 }
-
 
 /*
  ****************************************************************************
@@ -85,11 +83,7 @@ VixMntMsgQue::getMsgQueInstance(
  ****************************************************************************
  */
 
-void
-VixMntMsgQue::initInstance(){
-   vixMntMsgInstance = new VixMntMsgQue();
-}
-
+void VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
 
 /*
  ****************************************************************************
@@ -106,9 +100,8 @@ VixMntMsgQue::initInstance(){
  ****************************************************************************
  */
 
-VixMntMsgQue::VixMntMsgQue(
-   const char* msg_name,    // IN
-   bool readOnly){          // IN
+VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
+                           bool readOnly) {      // IN
 
    this->vixMntMsgAttr.mq_flags = 0;
    this->vixMntMsgAttr.mq_maxmsg = 8192;
@@ -120,48 +113,44 @@ VixMntMsgQue::VixMntMsgQue(
    this->readOnly = readOnly;
 
    if (!msg_name) {
-     this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
-   }
-   else {
-     this->vixMntMsgMapFileName = msg_name;
+      this->vixMntMsgMapFileName = VixMntMsgQue::vixMntMsgName;
+   } else {
+      this->vixMntMsgMapFileName = msg_name;
    }
 
    /*
    * return mq_id without open it again
    * if mq exist
    *
-   std::map<std::string, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.find(this->vixMntMsgMapFileName);
+   std::map<std::string, mqd_t>::iterator itr =
+   VixMntMsgQue::vixMntMsgMap.find(this->vixMntMsgMapFileName);
    if(itr != VixMntMsgQue::vixMntMsgMap.end()){
      this->vixMntMsgID = itr->second;
      return;
    }
    */
 
-   //ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
+   // ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
 
-     this->vixMntMsgID =
-       mq_open(
-       this->vixMntMsgMapFileName.c_str(),
-       O_CREAT | O_RDWR ,
-       0644,NULL);
+   this->vixMntMsgID =
+      mq_open(this->vixMntMsgMapFileName.c_str(), O_CREAT | O_RDWR, 0644, NULL);
 
-   if ( this->vixMntMsgID < 0) {
-     if ( errno == EEXIST ) {
-       WLog("exist mqid : %d | mq_name : %s",this->getVixMntMsgID(),vixMntMsgMapFileName.c_str());
-     }
-     else {
-       ELog("open mesage queue error %s ",strerror(errno));
-     }
+   if (this->vixMntMsgID < 0) {
+      if (errno == EEXIST) {
+         WLog("exist mqid : %d | mq_name : %s", this->getVixMntMsgID(),
+              vixMntMsgMapFileName.c_str());
+      } else {
+         ELog("open mesage queue error %s ", strerror(errno));
+      }
    }
 
    assert(this->vixMntMsgID > 0);
-   //ILog("original %u, new %u",VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName],this->vixMntMsgID);
+   // ILog("original %u, new
+   // %u",VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName],this->vixMntMsgID);
    VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
 
-   //ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
-
+   // ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
 }
-
 
 /*
  ****************************************************************************
@@ -179,19 +168,18 @@ VixMntMsgQue::VixMntMsgQue(
  ****************************************************************************
  */
 
-VixMntMsgQue::VixMntMsgQue(
-   mqd_t msg_id){ // IN
+VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) { // IN
 
    this->vixMntMsgID = msg_id;
-   std::map<std::string,mqd_t>::iterator item = VixMntMsgQue::vixMntMsgMap.begin();
-   for( ;item != VixMntMsgQue::vixMntMsgMap.end();item++) {
-      if( this->vixMntMsgID == item->second ){
-        this->vixMntMsgMapFileName = item->first;
+   std::map<std::string, mqd_t>::iterator item =
+      VixMntMsgQue::vixMntMsgMap.begin();
+   for (; item != VixMntMsgQue::vixMntMsgMap.end(); item++) {
+      if (this->vixMntMsgID == item->second) {
+         this->vixMntMsgMapFileName = item->first;
       }
    }
-   assert(item!= VixMntMsgQue::vixMntMsgMap.end());
+   assert(item != VixMntMsgQue::vixMntMsgMap.end());
 }
-
 
 /*
  ****************************************************************************
@@ -209,22 +197,20 @@ VixMntMsgQue::VixMntMsgQue(
  ****************************************************************************
  */
 
-void
-VixMntMsgQue::unlink(){
+void VixMntMsgQue::unlink() {
 
-   std::map<std::string, mqd_t>::iterator itr = VixMntMsgQue::vixMntMsgMap.begin();
-   while ( itr != VixMntMsgQue::vixMntMsgMap.end() ) {
-     if ( mq_unlink(itr->first.c_str()) < 0 ) {
-       ILog("%s unlink faild.",itr->first.c_str());
-     }
-     else {
-       ILog("%s unlink ok.",itr->first.c_str());
-     }
-     itr++;
+   std::map<std::string, mqd_t>::iterator itr =
+      VixMntMsgQue::vixMntMsgMap.begin();
+   while (itr != VixMntMsgQue::vixMntMsgMap.end()) {
+      if (mq_unlink(itr->first.c_str()) < 0) {
+         ILog("%s unlink faild.", itr->first.c_str());
+      } else {
+         ILog("%s unlink ok.", itr->first.c_str());
+      }
+      itr++;
    }
    VixMntMsgQue::vixMntMsgMap.clear();
 }
-
 
 /*
  ****************************************************************************
@@ -241,13 +227,12 @@ VixMntMsgQue::unlink(){
  ****************************************************************************
  */
 
-VixMntMsgQue::~VixMntMsgQue(){
+VixMntMsgQue::~VixMntMsgQue() {
 
-   if( this->vixMntMsgID != -1 ) {
-     mq_close(this->vixMntMsgID);
+   if (this->vixMntMsgID != -1) {
+      mq_close(this->vixMntMsgID);
    }
 }
-
 
 /*
  ****************************************************************************
@@ -264,22 +249,19 @@ VixMntMsgQue::~VixMntMsgQue(){
  ****************************************************************************
  */
 
-void
-VixMntMsgQue::releaseMsgQueInstance(
-   sem_t* sem) { // IN
+void VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
 
-   if ( sem )
-     sem_wait(sem);
+   if (sem)
+      sem_wait(sem);
 
-   if ( vixMntMsgInstance ) {
-     delete vixMntMsgInstance;
-     mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
+   if (vixMntMsgInstance) {
+      delete vixMntMsgInstance;
+      mq_unlink(VixMntMsgQue::vixMntMsgName.c_str());
    }
    vixMntMsgInstance = NULL;
 
-   if (sem )
-     sem_post(sem);
-
+   if (sem)
+      sem_post(sem);
 }
 
 /*
@@ -300,16 +282,13 @@ VixMntMsgQue::releaseMsgQueInstance(
  ****************************************************************************
  */
 
-mqd_t
-VixMntMsgQue::send(
-   const char* msg_ptr,     // IN
-   size_t msg_len,          // IN
-   unsigned msg_prio)       // IN
+mqd_t VixMntMsgQue::send(const char *msg_ptr, // IN
+                         size_t msg_len,      // IN
+                         unsigned msg_prio)   // IN
 {
-   //disable send function, when msg queue is readonly
+   // disable send function, when msg queue is readonly
    assert(!this->readOnly);
-   return mq_send(this->getVixMntMsgID(),msg_ptr,msg_len,msg_prio);
-
+   return mq_send(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
 /*
@@ -330,14 +309,11 @@ VixMntMsgQue::send(
  ****************************************************************************
  */
 
-mqd_t
-VixMntMsgQue::receive(
-   char* msg_ptr,         // IN
-   size_t msg_len,        // IN
-   unsigned* msg_prio )   // IN
+mqd_t VixMntMsgQue::receive(char *msg_ptr,      // IN
+                            size_t msg_len,     // IN
+                            unsigned *msg_prio) // IN
 {
-   return mq_receive(this->getVixMntMsgID(),msg_ptr,msg_len,msg_prio);
-
+   return mq_receive(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
 /*
@@ -356,21 +332,19 @@ VixMntMsgQue::receive(
  ****************************************************************************
  */
 
-bool
-VixMntMsgQue::sendMsgOp(
-   VixMntMsgOp msg_op,  // IN
-   unsigned msg_prio)   // IN
+bool VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
+                             unsigned msg_prio)  // IN
 {
-   /*
-   * bug : if op equal to ERROR
-   */
+/*
+* bug : if op equal to ERROR
+*/
 #if defined(__cplusplus) && __cplusplus >= 201103L
    assert(msg_op != VixMntMsgOp::ERROR);
 #else
    assert(msg_op != ERROR);
 #endif
-   const char* msg_str = getOpValue(msg_op);
-   return send(msg_str,strlen(msg_str), msg_prio) >=0 ;
+   const char *msg_str = getOpValue(msg_op);
+   return send(msg_str, strlen(msg_str), msg_prio) >= 0;
 }
 
 /*
@@ -388,18 +362,16 @@ VixMntMsgQue::sendMsgOp(
  ****************************************************************************
  */
 
-void
-VixMntMsgQue::receiveMsgOp (
-   VixMntMsgOp* msg_op,     // OUT
-   unsigned* msg_prio)      // IN
+void VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
+                                unsigned *msg_prio)  // IN
 {
    this->getattr(&this->vixMntMsgAttr);
 
    char *buf = new char[this->vixMntMsgAttr.mq_msgsize];
    // if not memeset, it may be old value
-   memset(buf,0,this->vixMntMsgAttr.mq_msgsize);
+   memset(buf, 0, this->vixMntMsgAttr.mq_msgsize);
 
-   if ( receive(buf,this->vixMntMsgAttr.mq_msgsize,msg_prio) < 0 )
+   if (receive(buf, this->vixMntMsgAttr.mq_msgsize, msg_prio) < 0)
 #if defined(__cplusplus) && __cplusplus >= 201103L
       *msg_op = VixMntMsgOp::ERROR;
 #else
@@ -409,7 +381,6 @@ VixMntMsgQue::receiveMsgOp (
       *msg_op = getOpIndex(buf);
 
    delete[] buf;
-
 }
 
 /*
@@ -429,18 +400,15 @@ VixMntMsgQue::receiveMsgOp (
  ****************************************************************************
  */
 
-bool
-VixMntMsgQue::sendMsg(
-   VixMntMsgData* msg_data,    // IN
-   unsigned msg_prio)          // IN
+bool VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
+                           unsigned msg_prio)       // IN
 {
    char *buf = new char[sizeof(VixMntMsgData)];
-   memcpy(buf,msg_data,sizeof(VixMntMsgData));
-   bool flag = send(buf,sizeof(VixMntMsgData),msg_prio) >= 0;
+   memcpy(buf, msg_data, sizeof(VixMntMsgData));
+   bool flag = send(buf, sizeof(VixMntMsgData), msg_prio) >= 0;
    delete[] buf;
 
    return flag;
-
 }
 
 /*
@@ -459,36 +427,32 @@ VixMntMsgQue::sendMsg(
  ****************************************************************************
  */
 
-void
-VixMntMsgQue::receiveMsg(
-   VixMntMsgData* msg_data,     // IN
-   unsigned* msg_prio)          // IN
+void VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data, // IN
+                              unsigned *msg_prio)      // IN
 {
    mq_attr tempAttr;
    this->getattr(&tempAttr);
-   //ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
+   // ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
    //     vixMntMsgAttr.mq_msgsize,
    //     vixMntMsgAttr.mq_curmsgs,
    //     tempAttr.mq_msgsize);
 
-   assert( 8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
+   assert(8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
 
-   //char *buf = new char[tempAttr.mq_msgsize];
+   // char *buf = new char[tempAttr.mq_msgsize];
    char *buf = new char[tempAttr.mq_msgsize];
 
-   if ( receive(buf,tempAttr.mq_msgsize,msg_prio) <0 ) {
-     ELog("receive error");
+   if (receive(buf, tempAttr.mq_msgsize, msg_prio) < 0) {
+      ELog("receive error");
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-     msg_data->msg_op = VixMntMsgOp::ERROR;
+      msg_data->msg_op = VixMntMsgOp::ERROR;
 #else
-     msg_data->msg_op = ERROR;
+      msg_data->msg_op = ERROR;
 #endif
-   }
-   else {
-     memcpy(msg_data,buf,sizeof(VixMntMsgData));
+   } else {
+      memcpy(msg_data, buf, sizeof(VixMntMsgData));
    }
 
    delete[] buf;
-
 }
