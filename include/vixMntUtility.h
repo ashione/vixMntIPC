@@ -78,6 +78,10 @@ int vixMntIPC_main();
 
 uint8 getVixMntIPCType();
 
+unsigned long hashString(unsigned char *str);
+
+unsigned long portMap(unsigned char *str);
+
 #ifdef __cplusplus
 }
 #endif

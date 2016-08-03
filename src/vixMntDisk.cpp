@@ -27,6 +27,7 @@ VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection,
    _vixHandle = NULL;
    ILog("open disklib");
    VixError vixError = VixDiskLib_Open(connection, path, flag, &_vixHandle);
+   diskBackingPath = path;
 
    SHOW_ERROR_INFO(vixError);
 }

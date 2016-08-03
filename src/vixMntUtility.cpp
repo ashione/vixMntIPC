@@ -646,3 +646,58 @@ getRandomFileName(const char *rootPath,
 
 uint8
 getVixMntIPCType() { return IPCTYPE_FLAG; }
+
+/**
+ ****************************************************************************
+ * hashString
+ * djb2 hash function,this algorithm (k=33) was first reported by dan
+ * bernstein many years ago in comp.lang.c. another version of this
+ * algorithm (now favored by bernstein) uses xor:
+ * hash(i) = hash(i - 1) * 33 ^ str[i]; the magic of number 33
+ * (why it works better than many other constants, prime or not) has never
+ * been adequately explained.
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * str
+ * -------------------------------------------------------------------------
+ * output paremeters :
+ * unsigned long , hash number
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
+ */
+
+unsigned long
+hashString(unsigned char *str)
+{
+   unsigned long hash = 5381;
+   int c;
+   while ( c == *str++ ){
+      hash = ((hash << 5) + hash) + hash + c;
+   }
+   return hash;
+}
+
+/**
+ ****************************************************************************
+ * portMap
+ * map diskname to a port
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * str
+ * -------------------------------------------------------------------------
+ * output paremeters :
+ * unsigned long , hash number
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
+ */
+
+unsigned long
+portMap(unsigned char *str)
+{
+   unsigned long port = hashString(str);
+   return (port%20000)+41413;
+}

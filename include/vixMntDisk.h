@@ -33,6 +33,9 @@ private:
    VixMntMmap *_mmap;
 
 public:
+   std::string diskBackingPath;
+
+public:
    explicit VixMntDiskHandle(VixDiskLibConnection connection, const char *path,
                              uint32 flag);
    ~VixMntDiskHandle();
