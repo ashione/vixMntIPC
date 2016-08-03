@@ -23,15 +23,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * class VixMntMsgQue is designed to deliver control path message
- * among different process.
- * Actually, suitable queue message size will be helpful.
+
+/**
+ * class VixMntMsgQue is designed to deliver control path message  among
+ * different process. Actually, suitable queue message size will be helpful.
  */
 
 class VixMntMsgQue {
-   // private  :
-   //   VixMntMsgQue();
 public:
    explicit VixMntMsgQue(const char *msg_name = NULL, bool readOnly = false);
    explicit VixMntMsgQue(mqd_t msg_id);
@@ -60,13 +58,14 @@ public:
 
    bool sendMsg(VixMntMsgData *msg_data, unsigned msg_prio = 0);
    void receiveMsg(VixMntMsgData *msg_data, unsigned *msg_prio = NULL);
+   // static function unlink is defined to unlink all message queue.
    static void unlink();
 
 public:
    static VixMntMsgQue *vixMntMsgInstance;
    static const std::string vixMntMsgName;
    static std::map<std::string, mqd_t> vixMntMsgMap;
-   // static pthread_mutex_t vixMntMsgLock;
+   // make sure the initInstance function is only called once.
    static pthread_once_t ponce;
 
 public:

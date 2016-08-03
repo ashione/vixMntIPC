@@ -8,8 +8,9 @@ const char *VIXMNT_MSG_OP_STR[OP_MODE_NUM] = {
    "MntInit", "MntInitDone", "MntWrite", "MntWriteDone",
    "MntRead", "MntReadDone", "HALT"};
 
-bool operator==(VixMntMsgOp op, const char *cstr_op) {
-
+bool
+operator==(VixMntMsgOp op, const char *cstr_op)
+{
 #if defined(__cplusplus) && __cplusplus >= 201103L
    if (op != VixMntMsgOp::ERROR)
 #else
@@ -19,11 +20,12 @@ bool operator==(VixMntMsgOp op, const char *cstr_op) {
    return false;
 }
 
-bool operator==(VixMntMsgOp op, std::string str_op) {
+bool operator==(VixMntMsgOp op, std::string str_op)
+{
    return operator==(op, str_op.c_str());
 }
 
-/*
+/**
  ****************************************************************************
  * getOpValue
  * convert enum type to string info
@@ -39,7 +41,9 @@ bool operator==(VixMntMsgOp op, std::string str_op) {
  ****************************************************************************
  */
 
-const char *getOpValue(VixMntMsgOp op) {
+const char*
+getOpValue(VixMntMsgOp op)
+{
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
    if (op == VixMntMsgOp::ERROR)
@@ -50,7 +54,7 @@ const char *getOpValue(VixMntMsgOp op) {
    return VIXMNT_MSG_OP_STR[(short)op];
 }
 
-/*
+/**
  ****************************************************************************
  * getOpIndex
  * convert operation string to VixMntMsgOp
@@ -66,8 +70,8 @@ const char *getOpValue(VixMntMsgOp op) {
  ****************************************************************************
  */
 
-VixMntMsgOp getOpIndex(const char *str_op) {
-
+VixMntMsgOp getOpIndex(const char *str_op)
+{
    VixMntMsgOp test_op[OP_MODE_NUM] = {
 #if defined(__cplusplus) && __cplusplus >= 201103L
       VixMntMsgOp::MntInit,
@@ -90,8 +94,9 @@ VixMntMsgOp getOpIndex(const char *str_op) {
    };
 
    for (int i = 0; i < OP_MODE_NUM; ++i) {
-      if (test_op[i] == str_op)
+      if (test_op[i] == str_op) {
          return test_op[i];
+      }
    }
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
@@ -101,7 +106,7 @@ VixMntMsgOp getOpIndex(const char *str_op) {
 #endif
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgData Constructor
  * create a new VixMntMsgData that only ship VixMntMsgOp
@@ -119,16 +124,16 @@ VixMntMsgOp getOpIndex(const char *str_op) {
  ****************************************************************************
  */
 
-VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,  // IN
-                             size_t msg_datasize, // IN
-                             char *msg_buff)      // IN
+VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+                             size_t msg_datasize,
+                             char *msg_buff)
 {
    this->msg_op = msg_op;
    this->msg_datasize = msg_datasize;
    memcpy(this->msg_buff, msg_buff, this->msg_datasize);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgData Constructor
  * using this only when msg_buff is string
@@ -144,14 +149,14 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,  // IN
  ****************************************************************************
  */
 
-VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op, // IN
-                             char *msg_buff)     // IN
+VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+                             char *msg_buff)
 {
    size_t msg_len = strlen(msg_buff);
    new (this) VixMntMsgData(msg_op, msg_len, msg_buff);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgData Constructor
  * add exra msg_response_q that only work in message queue
@@ -168,8 +173,11 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op, // IN
  ****************************************************************************
  */
 
-VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op, size_t msg_datasize,
-                             const char *msg_q_name, char *msg_buff) {
+VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
+                             size_t msg_datasize,
+                             const char *msg_q_name,
+                             char *msg_buff)
+{
    strncpy(msg_response_q, msg_q_name, strlen(msg_q_name));
    msg_response_q[strlen(msg_q_name)] = '\0';
    new (this) VixMntMsgData(msg_op, msg_datasize, msg_buff);

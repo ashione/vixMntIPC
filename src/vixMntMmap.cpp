@@ -1,4 +1,3 @@
-
 #include <vixMntMmap.h>
 #include <vixMntUtility.h>
 
@@ -15,10 +14,10 @@ extern "C" {
 #endif
  * VixMntMmap Constructor,
  * share memory will be used when isRoot is True.
- * XXX : it opens [datasize/pagesize] +1 frame for share memory or memory map.
+ * it opens [datasize/pagesize] +1 frame for share memory or memory map.
  */
 
-/*
+/**
  ****************************************************************************
  * VixMntMmap Constructor
  * -------------------------------------------------------------------------
@@ -36,9 +35,9 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
                        bool isRoot)          // IN
 {
    try {
-      if (isRoot)
+      if (isRoot) {
          this->file_name = VixMntMmap::fileRoot;
-      else
+      } else
          //   this->file_name = getRandomFileName(fileRoot);
          this->file_name = VixMntMmap::fileRoot;
    } catch (std::exception &e) {
@@ -46,15 +45,14 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
       this->file_name = "/vmware_mnt_shm";
    }
 
-   // this->fid = open(this->file_name.c_str(), O_RDWR | O_CREAT |
-   // O_TRUNC,0666);
    this->fid =
       shm_open(this->file_name.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666);
 
-   if (this->fid > 0)
+   if (this->fid > 0) {
       ILog("open share memory %d %s", this->fid, this->file_name.c_str());
-   else
+   } else {
       ILog("open share memory faild, map to file%d", this->fid);
+   }
 
    this->mmap_datasize = mmap_datasize > 0 ? mmap_datasize : MMAP_PAGE_SIZE;
    this->mmap_pagenum = this->mmap_datasize / MMAP_PAGE_SIZE + 1;
@@ -75,10 +73,10 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
    ILog("shm mmap addr : %x", this->mmap_data);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMmap::mntWriteMmap
- * a packaged function for writing buffer to shared memory
+ * A packaged function for writing buffer to shared memory.
  * -------------------------------------------------------------------------
  * input parameters  :
  * buf,        data buffer pointer
@@ -102,10 +100,10 @@ void VixMntMmap::mntWriteMmap(const uint8 *buf,  // IN
           write_size > 0 ? write_size : this->mmap_datasize);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMmap::mntReadMmap
- * await for reading data from shared memory
+ * Await for reading data from shared memory.
  * -------------------------------------------------------------------------
  * input parameters  :
  * buf,      data buffer pointer
@@ -128,7 +126,7 @@ void VixMntMmap::mntReadMmap(uint8 *buf,       // IN/OUT
           read_size > 0 ? read_size : this->mmap_datasize);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMmap Deconstructor
  * -------------------------------------------------------------------------
@@ -145,7 +143,4 @@ VixMntMmap::~VixMntMmap() {
 
    munmap(this->mmap_data, this->mmap_pagenum * MMAP_PAGE_SIZE);
    shm_unlink(this->file_name.c_str());
-   // printf("mmap_data : %x\n",this->mmap_data);
-   // if(fid > 0)
-   //   close(fid);
 }

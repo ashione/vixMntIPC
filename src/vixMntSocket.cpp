@@ -1,7 +1,7 @@
 #include <vixMntOperation.h>
 #include <vixMntSocket.h>
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer Constructor
  * bind a given port on localhost, it will exit whenever bind error.
@@ -17,13 +17,13 @@
  ****************************************************************************
  */
 
-VixMntSocketServer::VixMntSocketServer() : VixMntSocket() {
+VixMntSocketServer::VixMntSocketServer() : VixMntSocket()
+{
    sockaddr_in servaddr;
    listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
    if (listenfd == -1) {
       ELog("socket error");
-      // perror("socket error:");
       exit(1);
    }
 
@@ -33,7 +33,6 @@ VixMntSocketServer::VixMntSocketServer() : VixMntSocket() {
    servaddr.sin_port = htons(SOCKET_PORT);
 
    if (bind(listenfd, (sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
-      // perror("bind error:");
       ELog("bind error");
       exit(1);
    }
@@ -42,7 +41,7 @@ VixMntSocketServer::VixMntSocketServer() : VixMntSocket() {
 
 VixMntSocketServer::~VixMntSocketServer() { close(listenfd); }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer:;serverListen
  * starting server listening and enable epoll for socket fd
@@ -58,7 +57,9 @@ VixMntSocketServer::~VixMntSocketServer() { close(listenfd); }
  ****************************************************************************
  */
 
-void VixMntSocketServer::serverListen(VixMntDiskHandle *vixdh) {
+void
+VixMntSocketServer::serverListen(VixMntDiskHandle *vixdh)
+{
    if (listen(listenfd, SOCKET_LISTENQ)) {
       ELog("Server Listen Error, %s", strerror(errno));
    } else {
@@ -68,7 +69,7 @@ void VixMntSocketServer::serverListen(VixMntDiskHandle *vixdh) {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer::doEpoll
  * epoll starting
@@ -84,7 +85,9 @@ void VixMntSocketServer::serverListen(VixMntDiskHandle *vixdh) {
  ****************************************************************************
  */
 
-void VixMntSocketServer::doEpoll() {
+void
+VixMntSocketServer::doEpoll()
+{
    epoll_event events[SOCKET_EPOLLEVENTS];
    int ret;
    char buf[SOCKET_BUF_MAX_SIZE];
@@ -96,13 +99,14 @@ void VixMntSocketServer::doEpoll() {
       ret = epoll_wait(epollfd, events, SOCKET_EPOLLEVENTS, -1);
 
       handleEvents(events, ret, buf);
-      if (ret <= 0)
+      if (ret <= 0) {
          return;
+      }
    }
    close(epollfd);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer::handleEvents
  * handle different events in different functions / operations
@@ -119,9 +123,11 @@ void VixMntSocketServer::doEpoll() {
  ****************************************************************************
  */
 
-void VixMntSocketServer::handleEvents(epoll_event *events, // IN
-                                      int num,             // IN
-                                      char *buf) {         // IN
+void
+VixMntSocketServer::handleEvents(epoll_event *events,
+                                 int num,
+                                 char *buf)
+{
 
    for (int i = 0; i < num; i++) {
       int fd = events[i].data.fd;
@@ -135,7 +141,7 @@ void VixMntSocketServer::handleEvents(epoll_event *events, // IN
    }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntSocketServer::handleAccept
  * accpet a new socket client
@@ -151,7 +157,9 @@ void VixMntSocketServer::handleEvents(epoll_event *events, // IN
  ****************************************************************************
  */
 
-void VixMntSocketServer::handleAccept() {
+void
+VixMntSocketServer::handleAccept()
+{
 
    int clientFd;
    sockaddr_in clientAddr;
@@ -160,17 +168,18 @@ void VixMntSocketServer::handleAccept() {
 
    if (clientFd == -1) {
       ELog("Accept Error");
-      // perror("accept error.");
 
    } else {
-      ILog("Accept a new client : %s : %d", inet_ntoa(clientAddr.sin_addr),
+      /**
+       * ILog("Accept a new client : %s : %d", inet_ntoa(clientAddr.sin_addr),
            clientAddr.sin_port);
+      */
       addEvent(clientFd, EPOLLIN);
       clientMap4Write[clientFd] = 0;
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer::doRead
  * parser control data, then
@@ -189,34 +198,27 @@ void VixMntSocketServer::handleAccept() {
  ****************************************************************************
  */
 
-void VixMntSocketServer::doRead(int fd,       // IN
-                                char *buf,    // IN
-                                int maxLen) { // IN
+void VixMntSocketServer::doRead(int fd,
+                                char *buf,
+                                int maxLen)
+{
 
-   // maxLen = maxLen>0?maxLen:SOCKET_BUF_MAX_SIZE;
    maxLen = maxLen > 0 ? maxLen : sizeof(VixMntOpSocket);
-   // int nread = read(fd,buf,maxLen);
    int nread = recv(fd, buf, maxLen, 0);
-   // ILog("doread fd : %d, maxLen : %d,nread %d",fd,maxLen,nread);
    if (nread == -1) {
       ELog("Read Error");
-      // perror("read error");
       close(fd);
    } else if (nread == 0) {
-      ILog("Client Close");
       clientMap4Write.erase(fd);
       close(fd);
       deleteEvent(fd, EPOLLIN);
    } else {
       VixMntOpSocket vixskop;
       vixskop.convertFromBytes(buf);
-      // ILog("do readop %s",getOpValue(vixskop.carriedOp));
       if (vixskop.carriedOp == VixMntOp(MntRead)) {
-         // ILog("doread %u",vixskop.bufsize * VIXDISKLIB_SECTOR_SIZE);
          uint64 maxOps =
             vixskop.bufsize * VIXDISKLIB_SECTOR_SIZE / SOCKET_BUF_MAX_SIZE;
          uint64 eachSectorSize = SOCKET_BUF_MAX_SIZE / VIXDISKLIB_SECTOR_SIZE;
-         // ILog("doreadop maxOps %d",maxOps);
          uint32 i = 0;
          for (; i < maxOps; ++i) {
 
@@ -224,8 +226,6 @@ void VixMntSocketServer::doRead(int fd,       // IN
                vixdh->read((uint8 *)buf, vixskop.offset + i * eachSectorSize,
                            eachSectorSize);
             SHOW_ERROR_INFO(vixError);
-            // ILog("Read offset %u , bufsize %u,token
-            // %u",vixskop.offset+i*eachSectorSize,eachSectorSize,vixskop.token);
             int nwrite = rawWrite(fd, buf, SOCKET_BUF_MAX_SIZE);
 
             if (nwrite <= 0) {
@@ -237,22 +237,17 @@ void VixMntSocketServer::doRead(int fd,       // IN
          if (leftSector > 0) {
 
             /* mark client needed buffer size for next write operation*/
-            // clientMap4Write[fd] = leftSector * VIXDISKLIB_SECTOR_SIZE;
             VixError vixError = vixdh->read(
                (uint8 *)buf, vixskop.offset + i * eachSectorSize, leftSector);
             SHOW_ERROR_INFO(vixError);
-            // ILog("Read offset %u , bufsize %u,token
-            // %u",vixskop.offset+i*eachSectorSize,eachSectorSize,vixskop.token);
             int nwrite = rawWrite(fd, buf, leftSector * VIXDISKLIB_SECTOR_SIZE);
 
             if (nwrite <= 0) {
                ELog("Reminded Write Error.");
             }
-            // modifyEvent(fd,EPOLLOUT);
          }
       } else if (vixskop.carriedOp == VixMntOp(MntWrite)) {
          // continue to read reminded buf
-         // nread = recv(fd,buf+nread,sizeof(VixMntOpSocket)-nread,0);
          int ndataread = recv(fd, buf, vixskop.carriedBufSize, 0);
          vixskop.carriedBufSize = 0;
 
@@ -284,7 +279,7 @@ void VixMntSocketServer::doRead(int fd,       // IN
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketServer::doWrite
  * deprecated now if read size is bigger than SOCKET_BUF_MAX_SIZE
@@ -301,13 +296,13 @@ void VixMntSocketServer::doRead(int fd,       // IN
  ****************************************************************************
  */
 
-void VixMntSocketServer::doWrite(int fd,       // IN
-                                 char *buf,    // IN
-                                 int maxLen) { // IN
+void
+VixMntSocketServer::doWrite(int fd,
+                            char *buf,
+                            int maxLen)
+{
 
-   // maxLen =  maxLen>0?maxLen:strlen(buf);
    ILog("dowrite fd : %d, maxLen : %d", fd, clientMap4Write[fd]);
-   // int nwrite = send(fd,buf,clientMap4Write[fd],0);
    int nwrite = rawWrite(fd, buf, clientMap4Write[fd]);
    if (nwrite == -1) {
       ELog("Write Error");
@@ -315,10 +310,9 @@ void VixMntSocketServer::doWrite(int fd,       // IN
       deleteEvent(fd, EPOLLOUT);
    } else
       modifyEvent(fd, EPOLLIN);
-   // memset(buf,0,maxLen);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocket::addEvent
  * add event for socket epoll
@@ -335,7 +329,10 @@ void VixMntSocketServer::doWrite(int fd,       // IN
  ****************************************************************************
  */
 
-void VixMntSocket::addEvent(int fd, int state) {
+void
+VixMntSocket::addEvent(int fd,
+                       int state)
+{
 
    epoll_event ev;
    ev.events = state;
@@ -343,7 +340,7 @@ void VixMntSocket::addEvent(int fd, int state) {
    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocket::deleteEvent
  * -------------------------------------------------------------------------
@@ -359,8 +356,10 @@ void VixMntSocket::addEvent(int fd, int state) {
  ****************************************************************************
  */
 
-void VixMntSocket::deleteEvent(int fd,      // IN
-                               int state) { // IN
+void
+VixMntSocket::deleteEvent(int fd,
+                          int state)
+{
 
    epoll_event ev;
    ev.events = state;
@@ -368,7 +367,7 @@ void VixMntSocket::deleteEvent(int fd,      // IN
    epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &ev);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocket::modifyEvent
  * -------------------------------------------------------------------------
@@ -384,7 +383,10 @@ void VixMntSocket::deleteEvent(int fd,      // IN
  ****************************************************************************
  */
 
-void VixMntSocket::modifyEvent(int fd, int state) {
+void
+VixMntSocket::modifyEvent(int fd,
+                          int state)
+{
 
    epoll_event ev;
    ev.events = state;
@@ -392,7 +394,7 @@ void VixMntSocket::modifyEvent(int fd, int state) {
    epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &ev);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocket::rawRead
  * read data directly, but it will keep reading until recived data length
@@ -410,8 +412,11 @@ void VixMntSocket::modifyEvent(int fd, int state) {
  ****************************************************************************
  */
 
-int VixMntSocket::rawRead(int fd, char *buf, int bufsize) {
-   // ILog("Socket Base read %d",bufsize);
+int
+VixMntSocket::rawRead(int fd,
+                      char *buf,
+                      int bufsize)
+{
    if (bufsize <= 0)
       return bufsize;
 
@@ -419,20 +424,17 @@ int VixMntSocket::rawRead(int fd, char *buf, int bufsize) {
 
    if (recvSize == 0) {
       ELog("Server close");
-      // close(sockfd);
    } else if (recvSize == 0) {
       ELog("Send Error");
-      // close(sockfd);
    } else
       while (recvSize < bufsize) {
          int tempRecvSize = read(fd, buf + recvSize, bufsize - recvSize);
          recvSize += tempRecvSize;
-         // ILog("receSize %d",recvSize);
       }
    return recvSize;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocket::rawWrite
  * keep writing until all data are sent out
@@ -449,7 +451,11 @@ int VixMntSocket::rawRead(int fd, char *buf, int bufsize) {
  ****************************************************************************
  */
 
-int VixMntSocket::rawWrite(int fd, const char *buf, int bufsize) {
+int
+VixMntSocket::rawWrite(int fd,
+                       const char *buf,
+                       int bufsize)
+{
    // return write(sockfd,buf,bufsize);
    if (bufsize > 0) {
       int sendSize = write(fd, buf, bufsize);
@@ -469,7 +475,7 @@ int VixMntSocket::rawWrite(int fd, const char *buf, int bufsize) {
    return bufsize;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient Constructor
  * connect socket server automatically
@@ -485,7 +491,8 @@ int VixMntSocket::rawWrite(int fd, const char *buf, int bufsize) {
  ****************************************************************************
  */
 
-VixMntSocketClient::VixMntSocketClient() : VixMntSocket() {
+VixMntSocketClient::VixMntSocketClient() : VixMntSocket()
+{
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
    sockaddr_in servaddr;
    bzero(&servaddr, sizeof(servaddr));
@@ -497,7 +504,7 @@ VixMntSocketClient::VixMntSocketClient() : VixMntSocket() {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient Deconstructor
  * -------------------------------------------------------------------------
@@ -514,7 +521,7 @@ VixMntSocketClient::VixMntSocketClient() : VixMntSocket() {
 
 VixMntSocketClient::~VixMntSocketClient() { close(sockfd); }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient::doRead
  * unimplemented
@@ -530,13 +537,15 @@ VixMntSocketClient::~VixMntSocketClient() { close(sockfd); }
  ****************************************************************************
  */
 
-void VixMntSocketClient::doRead(int fd,       // IN
-                                char *buf,    // IN
-                                int maxLen) { // IN
+void
+VixMntSocketClient::doRead(int fd,
+                           char *buf,
+                           int maxLen)
+{
    // TODO
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClinet::doWrite
  * unimplemented
@@ -552,13 +561,15 @@ void VixMntSocketClient::doRead(int fd,       // IN
  ****************************************************************************
  */
 
-void VixMntSocketClient::doWrite(int fd,       // IN
-                                 char *buf,    // IN
-                                 int maxLen) { // IN
+void
+VixMntSocketClient::doWrite(int fd,
+                            char *buf,
+                            int maxLen)
+{
    // TODO
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketCLient::handleConnect
  * deprecated now
@@ -574,7 +585,9 @@ void VixMntSocketClient::doWrite(int fd,       // IN
  ****************************************************************************
  */
 
-void VixMntSocketClient::handleConnect() {
+void
+VixMntSocketClient::handleConnect()
+{
 
    epoll_event events[SOCKET_EPOLLEVENTS];
    char buf[SOCKET_BUF_MAX_SIZE];
@@ -587,14 +600,15 @@ void VixMntSocketClient::handleConnect() {
       ret = epoll_wait(epollfd, events, SOCKET_EPOLLEVENTS, -1);
       handleEvents(events, ret, buf);
 
-      if (ret <= 0)
+      if (ret <= 0) {
          return;
+      }
    }
 
    close(epollfd);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient:handleEvents
  * work in testing, deprecated now
@@ -612,18 +626,23 @@ void VixMntSocketClient::handleConnect() {
  ****************************************************************************
  */
 
-void VixMntSocketClient::handleEvents(epoll_event *events, int num, char *buf) {
+void
+VixMntSocketClient::handleEvents(epoll_event *events,
+                                 int num,
+                                 char *buf)
+{
 
    for (int i = 0; i < num; ++i) {
       int fd = events[i].data.fd;
-      if (events[i].events & EPOLLIN)
+      if (events[i].events & EPOLLIN) {
          doRead(fd, buf);
-      else if (events[i].events & EPOLLOUT)
+      } else if (events[i].events & EPOLLOUT) {
          doWrite(fd, buf);
+      }
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient::rawRead
  * class super class rawRead directly
@@ -639,17 +658,19 @@ void VixMntSocketClient::handleEvents(epoll_event *events, int num, char *buf) {
  ****************************************************************************
  */
 
-/*
+/**
  * read whole needed sectors
  * if not do this, client receiver will get incomplete data
  */
 
-int VixMntSocketClient::rawRead(char *buf,     // IN
-                                int bufsize) { // IN
+int
+VixMntSocketClient::rawRead(char *buf,
+                            int bufsize)
+{
    return VixMntSocket::rawRead(sockfd, buf, bufsize);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntSocketClient::rawWrite
  * call super class directly
@@ -666,7 +687,9 @@ int VixMntSocketClient::rawRead(char *buf,     // IN
  ****************************************************************************
  */
 
-int VixMntSocketClient::rawWrite(const char *buf, // IN
-                                 int bufsize) {   // IN
+int
+VixMntSocketClient::rawWrite(const char *buf,
+                             int bufsize)
+{
    return VixMntSocket::rawWrite(sockfd, buf, bufsize);
 }

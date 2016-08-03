@@ -63,12 +63,6 @@ private:
    void doRead(int fd, char *buf, int maxLen = 0);
    void doWrite(int fd, char *buf, int maxLen = 0);
 
-   /*
-   void addEvent(int fd,int state);
-   void deleteEvent(int fd,int state);
-   void modifyEvent(int fd,int state);
-   */
-
 private:
    int listenfd;
    VixMntDiskHandle *vixdh;

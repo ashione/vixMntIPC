@@ -1,15 +1,12 @@
 #ifndef VIXMNTUTILITY_H
 #define VIXMNTUTILITY_H
 
-// static VixMntMmap *mmap_instance = NULL;
-//#include <vixMntMsgOp.h>
 #include <vixDiskLib.h>
 
 #include <pthread.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include <string>
 
 #define MAX_RANDOM_LEN 10
 #define STR_RANDOM_NUM_LEN 62
@@ -54,11 +51,12 @@ void vixMntIPC_InitMsgQue();
 
 void vixMntIpC_CleanMsgQue();
 
-/*
+/**
  * initialization for IPC module
  * use memory map + share memory when IPCType =0
  * otherwise socket server
  */
+
 void vixMntIPC_InitDiskHandle(VixDiskLibConnection connection, const char *path,
                               uint32 flag, uint8 IPCType);
 

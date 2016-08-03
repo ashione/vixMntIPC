@@ -21,11 +21,10 @@ static VixMntMsgQue *msgQ_instance = NULL;
 static VixMntDiskHandle *diskHandle_instance = NULL;
 static uint8 IPCTYPE_FLAG = 0;
 
-/*
+/**
  ****************************************************************************
  * vixMntLog
- * print a specific log information, like
- * [level pid  time info]
+ * print a specific log information, like [level pid  time info]
  * -------------------------------------------------------------------------
  * input parameters  :
  * level, log level
@@ -43,13 +42,14 @@ static uint8 IPCTYPE_FLAG = 0;
  ****************************************************************************
  */
 
-void vixMntLog(short level, pid_t pid, int line, const char *func,
-               const char *fileName, const char *format, ...) {
-
-   /*
-    * TODO:
-    *  Multithread safe
-    */
+void
+vixMntLog(short level,
+          pid_t pid,
+          int line,
+          const char *func,
+          const char *fileName,
+          const char *format, ...)
+{
    const char *levelStr[] = {"I", "W", "E", "F"};
    char buffLog[] = "[%s%05d %s %s %s:%d] ";
    va_list args;
@@ -68,7 +68,7 @@ void vixMntLog(short level, pid_t pid, int line, const char *func,
    printf("%s\n", buffer);
 }
 
-/*
+/**
  ****************************************************************************
  * getnow
  * get current timestamp
@@ -84,7 +84,9 @@ void vixMntLog(short level, pid_t pid, int line, const char *func,
  ****************************************************************************
  */
 
-void getnow(char *buffer) {
+void
+getnow(char *buffer)
+{
 
    time_t rawtime;
    struct tm *timeinfo;
@@ -97,7 +99,7 @@ void getnow(char *buffer) {
    snprintf(buffer + strlen(buffer), 10, ":%06.f", us);
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_initMmap
  * -------------------------------------------------------------------------
@@ -112,16 +114,19 @@ void getnow(char *buffer) {
  ****************************************************************************
  */
 
-int vixMntIPC_InitMmap(size_t mmap_datasize, int isRoot) {
-   if (!mmap_instance)
+int
+vixMntIPC_InitMmap(size_t mmap_datasize, int isRoot)
+{
+   if (!mmap_instance) {
       mmap_instance = new VixMntMmap(mmap_datasize, isRoot != 0);
-   else
+   } else {
       WLog("map instance already init");
+   }
 
    return 0;
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_CleanMmap
  * clear memory map
@@ -137,8 +142,9 @@ int vixMntIPC_InitMmap(size_t mmap_datasize, int isRoot) {
  ****************************************************************************
  */
 
-int vixMntIPC_CleanMmap() {
-
+int
+vixMntIPC_CleanMmap()
+{
    if (mmap_instance)
       delete mmap_instance;
    mmap_instance = NULL;
@@ -149,7 +155,7 @@ int vixMntIPC_CleanMmap() {
    return -1;
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_WriteMmap
  * deprecated now, only export to fusemount
@@ -167,9 +173,10 @@ int vixMntIPC_CleanMmap() {
  ****************************************************************************
  */
 
-void vixMntIPC_WriteMmap(const char *buf,   // IN
-                         size_t write_pos,  // IN
-                         size_t write_size) // IN
+void
+vixMntIPC_WriteMmap(const char *buf,
+                         size_t write_pos,
+                         size_t write_size)
 {
    if (!mmap_instance) {
       FLog("mmap instance never init");
@@ -178,7 +185,7 @@ void vixMntIPC_WriteMmap(const char *buf,   // IN
    mmap_instance->mntWriteMmap((uint8 *)buf, write_pos, write_size);
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_ReadMmap
  * deprecated now, only export to fusemount
@@ -195,9 +202,10 @@ void vixMntIPC_WriteMmap(const char *buf,   // IN
  ****************************************************************************
  */
 
-void vixMntIPC_ReadMmap(char *buf,        // OUT
-                        size_t read_pos,  // IN
-                        size_t read_size) // IN
+void
+vixMntIPC_ReadMmap(char *buf,
+                   size_t read_pos,
+                   size_t read_size)
 {
    if (!mmap_instance) {
       FLog("mmap instance never init");
@@ -207,7 +215,7 @@ void vixMntIPC_ReadMmap(char *buf,        // OUT
    mmap_instance->mntReadMmap((uint8 *)buf, read_pos, read_size);
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIpc_InitMsgQue
  * open system message queue singleton
@@ -223,16 +231,19 @@ void vixMntIPC_ReadMmap(char *buf,        // OUT
  ****************************************************************************
  */
 
-void vixMntIPC_InitMsgQue() {
+void
+vixMntIPC_InitMsgQue()
+{
 
    if (!msgQ_instance) {
       msgQ_instance = VixMntMsgQue::getMsgQueInstance();
       ILog("msgQ_instance init ok");
-   } else
+   } else {
       ILog("msgQ_instance is already inited");
+   }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_CleanMsgQue
  * unlink system message queue
@@ -248,7 +259,9 @@ void vixMntIPC_InitMsgQue() {
  ****************************************************************************
  */
 
-void vixMntIPC_CleanMsgQue() {
+void
+vixMntIPC_CleanMsgQue()
+{
 
    if (msgQ_instance) {
       VixMntMsgQue::releaseMsgQueInstance();
@@ -257,7 +270,7 @@ void vixMntIPC_CleanMsgQue() {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_InitDiskHandle
  * diskhanlde initialization for IO operation later
@@ -275,8 +288,12 @@ void vixMntIPC_CleanMsgQue() {
  ****************************************************************************
  */
 
-void vixMntIPC_InitDiskHandle(VixDiskLibConnection connection, const char *path,
-                              uint32 flag, uint8 IPCType) {
+void
+vixMntIPC_InitDiskHandle(VixDiskLibConnection connection,
+                         const char *path,
+                         uint32 flag,
+                         uint8 IPCType)
+{
    IPCTYPE_FLAG = IPCType;
    diskHandle_instance = new VixMntDiskHandle(connection, path, flag);
 
@@ -287,7 +304,7 @@ void vixMntIPC_InitDiskHandle(VixDiskLibConnection connection, const char *path,
    }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_CleanDiskHandle
  * unlink all  message queues and release memory map when the process
@@ -304,7 +321,9 @@ void vixMntIPC_InitDiskHandle(VixDiskLibConnection connection, const char *path,
  ****************************************************************************
  */
 
-void vixMntIPC_CleanDiskHandle() {
+void
+vixMntIPC_CleanDiskHandle()
+{
    ILog("Clean DiskHandle");
    delete diskHandle_instance;
 
@@ -315,7 +334,7 @@ void vixMntIPC_CleanDiskHandle() {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_GetDiskInfo
  * Encapsulation for vixdisklib getDiskInfo function
@@ -331,12 +350,14 @@ void vixMntIPC_CleanDiskHandle() {
  ****************************************************************************
  */
 
-VixError vixMntIPC_GetDiskInfo(VixDiskLibInfo **info) {
+VixError
+vixMntIPC_GetDiskInfo(VixDiskLibInfo **info)
+{
    ILog("get vixdisklibinfo ");
    return diskHandle_instance->getDiskInfo(info);
 };
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_FreeDiskInfo
  * Encapsulation for vixdisklib freeDiskInfo function
@@ -352,12 +373,14 @@ VixError vixMntIPC_GetDiskInfo(VixDiskLibInfo **info) {
  ****************************************************************************
  */
 
-void vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info) {
+void
+vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info)
+{
    ILog("free vixdisklibinfo");
    diskHandle_instance->freeDiskInfo(info);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntIPC_run
  * deprecated now
@@ -373,21 +396,16 @@ void vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info) {
  ****************************************************************************
  */
 
-void *vixMntIPC_run(void *arg) {
+void*
+vixMntIPC_run(void *arg)
+{
    VixMntMsgQue *vixmntmsg = VixMntMsgQue::getMsgQueInstance();
-   // VixDiskLibHandle vixHandle = (VixDiskLibHandle) arg;
-
-   // assert(vixHandle);
    ILog("tranfer arg to vixHandle");
 
    pthread_t run_tid = pthread_self();
    while (true) {
 
       VixMntMsgOp msg_op;
-      // VixMntMsgData msg_data;
-      // vixmntmsg->receiveMsg(&msg_data);
-      // msg_op = msg_data.msg_op;
-
       vixmntmsg->receiveMsgOp(&msg_op);
 
       if (msg_op == VixMntOp(ERROR)) {
@@ -397,16 +415,14 @@ void *vixMntIPC_run(void *arg) {
          ILog("thread ID %u, stop listening, breaking", run_tid);
          break;
 
-      } else
+      } else {
          ILog("thread ID %u, receive %s", run_tid, getOpValue(msg_op));
+      }
    }
-   // instance is not belong to this thread
-   // VixMntMsgQue::releaseMsgQueInstance();
-
    return NULL;
 }
 
-/*
+/**
  ****************************************************************************
  * listening
  * deprecated now
@@ -422,8 +438,9 @@ void *vixMntIPC_run(void *arg) {
  ****************************************************************************
  */
 
-pthread_t listening() {
-
+pthread_t
+listening()
+{
    pthread_t pt_id;
    int err = pthread_create(&pt_id, NULL, vixMntIPC_run, NULL);
 
@@ -436,7 +453,7 @@ pthread_t listening() {
    return pt_id;
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_listen
  * -------------------------------------------------------------------------
@@ -451,17 +468,19 @@ pthread_t listening() {
  ****************************************************************************
  */
 
-void *vixMntIPC_listen(void *args) {
-   if (IPCTYPE_FLAG == VIXMNTIPC_MMAP)
+void*
+vixMntIPC_listen(void *args)
+{
+   if (IPCTYPE_FLAG == VIXMNTIPC_MMAP) {
       return diskHandle_instance->listen(args);
-   else {
+   } else {
       VixMntSocketServer *socketServer_instance = new VixMntSocketServer();
       socketServer_instance->serverListen(diskHandle_instance);
       return NULL;
    }
 }
 
-/*
+/**
  ****************************************************************************
  * vixMntIPC_main
  * starting IPC module and creating a new thread to listen
@@ -477,7 +496,9 @@ void *vixMntIPC_listen(void *args) {
  ****************************************************************************
  */
 
-int vixMntIPC_main() {
+int
+vixMntIPC_main()
+{
 
    pthread_t pt_id;
    // int err = pthread_create(&pt_id,NULL,vixMntIPC_run,(void *)vixHandle);
@@ -492,7 +513,7 @@ int vixMntIPC_main() {
    return pt_id;
 }
 
-/*
+/**
  ****************************************************************************
  * isDirectoryExist
  * -------------------------------------------------------------------------
@@ -507,8 +528,9 @@ int vixMntIPC_main() {
  ****************************************************************************
  */
 
-int isDirectoryExist(const char *path) {
-
+int
+isDirectoryExist(const char *path)
+{
    struct stat info;
 
    if (stat(path, &info))
@@ -517,7 +539,7 @@ int isDirectoryExist(const char *path) {
    return (info.st_mode & S_IFDIR) != 0;
 }
 
-/*
+/**
  ****************************************************************************
  * makeDirectoryHierarchy
  * create a hierarchy directory
@@ -533,7 +555,9 @@ int isDirectoryExist(const char *path) {
  ****************************************************************************
  */
 
-int makeDirectoryHierarchy(const char *path) {
+int
+makeDirectoryHierarchy(const char *path)
+{
    /*
     * check path was created.
     * If it's not, create whole path by hierarchy
@@ -549,14 +573,17 @@ int makeDirectoryHierarchy(const char *path) {
    switch (errno) {
    case ENOENT: {
       size_t pos = spath.find_last_of('/');
-      if (pos == std::string::npos)
+      if (pos == std::string::npos) {
          pos = spath.find_last_of('\\');
+      }
 
-      if (pos == std::string::npos)
+      if (pos == std::string::npos) {
          return false;
+      }
 
-      if (!makeDirectoryHierarchy(spath.substr(0, pos).c_str()))
+      if (!makeDirectoryHierarchy(spath.substr(0, pos).c_str())) {
          return false;
+      }
 
       int status = mkdir(spath.c_str(), mode);
       return !status;
@@ -569,7 +596,7 @@ int makeDirectoryHierarchy(const char *path) {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * getRandomFileName
  * generate a random string when given string prefix and length
@@ -586,9 +613,11 @@ int makeDirectoryHierarchy(const char *path) {
  ****************************************************************************
  */
 
-void getRandomFileName(const char *rootPath,  // IN
-                       size_t max_random_len, // IN
-                       char *destination) {   // OUT
+void
+getRandomFileName(const char *rootPath,
+                  size_t max_random_len,
+                  char *destination)
+{
 
    srand((unsigned)time(NULL));
 
@@ -596,13 +625,10 @@ void getRandomFileName(const char *rootPath,  // IN
    for (size_t i = 0; i < max_random_len - 1; ++i) {
       rfile_name += random_str[rand() % STR_RANDOM_NUM_LEN];
    }
-   // rfile_name += '\0';
-   // char *ptr = new char[rfile_name.size() +1 ];
    strncpy(destination, rfile_name.c_str(), rfile_name.size());
-   //   return rfile_name.c_str();
 }
 
-/*
+/**
  ****************************************************************************
  * getvixMntIPCType
  * export interface to fusemount
@@ -618,4 +644,5 @@ void getRandomFileName(const char *rootPath,  // IN
  ****************************************************************************
  */
 
-uint8 getVixMntIPCType() { return IPCTYPE_FLAG; }
+uint8
+getVixMntIPCType() { return IPCTYPE_FLAG; }

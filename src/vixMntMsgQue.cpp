@@ -7,13 +7,12 @@ VixMntMsgQue *VixMntMsgQue::vixMntMsgInstance = NULL;
 const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string, mqd_t> VixMntMsgQue::vixMntMsgMap;
 pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
-// pthread_mutex_t VixMntMsgQue::vixMntMsgLock = PTHREAD_MUTEX_INITIALIZER;
 
-/*
+/***
  ****************************************************************************
  * VixMntMsgQUe::getMsgQueInstance
- * produce singleton of VixMntMsgQue that is utilized
- * bettween parent process and son process
+ * produce singleton of VixMntMsgQue that is utilized bettween parent
+ * process and son process.
  * -------------------------------------------------------------------------
  * input parameters  :
  * sem, make sure it's singleton if sem is passed
@@ -26,7 +25,7 @@ pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
  ****************************************************************************
  */
 
-/*
+/**
  * abort - > this static pthread_mutex_t lock maybe not work in different
  * threads
  *  TODO :
@@ -34,31 +33,11 @@ pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
  *    add pthread_once for multithread safe
  */
 
-VixMntMsgQue *VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
+VixMntMsgQue
+*VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
 
    if (sem)
       sem_wait(sem);
-   /*
-      if( vixMntMsgInstance  == NULL){
-        VixMntMutex lock(&vixMntMsgLock);
-        try{
-          lock.lock();
-
-          ILog("first init instance, thread ID %u",pthread_self());
-          ILog("mutex lock add %x",&vixMntMsgLock);
-          vixMntMsgInstance = new VixMntMsgQue();
-
-          lock.unlock();
-        }
-        catch ( VixMntException& e ){
-           ELog("%s",e.what());
-        }
-
-      }
-      else{
-        ILog("already init instance");
-      }
-   */
    pthread_once(&ponce, &VixMntMsgQue::initInstance);
    if (sem)
       sem_post(sem);
@@ -67,7 +46,7 @@ VixMntMsgQue *VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
    return vixMntMsgInstance;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::initInstance
  * guarantee singleton with pthread_once
@@ -83,9 +62,10 @@ VixMntMsgQue *VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
  ****************************************************************************
  */
 
-void VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
+void
+VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue Constructor
  * -------------------------------------------------------------------------
@@ -103,13 +83,7 @@ void VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
 VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
                            bool readOnly) {      // IN
 
-   this->vixMntMsgAttr.mq_flags = 0;
-   this->vixMntMsgAttr.mq_maxmsg = 8192;
-   this->vixMntMsgAttr.mq_msgsize = 8192;
-   this->vixMntMsgAttr.mq_curmsgs = 0;
-   /*
-   * readOnly is unused now.
-   */
+   // readOnly is unused now.
    this->readOnly = readOnly;
 
    if (!msg_name) {
@@ -118,19 +92,6 @@ VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
       this->vixMntMsgMapFileName = msg_name;
    }
 
-   /*
-   * return mq_id without open it again
-   * if mq exist
-   *
-   std::map<std::string, mqd_t>::iterator itr =
-   VixMntMsgQue::vixMntMsgMap.find(this->vixMntMsgMapFileName);
-   if(itr != VixMntMsgQue::vixMntMsgMap.end()){
-     this->vixMntMsgID = itr->second;
-     return;
-   }
-   */
-
-   // ILog("msg map filename %s",this->vixMntMsgMapFileName.c_str());
 
    this->vixMntMsgID =
       mq_open(this->vixMntMsgMapFileName.c_str(), O_CREAT | O_RDWR, 0644, NULL);
@@ -145,14 +106,10 @@ VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
    }
 
    assert(this->vixMntMsgID > 0);
-   // ILog("original %u, new
-   // %u",VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName],this->vixMntMsgID);
    VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
-
-   // ILog("Messge size %d ",VixMntMsgQue::vixMntMsgMap.size());
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue Constructor
  * reuse a certain message queue by msg_id
@@ -181,10 +138,10 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) { // IN
    assert(item != VixMntMsgQue::vixMntMsgMap.end());
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::unlink
- * unlink all created message queue by static member vixMntMsgMap
+ * unlink all created message queue by static member vixMntMsgMap.
  * -------------------------------------------------------------------------
  * input parameters  :
  * No
@@ -197,7 +154,8 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) { // IN
  ****************************************************************************
  */
 
-void VixMntMsgQue::unlink() {
+void
+VixMntMsgQue::unlink() {
 
    std::map<std::string, mqd_t>::iterator itr =
       VixMntMsgQue::vixMntMsgMap.begin();
@@ -212,7 +170,7 @@ void VixMntMsgQue::unlink() {
    VixMntMsgQue::vixMntMsgMap.clear();
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue Deconstructor
  * -------------------------------------------------------------------------
@@ -234,10 +192,10 @@ VixMntMsgQue::~VixMntMsgQue() {
    }
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::releaseMsgQueInstance
- * release singleton of message queue
+ * release singleton of message queue.
  * -------------------------------------------------------------------------
  * input parameters  :
  * sem, if enable singleton in multiprocess
@@ -249,10 +207,12 @@ VixMntMsgQue::~VixMntMsgQue() {
  ****************************************************************************
  */
 
-void VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
+void
+VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
 
-   if (sem)
+   if (sem) {
       sem_wait(sem);
+   }
 
    if (vixMntMsgInstance) {
       delete vixMntMsgInstance;
@@ -264,7 +224,7 @@ void VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
       sem_post(sem);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::send
  * -------------------------------------------------------------------------
@@ -282,16 +242,17 @@ void VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
  ****************************************************************************
  */
 
-mqd_t VixMntMsgQue::send(const char *msg_ptr, // IN
-                         size_t msg_len,      // IN
-                         unsigned msg_prio)   // IN
+mqd_t
+VixMntMsgQue::send(const char *msg_ptr, // IN
+                   size_t msg_len,      // IN
+                   unsigned msg_prio)   // IN
 {
    // disable send function, when msg queue is readonly
    assert(!this->readOnly);
    return mq_send(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::receive
  * -------------------------------------------------------------------------
@@ -309,14 +270,15 @@ mqd_t VixMntMsgQue::send(const char *msg_ptr, // IN
  ****************************************************************************
  */
 
-mqd_t VixMntMsgQue::receive(char *msg_ptr,      // IN
-                            size_t msg_len,     // IN
-                            unsigned *msg_prio) // IN
+mqd_t
+VixMntMsgQue::receive(char *msg_ptr,      // IN
+                      size_t msg_len,     // IN
+                      unsigned *msg_prio) // IN
 {
    return mq_receive(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::sendMsgOp
  * -------------------------------------------------------------------------
@@ -332,10 +294,12 @@ mqd_t VixMntMsgQue::receive(char *msg_ptr,      // IN
  ****************************************************************************
  */
 
-bool VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
-                             unsigned msg_prio)  // IN
+bool
+VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
+                        unsigned msg_prio)  // IN
 {
-/*
+
+/**
 * bug : if op equal to ERROR
 */
 #if defined(__cplusplus) && __cplusplus >= 201103L
@@ -347,7 +311,7 @@ bool VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
    return send(msg_str, strlen(msg_str), msg_prio) >= 0;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::receiveMsgOp
  * -------------------------------------------------------------------------
@@ -362,7 +326,8 @@ bool VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
  ****************************************************************************
  */
 
-void VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
+void
+VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
                                 unsigned *msg_prio)  // IN
 {
    this->getattr(&this->vixMntMsgAttr);
@@ -383,7 +348,7 @@ void VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
    delete[] buf;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::sendMsg
  * -------------------------------------------------------------------------
@@ -400,8 +365,9 @@ void VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
  ****************************************************************************
  */
 
-bool VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
-                           unsigned msg_prio)       // IN
+bool
+VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
+                      unsigned msg_prio)       // IN
 {
    char *buf = new char[sizeof(VixMntMsgData)];
    memcpy(buf, msg_data, sizeof(VixMntMsgData));
@@ -411,7 +377,7 @@ bool VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
    return flag;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntMsgQue::receiveMsg
  * -------------------------------------------------------------------------
@@ -427,19 +393,14 @@ bool VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
  ****************************************************************************
  */
 
-void VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data, // IN
-                              unsigned *msg_prio)      // IN
+void
+VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data, // IN
+                         unsigned *msg_prio)      // IN
 {
    mq_attr tempAttr;
    this->getattr(&tempAttr);
-   // ILog("receiveMsg mq_msgsize = %ld,mq_curmsg %ld received msg size = %ld",
-   //     vixMntMsgAttr.mq_msgsize,
-   //     vixMntMsgAttr.mq_curmsgs,
-   //     tempAttr.mq_msgsize);
-
    assert(8192 >= tempAttr.mq_msgsize && tempAttr.mq_msgsize > 0);
 
-   // char *buf = new char[tempAttr.mq_msgsize];
    char *buf = new char[tempAttr.mq_msgsize];
 
    if (receive(buf, tempAttr.mq_msgsize, msg_prio) < 0) {

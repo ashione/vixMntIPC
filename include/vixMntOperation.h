@@ -30,6 +30,7 @@ class VixMntOpBase {
 public:
    VixMntOpBase(const char *, uint64, uint64);
    VixMntOpBase(){};
+   //virtual ~VixMntOpBase();
    virtual void convertToBytes(char *buf) { memcpy(buf, this, sizeof(*this)); }
    virtual void convertFromBytes(const char *buf) {
       memcpy(this, buf, sizeof(*this));
@@ -40,7 +41,6 @@ public:
    char fileName[VIXMNT_FILENAME_MAXLEN];
    uint64 bufsize;
    uint64 offset;
-   // virtual ~VixMntOpBase();
 };
 
 /*
@@ -80,42 +80,6 @@ public:
    uint64 token;
    VixMntMsgOp carriedOp;
 };
-
-/*
-class VixMntOpSocketRead : public VixMntOpSocketBase{
-   public :
-     VixMntOpSocketRead(){};
-     explicit VixMntOpSocketRead(
-         uint64 bufsize,
-         uint64 offset,
-         uint64 token = 0,
-         uint64 carriedBufSize = 0) :
-       VixMntOpRead("/fakeReadToken",bufsize,offset),
-       VixMntOpSocketBase(carriedBufSize,token,VixMntOp(MntRead))
-   {
-
-   }
-     BREW_CONVERTOR(VixMntOpSocketRead)
-
-};
-
-class VixMntOpSocketWrite :  public VixMntOpSocketBase{
-   public :
-     VixMntOpSocketWrite();
-     explicit VixMntOpSocketWrite(
-         uint64 bufsize,
-         uint64 offset,
-         uint64 token =0,
-         uint64 carriedBufSize = 0) :
-       VixMntOpWrite("/fakeWriteToken",bufsize,offset),
-       VixMntOpSocketBase(carriedBufSize,token,VixMntOp(MntWrite))
-   {
-
-   }
-     BREW_CONVERTOR(VixMntOpSocketWrite)
-
-};
-*/
 
 #ifdef __cplusplus
 }

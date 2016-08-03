@@ -12,7 +12,7 @@
 
 #define MMAP_PAGE_SIZE sysconf(_SC_PAGESIZE)
 
-/*
+/**
  * Todo :
  *  fullfill share memory address in multi-process
  */
@@ -21,21 +21,21 @@
 extern "C" {
 #endif
 
-class VixMntMmap {
+/**
+ * A memory map producer that offer establishments for exchanging data.
+ * It means whatever shipped between remote disk and local dev will
+ * be stored temporarily in this memory map.
+ */
 
+class VixMntMmap {
 public:
    VixMntMmap(size_t mmap_datasize = 0, bool isRoot = false);
    VixMntMmap(){};
    ~VixMntMmap();
 
-   // for vixdisklib, convert char* to uint8*
-
    void mntWriteMmap(const uint8 *buf, size_t write_pos = 0,
                      size_t write_size = 0);
    void mntReadMmap(uint8 *buf, size_t read_pos = 0, size_t read_size = 0);
-   // void mntWriteMmap(const char* buf, size_t write_pos= 0,size_t write_size =
-   // 0);
-   // void mntReadMmap(char* buf, size_t read_pos = 0, size_t read_size = 0);
 
    inline std::string getMmapFileName() { return this->file_name; }
    inline int getMmapFileId() { return this->fid; }

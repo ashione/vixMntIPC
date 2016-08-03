@@ -6,7 +6,8 @@
 #include <pthread.h>
 #include <string.h>
 
-VixMntMutex::VixMntMutex(void *shmMemMutex, bool recursive) {
+VixMntMutex::VixMntMutex(void *shmMemMutex, bool recursive)
+{
    _handle = shmMemMutex;
    pthread_mutexattr_t attr;
    pthread_mutexattr_init(&attr);
@@ -15,22 +16,26 @@ VixMntMutex::VixMntMutex(void *shmMemMutex, bool recursive) {
                                               : PTHREAD_MUTEX_FAST_NP);
 
    if (pthread_mutex_init((pthread_mutex_t *)_handle, &attr)) {
-      // free(_handle);
       throw VixMntException("Unable to create mutex");
    }
 }
 
-VixMntMutex::~VixMntMutex() {
+VixMntMutex::~VixMntMutex()
+{
    pthread_mutex_destroy((pthread_mutex_t *)_handle);
 }
 
-void VixMntMutex::lock() {
+void
+VixMntMutex::lock()
+{
    if (pthread_mutex_lock((pthread_mutex_t *)_handle)) {
       throw VixMntException("Unable to lock mutex");
    }
 }
 
-void VixMntMutex::unlock() {
+void
+VixMntMutex::unlock()
+{
    int result = (pthread_mutex_unlock((pthread_mutex_t *)_handle));
    if (result) {
       throw VixMntException("Unable to unlock mutex");
@@ -38,7 +43,9 @@ void VixMntMutex::unlock() {
    }
 }
 
-bool VixMntMutex::trylock() {
+bool
+VixMntMutex::trylock()
+{
    int tryResult = pthread_mutex_trylock((pthread_mutex_t *)_handle);
    if (tryResult) {
 

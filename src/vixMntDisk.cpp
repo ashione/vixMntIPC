@@ -4,12 +4,12 @@
 
 #include <string>
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle Constructor
  * -------------------------------------------------------------------------
- * input parameters
- * connection, connection of diskLib
+ * input parameters  :
+ * connection, connection of vixdiskLib
  * path, disk path
  * flag, disk operation mode
  * -------------------------------------------------------------------------
@@ -20,9 +20,10 @@
  ****************************************************************************
  */
 
-VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection, // IN
-                                   const char *path,                // IN
-                                   uint32 flag) {                   // IN
+VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection,
+                                   const char *path,
+                                   uint32 flag)
+{
    _vixHandle = NULL;
    ILog("open disklib");
    VixError vixError = VixDiskLib_Open(connection, path, flag, &_vixHandle);
@@ -30,7 +31,7 @@ VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection, // IN
    SHOW_ERROR_INFO(vixError);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle deconstructor
  * -------------------------------------------------------------------------
@@ -51,12 +52,12 @@ VixMntDiskHandle::~VixMntDiskHandle() {
    _vixHandle = NULL;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::Prepare
  * prepare for listening function called by libfuse,
  * this msgQ can contract with the other process by sending or receving
- * message, and then write or read buf via mmap
+ * message, and then write or read buf via mmap.
  * -------------------------------------------------------------------------
  * input parameters  :
  * msgQ_, system message queue
@@ -70,13 +71,15 @@ VixMntDiskHandle::~VixMntDiskHandle() {
  ****************************************************************************
  */
 
-void VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_, // IN
-                               VixMntMmap *mmap_) { // IN
+void
+VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_,
+                          VixMntMmap *mmap_)
+{
    _msgQ = msgQ_;
    _mmap = mmap_;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::listen
  * call proper function via specific operator message type
@@ -92,7 +95,9 @@ void VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_, // IN
  ****************************************************************************
  */
 
-void *VixMntDiskHandle::listen(void *args) { // IN
+void*
+VixMntDiskHandle::listen(void *args)
+{
 
    if (!_vixHandle || !_msgQ || !_mmap) {
       ELog("no preparation before listening");
@@ -126,11 +131,11 @@ void *VixMntDiskHandle::listen(void *args) { // IN
    return NULL;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::read
  * packaged vixdisklib read function
- * read data only via sector by sector
+ * Hint : read data only via sector by sector
  * -------------------------------------------------------------------------
  * input parameters  :
  * buf, the buf location
@@ -145,33 +150,35 @@ void *VixMntDiskHandle::listen(void *args) { // IN
  ****************************************************************************
  */
 
-VixError VixMntDiskHandle::read(uint8 *buf,          // IN
-                                uint64 offset,       // IN
-                                uint64 numberSector) // IN
+VixError
+VixMntDiskHandle::read(uint8 *buf,
+                       uint64 offset,
+                       uint64 numberSector)
 {
 
    VixError vixError = VixDiskLib_Read(_vixHandle, offset, numberSector, buf);
    return vixError;
 }
 
-/*
+/**
  ****************************************************************************
- * FunctionName
+ * VixMntDiskHandle::read
  * -------------------------------------------------------------------------
  * input parameters  :
- * msg_data, libfuse operator, offset and data sector size
+ * msg_data, it contains libfuse operator, offset and data sector size.
  * -------------------------------------------------------------------------
  * output paremeters :
  * VixError
  * -------------------------------------------------------------------------
  * Side Effect
- * if mmap size is less than read buffer size, mmap will throw exception
+ * if mmap size is less than read buffer size, mmap will throw exception.
  ****************************************************************************
  */
 
-VixError VixMntDiskHandle::read(VixMntMsgData *msg_data) { // IN
+VixError
+VixMntDiskHandle::read(VixMntMsgData *msg_data)
+{
    assert(_vixHandle);
-   // TODO : write readed buf to mmap
    VixMntOpRead opReadData;
    opReadData.convertFromBytes(msg_data->msg_buff);
    uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
@@ -180,8 +187,6 @@ VixError VixMntDiskHandle::read(VixMntMsgData *msg_data) { // IN
 
    VixError vixError = read(buf, opReadData.offset, opReadData.bufsize);
 
-   // write buf data for IPC terminal
-   //
    _mmap->mntWriteMmap(buf, 0, sizeResult);
 
    VixMntMsgData readMsgResult;
@@ -196,7 +201,7 @@ VixError VixMntDiskHandle::read(VixMntMsgData *msg_data) { // IN
    return vixError;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::write
  * packaged vixdisklib write function
@@ -214,14 +219,17 @@ VixError VixMntDiskHandle::read(VixMntMsgData *msg_data) { // IN
  ****************************************************************************
  */
 
-VixError VixMntDiskHandle::write(uint8 *buf, uint64 offset,
-                                 uint64 numberSector) {
+VixError
+VixMntDiskHandle::write(uint8 *buf,
+                        uint64 offset,
+                        uint64 numberSector)
+{
 
    VixError vixError = VixDiskLib_Write(_vixHandle, offset, numberSector, buf);
    return vixError;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::write
  * -------------------------------------------------------------------------
@@ -236,8 +244,9 @@ VixError VixMntDiskHandle::write(uint8 *buf, uint64 offset,
  ****************************************************************************
  */
 
-VixError VixMntDiskHandle::write(VixMntMsgData *msg_data) { // IN
-   // TODO : write writed buf to mmap
+VixError
+VixMntDiskHandle::write(VixMntMsgData *msg_data)
+{
    VixMntOpRead opWriteData;
    opWriteData.convertFromBytes(msg_data->msg_buff);
    uint64 sizeResult = opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE;
@@ -259,7 +268,7 @@ VixError VixMntDiskHandle::write(VixMntMsgData *msg_data) { // IN
    return vixError;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::getDiskInfo
  * packaged VixDiskLib GetInfo function
@@ -275,19 +284,21 @@ VixError VixMntDiskHandle::write(VixMntMsgData *msg_data) { // IN
  ****************************************************************************
  */
 
-VixError VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info) { // IN/OUT
+VixError
+VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info)
+{
 
    VixError vixError = VixDiskLib_GetInfo(_vixHandle, info);
    return vixError;
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::freeDiskInfo
- * packaged vixdisklib FreeInfo function
+ * Directly invoke vixdisklib FreeInfo function
  * -------------------------------------------------------------------------
  * input parameters  :
- * info
+ * info, vixDiskLibInfo
  * -------------------------------------------------------------------------
  * output paremeters :
  * No
@@ -297,12 +308,13 @@ VixError VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info) { // IN/OUT
  ****************************************************************************
  */
 
-void VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info) { // IN
-
+void
+VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info)
+{
    VixDiskLib_FreeInfo(info);
 }
 
-/*
+/**
  ****************************************************************************
  * VixMntDiskHandle::getErrorMsg
  * packaged vixdisklib GetErrorText function
@@ -318,8 +330,9 @@ void VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info) { // IN
  ****************************************************************************
  */
 
-std::string VixMntDiskHandle::getErrorMsg(VixError vixError) {
-
+std::string
+VixMntDiskHandle::getErrorMsg(VixError vixError)
+{
    char *msg = VixDiskLib_GetErrorText(vixError, NULL);
    std::string descp = msg;
    VixDiskLib_FreeErrorText(msg);
