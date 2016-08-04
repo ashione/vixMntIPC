@@ -54,7 +54,7 @@ public:
    VixMntSocketServer();
    ~VixMntSocketServer();
 
-   void serverListen(VixMntDiskHandle *);
+   void serverListen(std::map<std::string,VixMntDiskHandle* >&);
 
 private:
    void doEpoll();
@@ -65,7 +65,7 @@ private:
 
 private:
    int listenfd;
-   VixMntDiskHandle *vixdh;
+   std::map<std::string, VixMntDiskHandle* > *vixdhMap;
    std::map<int, uint64> clientMap4Write;
 };
 

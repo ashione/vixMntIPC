@@ -2,7 +2,9 @@
 
 VixMntOpBase::VixMntOpBase(const char *fileName_, uint64 bufsize_,
                            uint64 offset_) {
-   memcpy(fileName, fileName_, strlen(fileName));
+   int fileNameLen = strlen(fileName_);
+   memcpy(fileName, fileName_, fileNameLen);
+   fileName[fileNameLen]='\0';
    bufsize = bufsize_;
    offset = offset_;
 }

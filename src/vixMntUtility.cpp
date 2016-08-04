@@ -5,6 +5,8 @@
 #include <vixMntSocket.h>
 #include <vixMntUtility.h>
 
+#include <map>
+#include <string>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,6 +22,9 @@ static VixMntMmap *mmap_instance = NULL;
 static VixMntMsgQue *msgQ_instance = NULL;
 static VixMntDiskHandle *diskHandle_instance = NULL;
 static uint8 IPCTYPE_FLAG = 0;
+static std::map<std::string,VixMntDiskHandle* > diskHandleMap;
+
+static pthread_once_t socket_listen_ponce = PTHREAD_ONCE_INIT;
 
 /**
  ****************************************************************************
@@ -295,7 +300,15 @@ vixMntIPC_InitDiskHandle(VixDiskLibConnection connection,
                          uint8 IPCType)
 {
    IPCTYPE_FLAG = IPCType;
-   diskHandle_instance = new VixMntDiskHandle(connection, path, flag);
+
+   if(diskHandleMap.find(path) != diskHandleMap.end()) {
+      ELog("disk already opened");
+      diskHandle_instance = diskHandleMap[path];
+   } else {
+      diskHandle_instance = new VixMntDiskHandle(connection, path, flag);
+      ILog("init diskname %s",path);
+      diskHandleMap[path] = diskHandle_instance;
+    }
 
    if (IPCTYPE_FLAG == VIXMNTIPC_MMAP) {
       vixMntIPC_InitMmap(MMAP_MEMORY_SIZE, 0);
@@ -325,12 +338,19 @@ void
 vixMntIPC_CleanDiskHandle()
 {
    ILog("Clean DiskHandle");
-   delete diskHandle_instance;
 
    if (IPCTYPE_FLAG == VIXMNTIPC_MMAP) {
+      delete diskHandle_instance;
       vixMntIPC_CleanMmap();
       msgQ_instance->unlink();
       vixMntIPC_CleanMsgQue();
+   } else {
+      std::map<std::string,VixMntDiskHandle*>::iterator itr
+          = diskHandleMap.begin();
+      while( itr!=diskHandleMap.end() ) {
+         delete itr->second;
+         itr++;
+      }
    }
 }
 
@@ -452,6 +472,27 @@ listening()
    ILog("thread running, %u", pt_id);
    return pt_id;
 }
+/**
+ ****************************************************************************
+ * vixMntIPC_listenSocketOnce
+ * setup sokcet server to bind ip and port only once.
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * No
+ * -------------------------------------------------------------------------
+ * output paremeters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
+ */
+
+void vixMntIPC_listenSocketOnce()
+{
+   VixMntSocketServer *socketServer_instance = new VixMntSocketServer();
+   socketServer_instance->serverListen(diskHandleMap);
+}
 
 /**
  ****************************************************************************
@@ -474,8 +515,7 @@ vixMntIPC_listen(void *args)
    if (IPCTYPE_FLAG == VIXMNTIPC_MMAP) {
       return diskHandle_instance->listen(args);
    } else {
-      VixMntSocketServer *socketServer_instance = new VixMntSocketServer();
-      socketServer_instance->serverListen(diskHandle_instance);
+      pthread_once(&socket_listen_ponce, &vixMntIPC_listenSocketOnce);
       return NULL;
    }
 }
@@ -673,7 +713,7 @@ hashString(unsigned char *str)
 {
    unsigned long hash = 5381;
    int c;
-   while ( c == *str++ ){
+   while ( (c = *str++) ){
       hash = ((hash << 5) + hash) + hash + c;
    }
    return hash;
