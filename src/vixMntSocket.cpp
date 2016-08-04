@@ -58,7 +58,8 @@ VixMntSocketServer::~VixMntSocketServer() { close(listenfd); }
  */
 
 void
-VixMntSocketServer::serverListen(std::map<std::string,VixMntDiskHandle *> &vixdh)
+VixMntSocketServer::serverListen(
+        std::map<std::string,VixMntDiskHandle *> &vixdh)
 {
    if (listen(listenfd, SOCKET_LISTENQ)) {
       ELog("Server Listen Error, %s", strerror(errno));
@@ -225,8 +226,10 @@ void VixMntSocketServer::doRead(int fd,
          for (; i < maxOps; ++i) {
 
             VixError vixError =
-               (*vixdhMap)[diskHandleName]->read((uint8 *)buf, vixskop.offset + i * eachSectorSize,
-                           eachSectorSize);
+               (*vixdhMap)[diskHandleName]->read(
+                       (uint8 *)buf,
+                       vixskop.offset + i * eachSectorSize,
+                       eachSectorSize);
             SHOW_ERROR_INFO(vixError);
             int nwrite = rawWrite(fd, buf, SOCKET_BUF_MAX_SIZE);
 
@@ -263,7 +266,10 @@ void VixMntSocketServer::doRead(int fd,
             deleteEvent(fd, EPOLLIN);
          } else {
             VixError vixError =
-               (*vixdhMap)[diskHandleName]->write((uint8 *)buf, vixskop.offset, vixskop.bufsize);
+               (*vixdhMap)[diskHandleName]->write(
+                       (uint8 *)buf,
+                       vixskop.offset,
+                       vixskop.bufsize);
             SHOW_ERROR_INFO(vixError);
             vixskop.carriedOp = VixMntOp(MntWriteDone);
             ILog("Write offset %u , bufsize %u,token %u", vixskop.offset,
