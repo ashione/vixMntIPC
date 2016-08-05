@@ -183,8 +183,9 @@ VixMntSocketServer::handleAccept()
 /**
  ****************************************************************************
  * VixMntSocketServer::doRead
- * parser control data, then
- * read data from remote disk via vixmntdiskhandle
+ * parser control data, then read data from remote disk via vixmntdiskhandle.
+ * if realted filename(diskname) not exist in vixdhMap, no handle will be
+ * response.
  * -------------------------------------------------------------------------
  * input parameters :
  * fd
