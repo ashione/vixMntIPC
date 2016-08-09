@@ -24,7 +24,7 @@ extern "C" {
  * input parameters  :
  * mmap_datasize,  allocate a set number of share memory for memory map
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -83,7 +83,7 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
  * write_pos,  write position ( offset  )
  * write_size, data size
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -110,7 +110,7 @@ void VixMntMmap::mntWriteMmap(const uint8 *buf,  // IN
  * read_pos , read position (offset)
  * read_size, data size
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -132,7 +132,7 @@ void VixMntMmap::mntReadMmap(uint8 *buf,       // IN/OUT
  * -------------------------------------------------------------------------
  * input parameters  :
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No

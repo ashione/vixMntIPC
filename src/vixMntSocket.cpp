@@ -9,7 +9,7 @@
  * input parameters
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -49,7 +49,7 @@ VixMntSocketServer::~VixMntSocketServer() { close(listenfd); }
  * input parameters
  * vixdh
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -78,7 +78,7 @@ VixMntSocketServer::serverListen(
  * input parameters
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -117,7 +117,7 @@ VixMntSocketServer::doEpoll()
  * num, the number of events
  * buf
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect
  * No
@@ -150,7 +150,7 @@ VixMntSocketServer::handleEvents(epoll_event *events,
  * input parameters :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -192,7 +192,7 @@ VixMntSocketServer::handleAccept()
  * buf
  * maxLen, deprecated now
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -221,8 +221,8 @@ void VixMntSocketServer::doRead(int fd,
       //ILog("operation diskname %s",vixskop.fileName);
       if (vixskop.carriedOp == VixMntOp(MntRead)) {
          uint64 maxOps =
-            vixskop.bufsize * VIXDISKLIB_SECTOR_SIZE / SOCKET_BUF_MAX_SIZE;
-         uint64 eachSectorSize = SOCKET_BUF_MAX_SIZE / VIXDISKLIB_SECTOR_SIZE;
+            vixskop.bufsize * getSectorSize() / SOCKET_BUF_MAX_SIZE;
+         uint64 eachSectorSize = SOCKET_BUF_MAX_SIZE / getSectorSize();
          uint32 i = 0;
          for (; i < maxOps; ++i) {
 
@@ -246,7 +246,7 @@ void VixMntSocketServer::doRead(int fd,
             VixError vixError = (*vixdhMap)[diskHandleName]->read(
                (uint8 *)buf, vixskop.offset + i * eachSectorSize, leftSector);
             SHOW_ERROR_INFO(vixError);
-            int nwrite = rawWrite(fd, buf, leftSector * VIXDISKLIB_SECTOR_SIZE);
+            int nwrite = rawWrite(fd, buf, leftSector * getSectorSize());
 
             if (nwrite <= 0) {
                ELog("Reminded Write Error.");
@@ -298,7 +298,7 @@ void VixMntSocketServer::doRead(int fd,
  * buf
  * maxLen
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect
  * No
@@ -330,7 +330,7 @@ VixMntSocketServer::doWrite(int fd,
  * fd
  * state
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -357,7 +357,7 @@ VixMntSocket::addEvent(int fd,
  * fd
  * state
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -384,7 +384,7 @@ VixMntSocket::deleteEvent(int fd,
  * fd
  * state
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -413,7 +413,7 @@ VixMntSocket::modifyEvent(int fd,
  * fd
  * bufsize
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * buf
  * -------------------------------------------------------------------------
  * Side Effect
@@ -453,7 +453,7 @@ VixMntSocket::rawRead(int fd,
  * buf
  * bufsize
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect
  * No
@@ -492,7 +492,7 @@ VixMntSocket::rawWrite(int fd,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -520,7 +520,7 @@ VixMntSocketClient::VixMntSocketClient() : VixMntSocket()
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -538,7 +538,7 @@ VixMntSocketClient::~VixMntSocketClient() { close(sockfd); }
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -562,7 +562,7 @@ VixMntSocketClient::doRead(int fd,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -586,7 +586,7 @@ VixMntSocketClient::doWrite(int fd,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -627,7 +627,7 @@ VixMntSocketClient::handleConnect()
  * num, the number of events
  * buf
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -659,7 +659,7 @@ VixMntSocketClient::handleEvents(epoll_event *events,
  * input parameters  :
  * bufsize
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * buf
  * -------------------------------------------------------------------------
  * Side Effect
@@ -688,7 +688,7 @@ VixMntSocketClient::rawRead(char *buf,
  * buf
  * bufsize
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect

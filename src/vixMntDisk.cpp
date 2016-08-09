@@ -13,7 +13,7 @@
  * path, disk path
  * flag, disk operation mode
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect
  * No
@@ -39,7 +39,7 @@ VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection,
  * input parameters :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -64,7 +64,7 @@ VixMntDiskHandle::~VixMntDiskHandle() {
  * msgQ_, system message queue
  * mmap_, memory map handle
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect
@@ -73,8 +73,8 @@ VixMntDiskHandle::~VixMntDiskHandle() {
  */
 
 void
-VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_,
-                          VixMntMmap *mmap_)
+VixMntDiskHandle::prepare(VixMntMsgQue * msgQ_,
+                          VixMntMmap * mmap_)
 {
    _msgQ = msgQ_;
    _mmap = mmap_;
@@ -88,7 +88,7 @@ VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_,
  * input parameters  :
  * args, pthread passed arguments
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * NULL
  * -------------------------------------------------------------------------
  * Side Effect
@@ -96,8 +96,8 @@ VixMntDiskHandle::prepare(VixMntMsgQue *msgQ_,
  ****************************************************************************
  */
 
-void*
-VixMntDiskHandle::listen(void *args)
+void *
+VixMntDiskHandle::listen(void * args)
 {
 
    if (!_vixHandle || !_msgQ || !_mmap) {
@@ -143,7 +143,7 @@ VixMntDiskHandle::listen(void *args)
  * offset, disk's offset
  * numberSector, wanted buffer sector number of disk
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixError
  * -------------------------------------------------------------------------
  * Side Effect
@@ -168,7 +168,7 @@ VixMntDiskHandle::read(uint8 *buf,
  * input parameters  :
  * msg_data, it contains libfuse operator, offset and data sector size.
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixError
  * -------------------------------------------------------------------------
  * Side Effect
@@ -182,7 +182,7 @@ VixMntDiskHandle::read(VixMntMsgData *msg_data)
    assert(_vixHandle);
    VixMntOpRead opReadData;
    opReadData.convertFromBytes(msg_data->msg_buff);
-   uint64 sizeResult = opReadData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+   uint64 sizeResult = opReadData.bufsize * getSectorSize();
 
    uint8 buf[sizeResult];
 
@@ -212,7 +212,7 @@ VixMntDiskHandle::read(VixMntMsgData *msg_data)
  * offset, disk's offset
  * numberSector, wanted buffer sector number of disk
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixError
  * -------------------------------------------------------------------------
  * Side Effect
@@ -237,7 +237,7 @@ VixMntDiskHandle::write(uint8 *buf,
  * input parameters  :
  * msg_data, libfuse operator, offset and data sector size
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixError
  * -------------------------------------------------------------------------
  * Side Effect
@@ -250,7 +250,7 @@ VixMntDiskHandle::write(VixMntMsgData *msg_data)
 {
    VixMntOpRead opWriteData;
    opWriteData.convertFromBytes(msg_data->msg_buff);
-   uint64 sizeResult = opWriteData.bufsize * VIXDISKLIB_SECTOR_SIZE;
+   uint64 sizeResult = opWriteData.bufsize * getSectorSize();
 
    uint8 buf[sizeResult];
    // first read buf data from mmap area
@@ -277,7 +277,7 @@ VixMntDiskHandle::write(VixMntMsgData *msg_data)
  * input parameters  :
  * info
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * info
  * -------------------------------------------------------------------------
  * Side Effect
@@ -301,7 +301,7 @@ VixMntDiskHandle::getDiskInfo(VixDiskLibInfo **info)
  * input parameters  :
  * info, vixDiskLibInfo
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -323,7 +323,7 @@ VixMntDiskHandle::freeDiskInfo(VixDiskLibInfo *info)
  * input parameters  :
  * vixError
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * std::string
  * -------------------------------------------------------------------------
  * Side Effect:

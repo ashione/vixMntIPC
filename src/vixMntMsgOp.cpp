@@ -33,7 +33,7 @@ bool operator==(VixMntMsgOp op, std::string str_op)
  * input parameters  :
  * op
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * const char*
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -62,7 +62,7 @@ getOpValue(VixMntMsgOp op)
  * input parameters  :
  * str_op
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixMntMsgOp
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -116,7 +116,7 @@ VixMntMsgOp getOpIndex(const char *str_op)
  * msg_datasize
  * msg_buff
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -141,7 +141,7 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
  * input parameters  :
  * msg_op
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -166,7 +166,7 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
  * msg_datasize
  * msg_buff
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No

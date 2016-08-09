@@ -13,11 +13,10 @@ static VixMntMsgQue *fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
  ****************************************************************************
  * FuseMntIPC_Read
  * libfuse recall function
- * If memory map & message solution : insert a message into
- * system message queue, then waiting for the result after providing a
- * response message queue name;
- * If socket solution  : setup a socket client to connect socket server, then
- * waiting for returing.
+ * If memory map & message solution : insert a message into system message
+ * queue, then waiting for the result after providing a response message
+ * queue name; If socket solution  : setup a socket client to connect socket
+ * server, then waiting for returing.
  * -------------------------------------------------------------------------
  * input parameters  :
  * path,
@@ -25,7 +24,7 @@ static VixMntMsgQue *fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
  * offset,
  * fi
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * buf
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -62,7 +61,6 @@ FuseMntIPC_Read(const char *path,
          memcpy(&sizeResult, readMsgResult.msg_buff,
                 readMsgResult.msg_datasize);
          vixMntIPC_ReadMmap(buf, 0, sizeResult);
-
          return sizeResult;
       }
       WLog("addr %u, size %u,read %s error", offset, size, path);
@@ -73,7 +71,7 @@ FuseMntIPC_Read(const char *path,
       VixMntSocketClient *fuseSocketClient = new VixMntSocketClient();
       fuseSocketClient->rawWrite((char *)(&fuseOpSocket),
                                  sizeof(VixMntOpSocket));
-      fuseSocketClient->rawRead(buf, size * VIXDISKLIB_SECTOR_SIZE);
+      fuseSocketClient->rawRead(buf, size * getSectorSize());
       delete fuseSocketClient;
 
       return size;
@@ -94,7 +92,7 @@ FuseMntIPC_Read(const char *path,
  * offset,
  * fi
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -145,7 +143,7 @@ FuseMntIPC_Write(const char *path,
       // socket client send raw data after notification
       fuseSocketClient->rawWrite((char *)(&fuseOpSocket),
                                  sizeof(VixMntOpSocket));
-      fuseSocketClient->rawWrite(buf, size * VIXDISKLIB_SECTOR_SIZE);
+      fuseSocketClient->rawWrite(buf, size * getSectorSize());
 
       delete fuseSocketClient;
 

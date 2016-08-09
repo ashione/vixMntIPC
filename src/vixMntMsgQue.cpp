@@ -17,7 +17,7 @@ pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
  * input parameters  :
  * sem, make sure it's singleton if sem is passed
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * VixMntMsgQue
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -54,7 +54,7 @@ VixMntMsgQue
  * input parameters  :
  * no
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * no
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -73,7 +73,7 @@ VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
  * msg_name , message queue name
  * readOnly , message queue IO attr
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -117,7 +117,7 @@ VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
  * input parameters  :
  * msg_id
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  *
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -146,7 +146,7 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) { // IN
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -177,7 +177,7 @@ VixMntMsgQue::unlink() {
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -200,7 +200,7 @@ VixMntMsgQue::~VixMntMsgQue() {
  * input parameters  :
  * sem, if enable singleton in multiprocess
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -233,7 +233,7 @@ VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
  * msg_len,    message buffer length
  * msg_prio,   message buffer priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * mqd_t, return sender's mqd_t if operation is successful,
  *        otherwise return -1
  * -------------------------------------------------------------------------
@@ -261,7 +261,7 @@ VixMntMsgQue::send(const char *msg_ptr, // IN
  * msg_len,    message buffer length
  * msg_prio,   message buffer priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * mqd_t, return sender's mqd_t if operation is successful,
  *        otherwise return -1
  * -------------------------------------------------------------------------
@@ -286,7 +286,7 @@ VixMntMsgQue::receive(char *msg_ptr,      // IN
  * msg_op,     message operation
  * msg_prio,   message buffer priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * bool, return true otherwise false
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -318,7 +318,7 @@ VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
  * input parameters  :
  * msg_prio,   message buffer priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * msg_op,     message operation
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -357,7 +357,7 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
  *             and message data of control path
  * msg_prio,   message buffer priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * bool , return true if send successful, otherwise return false
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -385,7 +385,7 @@ VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
  * msg_data, libfuse operator, offset and data sector size
  * msg_prio, message priority
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect

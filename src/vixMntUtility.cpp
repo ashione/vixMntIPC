@@ -25,6 +25,7 @@ static uint8 IPCTYPE_FLAG = 0;
 static std::map<std::string,VixMntDiskHandle* > diskHandleMap;
 
 static pthread_once_t socket_listen_ponce = PTHREAD_ONCE_INIT;
+static uint32 diskHandleSectorSize = 0;
 
 /**
  ****************************************************************************
@@ -39,7 +40,7 @@ static pthread_once_t socket_listen_ponce = PTHREAD_ONCE_INIT;
  * filename, current source code file name
  * format , argument format
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -81,7 +82,7 @@ vixMntLog(short level,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * buffer
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -112,7 +113,7 @@ getnow(char *buffer)
  * mmap_datasize
  * isRoot
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -139,7 +140,7 @@ vixMntIPC_InitMmap(size_t mmap_datasize, int isRoot)
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -170,7 +171,7 @@ vixMntIPC_CleanMmap()
  * write_pos
  * write_size
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -199,7 +200,7 @@ vixMntIPC_WriteMmap(const char *buf,
  * read_pos
  * read_size
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * buf
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -228,7 +229,7 @@ vixMntIPC_ReadMmap(char *buf,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -256,7 +257,7 @@ vixMntIPC_InitMsgQue()
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -286,7 +287,7 @@ vixMntIPC_CleanMsgQue()
  * flag,
  * IPCType, socket or message queue
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * -------------------------------------------------------------------------
  * Side Effect:
  * No
@@ -326,7 +327,7 @@ vixMntIPC_InitDiskHandle(VixDiskLibConnection connection,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -362,7 +363,7 @@ vixMntIPC_CleanDiskHandle()
  * input parameters  :
  * info
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -385,7 +386,7 @@ vixMntIPC_GetDiskInfo(VixDiskLibInfo **info)
  * input parameters  :
  * info
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -408,7 +409,7 @@ vixMntIPC_FreeDiskInfo(VixDiskLibInfo *info)
  * input parameters  :
  * arg, pthread arguments
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -450,7 +451,7 @@ vixMntIPC_run(void *arg)
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -480,7 +481,7 @@ listening()
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -501,7 +502,7 @@ void vixMntIPC_listenSocketOnce()
  * input parameters  :
  * args, pthread carried arguments
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -528,7 +529,7 @@ vixMntIPC_listen(void *args)
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -560,7 +561,7 @@ vixMntIPC_main()
  * input parameters  :
  * path
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -587,7 +588,7 @@ isDirectoryExist(const char *path)
  * input parameters  :
  * path
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -645,7 +646,7 @@ makeDirectoryHierarchy(const char *path)
  * rootPath,
  * max_random_len
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * destination
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -676,7 +677,7 @@ getRandomFileName(const char *rootPath,
  * input parameters  :
  * No
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * No
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -700,7 +701,7 @@ getVixMntIPCType() { return IPCTYPE_FLAG; }
  * input parameters  :
  * str
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * unsigned long , hash number
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -727,7 +728,7 @@ hashString(unsigned char *str)
  * input parameters  :
  * str
  * -------------------------------------------------------------------------
- * output paremeters :
+ * output parameters :
  * unsigned long , hash number
  * -------------------------------------------------------------------------
  * Side Effect:
@@ -740,4 +741,35 @@ portMap(unsigned char *str)
 {
    unsigned long port = hashString(str);
    return (port%20000)+41413;
+}
+
+/**
+ ****************************************************************************
+ * getSectorSize
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
+ */
+
+uint32
+getSectorSize()
+{
+    /*
+   if ( diskHandleSectorSize ) {
+      return diskHandleSectorSize;
+   }
+   assert(diskHandle_instance);
+   VixDiskLibInfo *info;
+   vixMntIPC_GetDiskInfo(&info);
+   diskHandleSectorSize = info->sectorSize;
+   vixMntIPC_FreeDiskInfo(info);
+   return diskHandleSectorSize;
+   */
+   diskHandleSectorSize = VIXDISKLIB_SECTOR_SIZE_512B;
+   return VIXDISKLIB_SECTOR_SIZE_512B;
 }
