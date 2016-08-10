@@ -8,18 +8,12 @@
 #include <exception>
 
 std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
-/*
-#ifdef __cplusplus
-extern "C" {
-#endif
- * VixMntMmap Constructor,
- * share memory will be used when isRoot is True.
- * it opens [datasize/pagesize] +1 frame for share memory or memory map.
- */
 
 /**
  ****************************************************************************
  * VixMntMmap Constructor
+ * share memory will be used when isRoot is True.
+ * it opens [datasize/pagesize] +1 frame for share memory or memory map.
  * -------------------------------------------------------------------------
  * input parameters  :
  * mmap_datasize,  allocate a set number of share memory for memory map
@@ -31,8 +25,8 @@ extern "C" {
  ****************************************************************************
  */
 
-VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
-                       bool isRoot)          // IN
+VixMntMmap::VixMntMmap(size_t mmap_datasize,
+                       bool isRoot)
 {
    try {
       if (isRoot) {
@@ -65,10 +59,11 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
       this->mmap_data = (char *)mmap(NULL, this->mmap_pagenum * MMAP_PAGE_SIZE,
                                      PROT_READ | PROT_WRITE,
                                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-   } else
+   } else {
       this->mmap_data =
          (char *)mmap(NULL, this->mmap_pagenum * MMAP_PAGE_SIZE,
                       PROT_READ | PROT_WRITE, MAP_SHARED, this->fid, 0);
+   }
 
    ILog("shm mmap addr : %x", this->mmap_data);
 }
@@ -91,9 +86,9 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize, // IN
  ****************************************************************************
  */
 
-void VixMntMmap::mntWriteMmap(const uint8 *buf,  // IN
-                              size_t write_pos,  // IN
-                              size_t write_size) // IN
+void VixMntMmap::mntWriteMmap(const uint8 *buf,
+                              size_t write_pos,
+                              size_t write_size)
 {
 
    memcpy(this->mmap_data + write_pos, buf,
@@ -118,9 +113,9 @@ void VixMntMmap::mntWriteMmap(const uint8 *buf,  // IN
  ****************************************************************************
  */
 
-void VixMntMmap::mntReadMmap(uint8 *buf,       // IN/OUT
-                             size_t read_pos,  // IN
-                             size_t read_size) // IN
+void VixMntMmap::mntReadMmap(uint8 *buf,
+                             size_t read_pos,
+                             size_t read_size)
 {
    memcpy(buf, this->mmap_data + read_pos,
           read_size > 0 ? read_size : this->mmap_datasize);

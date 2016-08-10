@@ -36,6 +36,12 @@ enum VixMntMsgOp {
 };
 #endif
 
+/**
+ * VixMntMsgData was designed to be a packaged control path info,
+ * msg_datasize means how long message buffer size ( VixMntOp usually ),
+ * msg_response_q is the recall message queue name;
+ */
+
 class VixMntMsgData {
 public:
    VixMntMsgOp msg_op;

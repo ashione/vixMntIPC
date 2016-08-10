@@ -45,7 +45,7 @@ public:
 
 /*
  * warning : bufsize is sector number in vixdisklib
- *
+ * VixMntOpRead is protool for control path.
  */
 
 class VixMntOpRead : public VixMntOpBase {

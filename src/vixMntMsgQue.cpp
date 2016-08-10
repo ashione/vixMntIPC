@@ -34,7 +34,7 @@ pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
  */
 
 VixMntMsgQue
-*VixMntMsgQue::getMsgQueInstance(sem_t *sem) { // IN
+*VixMntMsgQue::getMsgQueInstance(sem_t *sem) {
 
    if (sem)
       sem_wait(sem);
@@ -80,8 +80,8 @@ VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
  ****************************************************************************
  */
 
-VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
-                           bool readOnly) {      // IN
+VixMntMsgQue::VixMntMsgQue(const char *msg_name,
+                           bool readOnly) {
 
    // readOnly is unused now.
    this->readOnly = readOnly;
@@ -125,7 +125,7 @@ VixMntMsgQue::VixMntMsgQue(const char *msg_name, // IN
  ****************************************************************************
  */
 
-VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) { // IN
+VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) {
 
    this->vixMntMsgID = msg_id;
    std::map<std::string, mqd_t>::iterator item =
@@ -208,7 +208,7 @@ VixMntMsgQue::~VixMntMsgQue() {
  */
 
 void
-VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
+VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) {
 
    if (sem) {
       sem_wait(sem);
@@ -243,9 +243,9 @@ VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) { // IN
  */
 
 mqd_t
-VixMntMsgQue::send(const char *msg_ptr, // IN
-                   size_t msg_len,      // IN
-                   unsigned msg_prio)   // IN
+VixMntMsgQue::send(const char *msg_ptr,
+                   size_t msg_len,
+                   unsigned msg_prio)
 {
    // disable send function, when msg queue is readonly
    assert(!this->readOnly);
@@ -271,9 +271,9 @@ VixMntMsgQue::send(const char *msg_ptr, // IN
  */
 
 mqd_t
-VixMntMsgQue::receive(char *msg_ptr,      // IN
-                      size_t msg_len,     // IN
-                      unsigned *msg_prio) // IN
+VixMntMsgQue::receive(char *msg_ptr,
+                      size_t msg_len,
+                      unsigned *msg_prio)
 {
    return mq_receive(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
@@ -295,8 +295,8 @@ VixMntMsgQue::receive(char *msg_ptr,      // IN
  */
 
 bool
-VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
-                        unsigned msg_prio)  // IN
+VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
+                        unsigned msg_prio)
 {
 
 /**
@@ -327,8 +327,8 @@ VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op, // IN
  */
 
 void
-VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
-                                unsigned *msg_prio)  // IN
+VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op,
+                                unsigned *msg_prio)
 {
    this->getattr(&this->vixMntMsgAttr);
 
@@ -336,14 +336,11 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
    // if not memeset, it may be old value
    memset(buf, 0, this->vixMntMsgAttr.mq_msgsize);
 
-   if (receive(buf, this->vixMntMsgAttr.mq_msgsize, msg_prio) < 0)
-#if defined(__cplusplus) && __cplusplus >= 201103L
-      *msg_op = VixMntMsgOp::ERROR;
-#else
-      *msg_op = ERROR;
-#endif
-   else
+   if (receive(buf, this->vixMntMsgAttr.mq_msgsize, msg_prio) < 0) {
+      *msg_op = VixMntOp(ERROR);
+   } else {
       *msg_op = getOpIndex(buf);
+   }
 
    delete[] buf;
 }
@@ -366,8 +363,8 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op, // OUT
  */
 
 bool
-VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
-                      unsigned msg_prio)       // IN
+VixMntMsgQue::sendMsg(VixMntMsgData *msg_data,
+                      unsigned msg_prio)
 {
    char *buf = new char[sizeof(VixMntMsgData)];
    memcpy(buf, msg_data, sizeof(VixMntMsgData));
@@ -394,8 +391,8 @@ VixMntMsgQue::sendMsg(VixMntMsgData *msg_data, // IN
  */
 
 void
-VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data, // IN
-                         unsigned *msg_prio)      // IN
+VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data,
+                         unsigned *msg_prio)
 {
    mq_attr tempAttr;
    this->getattr(&tempAttr);
@@ -405,12 +402,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data, // IN
 
    if (receive(buf, tempAttr.mq_msgsize, msg_prio) < 0) {
       ELog("receive error");
-
-#if defined(__cplusplus) && __cplusplus >= 201103L
-      msg_data->msg_op = VixMntMsgOp::ERROR;
-#else
-      msg_data->msg_op = ERROR;
-#endif
+      msg_data->msg_op = VixMntOp(ERROR);
    } else {
       memcpy(msg_data, buf, sizeof(VixMntMsgData));
    }
