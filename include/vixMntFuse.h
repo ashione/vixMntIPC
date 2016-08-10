@@ -26,10 +26,10 @@ extern "C" {
  */
 
 int FuseMntIPC_Read(const char *path, char *buf, size_t size, off_t offset,
-                    struct fuse_file_info *fi);
+                    struct fuse_file_info *fi, const uint32 sectorSize);
 
 int FuseMntIPC_Write(const char *path, const char *buf, size_t size,
-                     off_t offset, struct fuse_file_info *fi);
+                     off_t offset, struct fuse_file_info *fi, const uint32 sectorSize);
 
 #ifdef __cplusplus
 }

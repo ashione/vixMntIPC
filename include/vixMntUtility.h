@@ -82,8 +82,6 @@ unsigned long hashString(unsigned char *str);
 
 unsigned long portMap(unsigned char *str);
 
-uint32 getSectorSize();
-
 #ifdef __cplusplus
 }
 #endif

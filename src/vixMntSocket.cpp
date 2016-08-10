@@ -219,15 +219,21 @@ void VixMntSocketServer::doRead(int fd,
       vixskop.convertFromBytes(buf);
       std::string diskHandleName = vixskop.fileName;
       //ILog("operation diskname %s",vixskop.fileName);
+      VixMntDiskHandle *vixDiskHandle = NULL;
+      if (vixdhMap->find(diskHandleName) != vixdhMap->end()) {
+          vixDiskHandle = (*vixdhMap)[diskHandleName];
+      }
+      assert(vixDiskHandle);
+      uint32 sectorSize = vixDiskHandle->getSectorSize();
+
       if (vixskop.carriedOp == VixMntOp(MntRead)) {
-         uint64 maxOps =
-            vixskop.bufsize * getSectorSize() / SOCKET_BUF_MAX_SIZE;
-         uint64 eachSectorSize = SOCKET_BUF_MAX_SIZE / getSectorSize();
+         uint64 maxOps = vixskop.bufsize * sectorSize/ SOCKET_BUF_MAX_SIZE;
+         uint64 eachSectorSize = SOCKET_BUF_MAX_SIZE / sectorSize;
          uint32 i = 0;
          for (; i < maxOps; ++i) {
 
             VixError vixError =
-               (*vixdhMap)[diskHandleName]->read(
+               vixDiskHandle->read(
                        (uint8 *)buf,
                        vixskop.offset + i * eachSectorSize,
                        eachSectorSize);
@@ -243,10 +249,10 @@ void VixMntSocketServer::doRead(int fd,
          if (leftSector > 0) {
 
             /* mark client needed buffer size for next write operation*/
-            VixError vixError = (*vixdhMap)[diskHandleName]->read(
+            VixError vixError = vixDiskHandle->read(
                (uint8 *)buf, vixskop.offset + i * eachSectorSize, leftSector);
             SHOW_ERROR_INFO(vixError);
-            int nwrite = rawWrite(fd, buf, leftSector * getSectorSize());
+            int nwrite = rawWrite(fd, buf, leftSector * sectorSize);
 
             if (nwrite <= 0) {
                ELog("Reminded Write Error.");
@@ -267,14 +273,14 @@ void VixMntSocketServer::doRead(int fd,
             deleteEvent(fd, EPOLLIN);
          } else {
             VixError vixError =
-               (*vixdhMap)[diskHandleName]->write(
+               vixDiskHandle->write(
                        (uint8 *)buf,
                        vixskop.offset,
                        vixskop.bufsize);
             SHOW_ERROR_INFO(vixError);
             vixskop.carriedOp = VixMntOp(MntWriteDone);
-            ILog("Write offset %u , bufsize %u,token %u", vixskop.offset,
-                 vixskop.bufsize, vixskop.token);
+            ILog("Write offset %u , bufsize %u,token %u",
+                  vixskop.offset, vixskop.bufsize, vixskop.token);
 
             // nofity socket client write successful
             memcpy(buf, (char *)&vixskop, sizeof(vixskop));

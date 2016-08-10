@@ -26,10 +26,12 @@ VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection,
 {
    _vixHandle = NULL;
    ILog("open disklib");
+   assert(connection);
    VixError vixError = VixDiskLib_Open(connection, path, flag, &_vixHandle);
    diskBackingPath = path;
 
    SHOW_ERROR_INFO(vixError);
+   this->getDiskInfo(&_vixInfo);
 }
 
 /**
@@ -50,6 +52,8 @@ VixMntDiskHandle::VixMntDiskHandle(VixDiskLibConnection connection,
 VixMntDiskHandle::~VixMntDiskHandle() {
    VixError vixError = VixDiskLib_Close(_vixHandle);
    SHOW_ERROR_INFO(vixError);
+   this->freeDiskInfo(_vixInfo);
+   _vixInfo = NULL;
    _vixHandle = NULL;
 }
 

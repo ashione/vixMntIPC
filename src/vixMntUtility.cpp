@@ -25,7 +25,6 @@ static uint8 IPCTYPE_FLAG = 0;
 static std::map<std::string,VixMntDiskHandle* > diskHandleMap;
 
 static pthread_once_t socket_listen_ponce = PTHREAD_ONCE_INIT;
-static uint32 diskHandleSectorSize = 0;
 
 /**
  ****************************************************************************
@@ -741,35 +740,4 @@ portMap(unsigned char *str)
 {
    unsigned long port = hashString(str);
    return (port%20000)+41413;
-}
-
-/**
- ****************************************************************************
- * getSectorSize
- * -------------------------------------------------------------------------
- * input parameters  :
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect:
- * No
- ****************************************************************************
- */
-
-uint32
-getSectorSize()
-{
-    /*
-   if ( diskHandleSectorSize ) {
-      return diskHandleSectorSize;
-   }
-   assert(diskHandle_instance);
-   VixDiskLibInfo *info;
-   vixMntIPC_GetDiskInfo(&info);
-   diskHandleSectorSize = info->sectorSize;
-   vixMntIPC_FreeDiskInfo(info);
-   return diskHandleSectorSize;
-   */
-   diskHandleSectorSize = VIXDISKLIB_SECTOR_SIZE_512B;
-   return VIXDISKLIB_SECTOR_SIZE_512B;
 }

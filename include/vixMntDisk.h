@@ -10,8 +10,9 @@
 extern "C" {
 #endif
 
-/** SHOW_ERROR_INFO mainly convert char* errorMsg  to string that can be printed
- *  in Log.
+/**
+ * SHOW_ERROR_INFO mainly convert char* errorMsg  to string that can be printed
+ * in Log.
  */
 
 #define SHOW_ERROR_INFO(vixError)                                              \
@@ -29,6 +30,7 @@ extern "C" {
 class VixMntDiskHandle {
 private:
    VixDiskLibHandle _vixHandle;
+   VixDiskLibInfo * _vixInfo;
    VixMntMsgQue *_msgQ;
    VixMntMmap *_mmap;
 
@@ -48,6 +50,14 @@ public:
    VixError getDiskInfo(VixDiskLibInfo **info);
    void freeDiskInfo(VixDiskLibInfo *info);
    static std::string getErrorMsg(VixError vixError);
+   inline SectorType getCapacity() {
+       assert(_vixInfo);
+       return _vixInfo->capacity;
+   }
+   inline uint32 getSectorSize() {
+       assert(_vixInfo);
+       return _vixInfo->sectorSize;
+   }
 };
 
 #ifdef __cplusplus

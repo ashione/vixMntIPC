@@ -37,7 +37,8 @@ FuseMntIPC_Read(const char *path,
                 char *buf,
                 size_t size,
                 off_t offset,
-                struct fuse_file_info *fi)
+                struct fuse_file_info *fi,
+                const uint32 sectorSize)
 {
    uint8 IPCType_ = getVixMntIPCType();
    if (IPCType_ == VIXMNTIPC_MMAP) {
@@ -71,7 +72,7 @@ FuseMntIPC_Read(const char *path,
       VixMntSocketClient *fuseSocketClient = new VixMntSocketClient();
       fuseSocketClient->rawWrite((char *)(&fuseOpSocket),
                                  sizeof(VixMntOpSocket));
-      fuseSocketClient->rawRead(buf, size * getSectorSize());
+      fuseSocketClient->rawRead(buf, size * sectorSize);
       delete fuseSocketClient;
 
       return size;
@@ -105,7 +106,8 @@ FuseMntIPC_Write(const char *path,
                  const char *buf,
                  size_t size,
                  off_t offset,
-                 struct fuse_file_info *fi)
+                 struct fuse_file_info *fi,
+                 const uint32 sectorSize)
 {
    uint8 IPCType_ = getVixMntIPCType();
    if (IPCType_ == VIXMNTIPC_MMAP) {
@@ -143,7 +145,7 @@ FuseMntIPC_Write(const char *path,
       // socket client send raw data after notification
       fuseSocketClient->rawWrite((char *)(&fuseOpSocket),
                                  sizeof(VixMntOpSocket));
-      fuseSocketClient->rawWrite(buf, size * getSectorSize());
+      fuseSocketClient->rawWrite(buf, size * sectorSize);
 
       delete fuseSocketClient;
 
