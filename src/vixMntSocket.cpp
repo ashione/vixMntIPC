@@ -1,5 +1,6 @@
 #include <vixMntOperation.h>
 #include <vixMntSocket.h>
+#include <vixMntException.h>
 
 /**
  ****************************************************************************
@@ -24,7 +25,7 @@ VixMntSocketServer::VixMntSocketServer() : VixMntSocket()
 
    if (listenfd == -1) {
       ELog("socket error");
-      exit(1);
+      throw VixMntException("Socket Error");
    }
 
    bzero(&servaddr, sizeof(servaddr));
@@ -34,7 +35,7 @@ VixMntSocketServer::VixMntSocketServer() : VixMntSocket()
 
    if (bind(listenfd, (sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
       ELog("bind error");
-      exit(1);
+      throw VixMntException("Bind Error");
    }
    ILog("Server Start.");
 }
@@ -63,6 +64,7 @@ VixMntSocketServer::serverListen(
 {
    if (listen(listenfd, SOCKET_LISTENQ)) {
       ELog("Server Listen Error, %s", strerror(errno));
+      throw VixMntException("Server Listen Error");
    } else {
       ILog("Server Listen Start");
       this->vixdhMap = &vixdh;
@@ -110,7 +112,7 @@ VixMntSocketServer::doEpoll()
 /**
  ****************************************************************************
  * VixMntSocketServer::handleEvents
- * handle different events in different functions / operations
+ * Handle different events in different functions / operations.
  * -------------------------------------------------------------------------
  * input parameters
  * events
@@ -129,23 +131,27 @@ VixMntSocketServer::handleEvents(epoll_event *events,
                                  int num,
                                  char *buf)
 {
+   try {
+      for (int i = 0; i < num; i++) {
+         int fd = events[i].data.fd;
 
-   for (int i = 0; i < num; i++) {
-      int fd = events[i].data.fd;
-
-      if (fd == listenfd && (events[i].events & EPOLLIN))
-         handleAccept();
-      else if (events[i].events & EPOLLIN)
-         doRead(fd, buf);
-      else if (events[i].events & EPOLLOUT)
-         doWrite(fd, buf);
+         if (fd == listenfd && (events[i].events & EPOLLIN))
+            handleAccept();
+         else if (events[i].events & EPOLLIN)
+            doRead(fd, buf);
+         else if (events[i].events & EPOLLOUT)
+            doWrite(fd, buf);
+      }
+   } catch (VixMntException& e) {
+      ELog("Exception : %s",e.what());
    }
+
 }
 
 /**
  ****************************************************************************
  * vixMntSocketServer::handleAccept
- * accpet a new socket client
+ * Accpet a new socket client or report error.
  * -------------------------------------------------------------------------
  * input parameters :
  * No
@@ -169,12 +175,9 @@ VixMntSocketServer::handleAccept()
 
    if (clientFd == -1) {
       ELog("Accept Error");
+      throw VixMntException("Accept Error");
 
    } else {
-      /**
-       * ILog("Accept a new client : %s : %d", inet_ntoa(clientAddr.sin_addr),
-           clientAddr.sin_port);
-      */
       addEvent(clientFd, EPOLLIN);
       clientMap4Write[clientFd] = 0;
    }
@@ -185,7 +188,7 @@ VixMntSocketServer::handleAccept()
  * VixMntSocketServer::doRead
  * parser control data, then read data from remote disk via vixmntdiskhandle.
  * if realted filename(diskname) not exist in vixdhMap, no handle will be
- * response.
+ * responsed.
  * -------------------------------------------------------------------------
  * input parameters :
  * fd
@@ -208,8 +211,9 @@ void VixMntSocketServer::doRead(int fd,
    maxLen = maxLen > 0 ? maxLen : sizeof(VixMntOpSocket);
    int nread = recv(fd, buf, maxLen, 0);
    if (nread == -1) {
-      ELog("Read Error");
+      WLog("Read Error");
       close(fd);
+      throw VixMntException("Read Exception");
    } else if (nread == 0) {
       clientMap4Write.erase(fd);
       close(fd);
@@ -242,13 +246,14 @@ void VixMntSocketServer::doRead(int fd,
 
             if (nwrite <= 0) {
                ELog("Batch Write Error.");
+               throw VixMntException("Batch Write Error");
             }
          }
          uint64 leftSector = vixskop.bufsize - i * eachSectorSize;
 
          if (leftSector > 0) {
 
-            /* mark client needed buffer size for next write operation*/
+            // mark client needed buffer size for next write operation
             VixError vixError = vixDiskHandle->read(
                (uint8 *)buf, vixskop.offset + i * eachSectorSize, leftSector);
             SHOW_ERROR_INFO(vixError);
@@ -256,6 +261,7 @@ void VixMntSocketServer::doRead(int fd,
 
             if (nwrite <= 0) {
                ELog("Reminded Write Error.");
+               throw VixMntException("Reminded Write Error");
             }
          }
       } else if (vixskop.carriedOp == VixMntOp(MntWrite)) {
@@ -264,8 +270,9 @@ void VixMntSocketServer::doRead(int fd,
          vixskop.carriedBufSize = 0;
 
          if (ndataread == -1) {
-            ELog("Read Error");
+            WLog("Read Error");
             close(fd);
+            throw VixMntException("Read Exception");
          } else if (ndataread == 0) {
             ILog("Client Close");
             clientMap4Write.erase(fd);
@@ -290,6 +297,7 @@ void VixMntSocketServer::doRead(int fd,
 
       } else {
          ELog("Error");
+         throw VixMntException("Unkown Operation Error");
       }
    }
 }
@@ -323,6 +331,7 @@ VixMntSocketServer::doWrite(int fd,
       ELog("Write Error");
       close(fd);
       deleteEvent(fd, EPOLLOUT);
+      throw VixMntException("Write Error");
    } else
       modifyEvent(fd, EPOLLIN);
 }
@@ -439,8 +448,10 @@ VixMntSocket::rawRead(int fd,
 
    if (recvSize == 0) {
       ELog("Server close");
+      throw VixMntException("Server Close");
    } else if (recvSize == 0) {
       ELog("Send Error");
+      throw VixMntException("Send Close");
    } else
       while (recvSize < bufsize) {
          int tempRecvSize = read(fd, buf + recvSize, bufsize - recvSize);
@@ -476,10 +487,10 @@ VixMntSocket::rawWrite(int fd,
       int sendSize = write(fd, buf, bufsize);
       if (sendSize == 0) {
          ELog("Server close");
-         // close(sockfd);
+         throw VixMntException("Server Close");
       } else if (sendSize == 0) {
          ELog("Send Error");
-         // close(sockfd);
+         throw VixMntException("Send Error");
       } else {
          while (sendSize < bufsize) {
             int tempSendSize = write(fd, buf + sendSize, bufsize - sendSize);
@@ -516,6 +527,7 @@ VixMntSocketClient::VixMntSocketClient() : VixMntSocket()
    inet_pton(AF_INET, SOCKET_IPADDRESS, &servaddr.sin_addr);
    if (connect(sockfd, (sockaddr *)&servaddr, sizeof(servaddr))) {
       ELog(" Connect Error, %s", strerror(errno));
+      throw VixMntException("Connection Error");
    }
 }
 

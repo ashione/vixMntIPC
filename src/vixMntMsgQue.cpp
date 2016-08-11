@@ -403,6 +403,7 @@ VixMntMsgQue::receiveMsg(VixMntMsgData *msg_data,
    if (receive(buf, tempAttr.mq_msgsize, msg_prio) < 0) {
       ELog("receive error");
       msg_data->msg_op = VixMntOp(ERROR);
+      throw  VixMntException("Receive Error");
    } else {
       memcpy(msg_data, buf, sizeof(VixMntMsgData));
    }

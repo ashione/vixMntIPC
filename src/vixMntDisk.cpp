@@ -123,10 +123,8 @@ VixMntDiskHandle::listen(void * args)
          ILog(" stop listening, breaking");
          break;
       } else if (msg_op == VixMntOp(MntRead)) {
-         // ILog("receive %s",getOpValue(msg_op));
          SHOW_ERROR_INFO(read(&msg_data));
       } else if (msg_op == VixMntOp(MntWrite)) {
-         // ILog("receive %s",getOpValue(msg_op));
          SHOW_ERROR_INFO(write(&msg_data));
       } else {
          ELog("receive exception");

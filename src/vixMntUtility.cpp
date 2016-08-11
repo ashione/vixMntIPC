@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <time.h>
+#include <libgen.h>
 
 const char *random_str =
    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -64,12 +65,11 @@ vixMntLog(short level,
 
    getnow(timebuf);
 
-   snprintf(buffer, 0x100, buffLog, levelStr[level], pid, timebuf, fileName,
-            func, line);
+   snprintf(buffer, 0x100, buffLog, levelStr[level], pid, 
+            timebuf, basename((char*)fileName), func, line);
    vsnprintf(buffer + strlen(buffer), 80, format, args);
 
    va_end(args);
-
    printf("%s\n", buffer);
 }
 
@@ -101,7 +101,7 @@ getnow(char *buffer)
    struct timeval tp;
    gettimeofday(&tp, NULL);
    float us = tp.tv_usec;
-   snprintf(buffer + strlen(buffer), 10, ":%06.f", us);
+   snprintf(buffer + strlen(buffer), 10, ".%06.f", us);
 }
 
 /**
@@ -239,7 +239,6 @@ vixMntIPC_ReadMmap(char *buf,
 void
 vixMntIPC_InitMsgQue()
 {
-
    if (!msgQ_instance) {
       msgQ_instance = VixMntMsgQue::getMsgQueInstance();
       ILog("msgQ_instance init ok");
@@ -267,7 +266,6 @@ vixMntIPC_InitMsgQue()
 void
 vixMntIPC_CleanMsgQue()
 {
-
    if (msgQ_instance) {
       VixMntMsgQue::releaseMsgQueInstance();
       ILog("release msgQ_instance");
