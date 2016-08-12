@@ -10,6 +10,16 @@ function link()
         ln -sf $i `basename $i`
     done
 }
+function hard_link()
+{
+    for i in `ls src/*.cpp`; do
+        ln -f $i `basename $i`
+    done
+
+    for i in `ls include/*.h`; do
+        ln -f $i `basename $i`
+    done
+}
 
 function un_link()
 {
@@ -20,9 +30,10 @@ function un_link()
 
 function help()
 {
-    echo "usage : xx [ -l -u ] [ -h ]"
+    echo "usage : xx [ -l -u -c ] [ -h ]"
     echo " -h : show help information"
     echo " -l : link all files"
+    echo " -c : hard_link all files"
     echo " -u : unlink all sources and include files"
 }
 
@@ -36,6 +47,10 @@ then
     then
         link
         echo "link all sources"
+    elif  [ $1 == "-c" ]
+    then
+        hard_link
+        echo "hard link sources"
     else
         help
     fi

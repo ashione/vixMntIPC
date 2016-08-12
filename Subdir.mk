@@ -1,5 +1,7 @@
-SUBDIR_FILES += $(addprefix ,vixMntMsgOp.cpp vixMntOperation.cpp vixMntMmap.cpp vixMntMsgQue.cpp vixMntUtility.cpp)
-##SUBDIR_FILES += $(wildcard *.cpp ) 
+SUBDIR_FILES += $(addprefix ,vixMntMsgOp.cpp vixMntOperation.cpp \
+				vixMntMmap.cpp vixMntMsgQue.cpp vixMntUtility.cpp \
+				vixMntDisk.cpp vixMntFuse.cpp vixMntSocket.cpp)
+##SUBDIR_FILES += $(wildcard *.cpp )
 #$(info '*************************')
 #$(info $(SUBDIR_FILES))
 #$(info '*************************')
