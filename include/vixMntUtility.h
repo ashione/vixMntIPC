@@ -31,10 +31,6 @@ extern "C" {
 #define FLog(format, ...)                                                      \
    vixMntLog(3, getpid(), __LINE__, __func__, __FILE__, format, ##__VA_ARGS__)
 
-int isDirectoryExist(const char *path);
-
-int makeDirectoryHierarchy(const char *path);
-
 void vixMntLog(short level, pid_t pid, int line, const char *func,
                const char *fileName, const char *format, ...);
 
@@ -72,15 +68,9 @@ void getRandomFileName(const char *, size_t max_random_len, char *);
 
 pthread_t vixMntIPC_listen();
 
-pthread_t listening();
-
 int vixMntIPC_main();
 
 uint8 getVixMntIPCType();
-
-unsigned long hashString(unsigned char *str);
-
-unsigned long portMap(unsigned char *str);
 
 #ifdef __cplusplus
 }
