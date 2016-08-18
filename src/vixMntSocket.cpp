@@ -162,7 +162,6 @@ void VixMntSocketServer::doRead(int fd,
       VixMntOpSocket vixskop;
       vixskop.convertFromBytes(buf);
       std::string diskHandleName = vixskop.fileName;
-      //ILog("operation diskname %s",vixskop.fileName);
       VixMntDiskHandle *vixDiskHandle = NULL;
       if (vixdhMap->find(diskHandleName) != vixdhMap->end()) {
           vixDiskHandle = (*vixdhMap)[diskHandleName];

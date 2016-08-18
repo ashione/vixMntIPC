@@ -25,8 +25,7 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize,
       if (isRoot) {
          this->file_name = VixMntMmap::fileRoot;
       } else
-         //   this->file_name = getRandomFileName(fileRoot);
-         this->file_name = VixMntMmap::fileRoot;
+         this->file_name = "/vmware_mnt_tmp";
    } catch (std::exception &e) {
       ELog("set file_name error");
       this->file_name = "/vmware_mnt_shm";
