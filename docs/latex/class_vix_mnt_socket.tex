@@ -1,0 +1,146 @@
+\hypertarget{class_vix_mnt_socket}{}\section{Vix\+Mnt\+Socket Class Reference}
+\label{class_vix_mnt_socket}\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+Inheritance diagram for Vix\+Mnt\+Socket\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_vix_mnt_socket}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_socket_a00ea7c838e653815f65242728bed91d4}{}\label{class_vix_mnt_socket_a00ea7c838e653815f65242728bed91d4} 
+{\bfseries Vix\+Mnt\+Socket} (int epollfd\+\_\+=-\/1)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_socket_acf68d482f200c9f366807130d150a639}{}\label{class_vix_mnt_socket_acf68d482f200c9f366807130d150a639} 
+virtual void {\bfseries do\+Read} (int fd, char $\ast$buf, int max\+Len=0)=0
+\item 
+\hypertarget{class_vix_mnt_socket_a987dea28d58eee116128eba14bb1c1a9}{}\label{class_vix_mnt_socket_a987dea28d58eee116128eba14bb1c1a9} 
+virtual void {\bfseries do\+Write} (int fd, char $\ast$buf, int max\+Len=0)=0
+\item 
+\hypertarget{class_vix_mnt_socket_abf868d22e906ee3025f9f8b2b84dad92}{}\label{class_vix_mnt_socket_abf868d22e906ee3025f9f8b2b84dad92} 
+virtual void {\bfseries handle\+Events} (epoll\+\_\+event $\ast$, int, char $\ast$)=0
+\item 
+virtual int \hyperlink{class_vix_mnt_socket_aad48ed0239fc3fb9e822cc13e6fefa97}{raw\+Read} (int fd, char $\ast$buf, int max\+Len)
+\begin{DoxyCompactList}\small\item\em read data directly, but it will keep reading until received data length is equal to buffer size. \end{DoxyCompactList}\item 
+virtual int \hyperlink{class_vix_mnt_socket_a08d845463648d0978024817fdda8b7e9}{raw\+Write} (int fd, const char $\ast$buf, int max\+Len)
+\begin{DoxyCompactList}\small\item\em keep writing until all data were sent out. \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_socket_a6489a8065654dc69cca7dd71348211af}{add\+Event} (int fd, int state)
+\begin{DoxyCompactList}\small\item\em Add event for socket epoll. \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_socket_a08b1d3d1dbf17ef8d2a20dc1bcfd2596}{delete\+Event} (int fd, int state)
+\begin{DoxyCompactList}\small\item\em delete event from epoll eventlist \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_socket_a1c480a5b37f5938480781d40f00ce386}{modify\+Event} (int fd, int state)
+\begin{DoxyCompactList}\small\item\em modify event from epoll eventlist \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_socket_a3b70b47638e830e5f2caa73e86386074}{}\label{class_vix_mnt_socket_a3b70b47638e830e5f2caa73e86386074} 
+int {\bfseries epollfd}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_vix_mnt_socket_a6489a8065654dc69cca7dd71348211af}{}\label{class_vix_mnt_socket_a6489a8065654dc69cca7dd71348211af} 
+\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}!add\+Event@{add\+Event}}
+\index{add\+Event@{add\+Event}!Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+\subsubsection{\texorpdfstring{add\+Event()}{addEvent()}}
+{\ttfamily void Vix\+Mnt\+Socket\+::add\+Event (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{int}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Add event for socket epoll. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fd} & \\
+\hline
+{\em state} & \mbox{[}in\mbox{]} epoll action \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_socket_a08b1d3d1dbf17ef8d2a20dc1bcfd2596}{}\label{class_vix_mnt_socket_a08b1d3d1dbf17ef8d2a20dc1bcfd2596} 
+\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}!delete\+Event@{delete\+Event}}
+\index{delete\+Event@{delete\+Event}!Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+\subsubsection{\texorpdfstring{delete\+Event()}{deleteEvent()}}
+{\ttfamily void Vix\+Mnt\+Socket\+::delete\+Event (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{int}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+delete event from epoll eventlist 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fd} & \\
+\hline
+{\em state} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_socket_a1c480a5b37f5938480781d40f00ce386}{}\label{class_vix_mnt_socket_a1c480a5b37f5938480781d40f00ce386} 
+\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}!modify\+Event@{modify\+Event}}
+\index{modify\+Event@{modify\+Event}!Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+\subsubsection{\texorpdfstring{modify\+Event()}{modifyEvent()}}
+{\ttfamily void Vix\+Mnt\+Socket\+::modify\+Event (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{int}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+modify event from epoll eventlist 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fd} & \\
+\hline
+{\em state} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_socket_aad48ed0239fc3fb9e822cc13e6fefa97}{}\label{class_vix_mnt_socket_aad48ed0239fc3fb9e822cc13e6fefa97} 
+\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}!raw\+Read@{raw\+Read}}
+\index{raw\+Read@{raw\+Read}!Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+\subsubsection{\texorpdfstring{raw\+Read()}{rawRead()}}
+{\ttfamily int Vix\+Mnt\+Socket\+::raw\+Read (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{char $\ast$}]{buf,  }\item[{int}]{bufsize }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+read data directly, but it will keep reading until received data length is equal to buffer size. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fd} & \\
+\hline
+{\em buf} & \\
+\hline
+{\em bufsize} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_socket_a08d845463648d0978024817fdda8b7e9}{}\label{class_vix_mnt_socket_a08d845463648d0978024817fdda8b7e9} 
+\index{Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}!raw\+Write@{raw\+Write}}
+\index{raw\+Write@{raw\+Write}!Vix\+Mnt\+Socket@{Vix\+Mnt\+Socket}}
+\subsubsection{\texorpdfstring{raw\+Write()}{rawWrite()}}
+{\ttfamily int Vix\+Mnt\+Socket\+::raw\+Write (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{const char $\ast$}]{buf,  }\item[{int}]{bufsize }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+keep writing until all data were sent out. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fd} & \\
+\hline
+{\em buf} & \\
+\hline
+{\em bufsize} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+written length 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vix\+Mnt\+Socket.\+h\item 
+src/vix\+Mnt\+Socket.\+cpp\end{DoxyCompactItemize}

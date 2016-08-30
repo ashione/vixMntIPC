@@ -1,0 +1,62 @@
+\hypertarget{class_vix_mnt_op_base}{}\section{Vix\+Mnt\+Op\+Base Class Reference}
+\label{class_vix_mnt_op_base}\index{Vix\+Mnt\+Op\+Base@{Vix\+Mnt\+Op\+Base}}
+Inheritance diagram for Vix\+Mnt\+Op\+Base\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_vix_mnt_op_base}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_vix_mnt_op_base_af6b0622766c4a457c140c3a3954740be}{Vix\+Mnt\+Op\+Base} (const char $\ast$, uint64, uint64)
+\begin{DoxyCompactList}\small\item\em fuse parameters protocol \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_op_base_a59113f1498bbe2a252cfeced60c24c71}{}\label{class_vix_mnt_op_base_a59113f1498bbe2a252cfeced60c24c71} 
+virtual void {\bfseries convert\+To\+Bytes} (char $\ast$buf)
+\item 
+\hypertarget{class_vix_mnt_op_base_abaa96a95be1faafe18af9dfaaaaed721}{}\label{class_vix_mnt_op_base_abaa96a95be1faafe18af9dfaaaaed721} 
+virtual void {\bfseries convert\+From\+Bytes} (const char $\ast$buf)
+\item 
+\hypertarget{class_vix_mnt_op_base_a7566a6bc2d1d918c16ccdd8d096d71ea}{}\label{class_vix_mnt_op_base_a7566a6bc2d1d918c16ccdd8d096d71ea} 
+virtual size\+\_\+t {\bfseries size} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_op_base_aa2fb1d1cfb3a14c3e97d03fac672b4f2}{}\label{class_vix_mnt_op_base_aa2fb1d1cfb3a14c3e97d03fac672b4f2} 
+char {\bfseries file\+Name} \mbox{[}V\+I\+X\+M\+N\+T\+\_\+\+F\+I\+L\+E\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+EN\mbox{]}
+\item 
+\hypertarget{class_vix_mnt_op_base_a1a3c23cd04d5257964b4aefb3fe7fb21}{}\label{class_vix_mnt_op_base_a1a3c23cd04d5257964b4aefb3fe7fb21} 
+uint64 {\bfseries bufsize}
+\item 
+\hypertarget{class_vix_mnt_op_base_aef48e6d78aaf0192776ac82eb95e3d43}{}\label{class_vix_mnt_op_base_aef48e6d78aaf0192776ac82eb95e3d43} 
+uint64 {\bfseries offset}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_vix_mnt_op_base_af6b0622766c4a457c140c3a3954740be}{}\label{class_vix_mnt_op_base_af6b0622766c4a457c140c3a3954740be} 
+\index{Vix\+Mnt\+Op\+Base@{Vix\+Mnt\+Op\+Base}!Vix\+Mnt\+Op\+Base@{Vix\+Mnt\+Op\+Base}}
+\index{Vix\+Mnt\+Op\+Base@{Vix\+Mnt\+Op\+Base}!Vix\+Mnt\+Op\+Base@{Vix\+Mnt\+Op\+Base}}
+\subsubsection{\texorpdfstring{Vix\+Mnt\+Op\+Base()}{VixMntOpBase()}}
+{\ttfamily Vix\+Mnt\+Op\+Base\+::\+Vix\+Mnt\+Op\+Base (\begin{DoxyParamCaption}\item[{const char $\ast$}]{file\+Name\+\_\+,  }\item[{uint64}]{bufsize\+\_\+,  }\item[{uint64}]{offset\+\_\+ }\end{DoxyParamCaption})}
+
+
+
+fuse parameters protocol 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Name\+\_\+} & \mbox{[}in\mbox{]} diskname or message queue \\
+\hline
+{\em bufsize\+\_\+} & \mbox{[}in\mbox{]} buffer size of one operation \\
+\hline
+{\em offset\+\_\+} & \mbox{[}in\mbox{]} offset of disk \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vix\+Mnt\+Operation.\+h\item 
+src/vix\+Mnt\+Operation.\+cpp\end{DoxyCompactItemize}

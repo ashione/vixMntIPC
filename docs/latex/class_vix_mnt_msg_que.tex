@@ -1,0 +1,274 @@
+\hypertarget{class_vix_mnt_msg_que}{}\section{Vix\+Mnt\+Msg\+Que Class Reference}
+\label{class_vix_mnt_msg_que}\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+
+
+{\ttfamily \#include $<$vix\+Mnt\+Msg\+Que.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_vix_mnt_msg_que_a8b8ee1d568633d791ab05474ebf49139}{Vix\+Mnt\+Msg\+Que} (const char $\ast$msg\+\_\+name=N\+U\+LL, bool read\+Only=false)
+\item 
+\hyperlink{class_vix_mnt_msg_que_a5ad26c6043aa804ac1358568e76f6f62}{Vix\+Mnt\+Msg\+Que} (mqd\+\_\+t msg\+\_\+id)
+\begin{DoxyCompactList}\small\item\em reuse a certain message queue by msg\+\_\+id \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_msg_que_a7ea9ff16c3827370402a38afaccd659b}{}\label{class_vix_mnt_msg_que_a7ea9ff16c3827370402a38afaccd659b} 
+mqd\+\_\+t {\bfseries get\+Vix\+Mnt\+Msg\+ID} () const
+\item 
+\hypertarget{class_vix_mnt_msg_que_a70fc5cdb1262614efa4900ffc61c3631}{}\label{class_vix_mnt_msg_que_a70fc5cdb1262614efa4900ffc61c3631} 
+void {\bfseries getattr} (mq\+\_\+attr $\ast$mq\+Attr)
+\item 
+\hypertarget{class_vix_mnt_msg_que_abe4599d03af6800977eec057b383d309}{}\label{class_vix_mnt_msg_que_abe4599d03af6800977eec057b383d309} 
+void {\bfseries setattr} (mq\+\_\+attr $\ast$mq\+Attr)
+\item 
+\hypertarget{class_vix_mnt_msg_que_aade45399f63c69c0d3e2bdbef9a6f06e}{}\label{class_vix_mnt_msg_que_aade45399f63c69c0d3e2bdbef9a6f06e} 
+\hyperlink{class_vix_mnt_msg_que_aade45399f63c69c0d3e2bdbef9a6f06e}{$\sim$\+Vix\+Mnt\+Msg\+Que} ()
+\begin{DoxyCompactList}\small\item\em close system message queue bus. \end{DoxyCompactList}\item 
+mqd\+\_\+t \hyperlink{class_vix_mnt_msg_que_ab5684dff3d3cfa03db2db4856817e951}{send} (const char $\ast$msg\+\_\+data, size\+\_\+t msg\+\_\+size, unsigned msg\+\_\+prio=0)
+\begin{DoxyCompactList}\small\item\em send a message \end{DoxyCompactList}\item 
+mqd\+\_\+t \hyperlink{class_vix_mnt_msg_que_ad73da8c8df46a7f9a3dec2c6adab38d2}{receive} (char $\ast$msg\+\_\+data, size\+\_\+t msg\+\_\+size, unsigned $\ast$msg\+\_\+prio=N\+U\+LL)
+\begin{DoxyCompactList}\small\item\em receive message (block) \end{DoxyCompactList}\item 
+bool \hyperlink{class_vix_mnt_msg_que_a1da1dc845dc75159916384a51a1b3925}{send\+Msg\+Op} (Vix\+Mnt\+Msg\+Op msg\+\_\+op, unsigned msg\+\_\+prio=0)
+\begin{DoxyCompactList}\small\item\em message message with op \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_msg_que_a554c768d90484fcf533831034146914a}{receive\+Msg\+Op} (Vix\+Mnt\+Msg\+Op $\ast$msg\+\_\+op, unsigned $\ast$msg\+\_\+prio=N\+U\+LL)
+\begin{DoxyCompactList}\small\item\em receive message operations \end{DoxyCompactList}\item 
+bool \hyperlink{class_vix_mnt_msg_que_a45df4e786921e87a7adfa651eb06f3d9}{send\+Msg} (\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$msg\+\_\+data, unsigned msg\+\_\+prio=0)
+\begin{DoxyCompactList}\small\item\em send message \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_msg_que_ac710f60f5b4fef6ea1e38db0a0158882}{receive\+Msg} (\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$msg\+\_\+data, unsigned $\ast$msg\+\_\+prio=N\+U\+LL)
+\begin{DoxyCompactList}\small\item\em block waiting for receiving message \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} $\ast$ \hyperlink{class_vix_mnt_msg_que_a16aa3ef3cdaf66b4eb09fd8a58840dbb}{get\+Msg\+Que\+Instance} (sem\+\_\+t $\ast$sem=N\+U\+LL)
+\begin{DoxyCompactList}\small\item\em produce singleton of \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} that is utilized bettween parent process and son process. \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_msg_que_a656d5ed77ebae6340dfb5918429166e4}{}\label{class_vix_mnt_msg_que_a656d5ed77ebae6340dfb5918429166e4} 
+static void \hyperlink{class_vix_mnt_msg_que_a656d5ed77ebae6340dfb5918429166e4}{init\+Instance} ()
+\begin{DoxyCompactList}\small\item\em guarantee singleton with pthread\+\_\+once \end{DoxyCompactList}\item 
+static void \hyperlink{class_vix_mnt_msg_que_a37287bf5572e8c9311aa9e8cde04cdf5}{release\+Msg\+Que\+Instance} (sem\+\_\+t $\ast$sem=N\+U\+LL)
+\begin{DoxyCompactList}\small\item\em release message queue \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_msg_que_af9cd79fba39d8a8d124d2cb97a6b7a74}{}\label{class_vix_mnt_msg_que_af9cd79fba39d8a8d124d2cb97a6b7a74} 
+static void \hyperlink{class_vix_mnt_msg_que_af9cd79fba39d8a8d124d2cb97a6b7a74}{unlink} ()
+\begin{DoxyCompactList}\small\item\em unlink all created message queues by static member vix\+Mnt\+Msg\+Map. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_msg_que_a18929125a51938ca956520067a09c032}{}\label{class_vix_mnt_msg_que_a18929125a51938ca956520067a09c032} 
+mqd\+\_\+t {\bfseries vix\+Mnt\+Msg\+ID}
+\item 
+\hypertarget{class_vix_mnt_msg_que_a55585fa77dbedc5a5934349bcd7798a8}{}\label{class_vix_mnt_msg_que_a55585fa77dbedc5a5934349bcd7798a8} 
+mq\+\_\+attr {\bfseries vix\+Mnt\+Msg\+Attr}
+\item 
+\hypertarget{class_vix_mnt_msg_que_a5c8fdf898e594a6d1cdcbcb4ede60b39}{}\label{class_vix_mnt_msg_que_a5c8fdf898e594a6d1cdcbcb4ede60b39} 
+std\+::string {\bfseries vix\+Mnt\+Msg\+Map\+File\+Name}
+\item 
+\hypertarget{class_vix_mnt_msg_que_aceced283130a4c5cbee3e7fc6bb5c3ba}{}\label{class_vix_mnt_msg_que_aceced283130a4c5cbee3e7fc6bb5c3ba} 
+bool {\bfseries read\+Only}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_msg_que_af3acc6cf6c34bc584f98bef1e99428e2}{}\label{class_vix_mnt_msg_que_af3acc6cf6c34bc584f98bef1e99428e2} 
+static \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} $\ast$ {\bfseries vix\+Mnt\+Msg\+Instance} = N\+U\+LL
+\item 
+\hypertarget{class_vix_mnt_msg_que_ad401e5ed3644ce487b4ce289801d00db}{}\label{class_vix_mnt_msg_que_ad401e5ed3644ce487b4ce289801d00db} 
+static const std\+::string {\bfseries vix\+Mnt\+Msg\+Name} = \char`\"{}/vix\+Mnt\+Api\char`\"{}
+\item 
+\hypertarget{class_vix_mnt_msg_que_a22f505c468facd89ccf7d57b6d81fe0b}{}\label{class_vix_mnt_msg_que_a22f505c468facd89ccf7d57b6d81fe0b} 
+static std\+::map$<$ std\+::string, mqd\+\_\+t $>$ {\bfseries vix\+Mnt\+Msg\+Map}
+\item 
+\hypertarget{class_vix_mnt_msg_que_a27a1aa83afc39b4664ee7f68b4d87011}{}\label{class_vix_mnt_msg_que_a27a1aa83afc39b4664ee7f68b4d87011} 
+static pthread\+\_\+once\+\_\+t {\bfseries ponce} = P\+T\+H\+R\+E\+A\+D\+\_\+\+O\+N\+C\+E\+\_\+\+I\+N\+IT
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+class \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} is designed to deliver control path message among different process. Actually, suitable queue message size will be helpful. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_vix_mnt_msg_que_a8b8ee1d568633d791ab05474ebf49139}{}\label{class_vix_mnt_msg_que_a8b8ee1d568633d791ab05474ebf49139} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{Vix\+Mnt\+Msg\+Que()}{VixMntMsgQue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\ttfamily Vix\+Mnt\+Msg\+Que\+::\+Vix\+Mnt\+Msg\+Que (\begin{DoxyParamCaption}\item[{const char $\ast$}]{msg\+\_\+name = {\ttfamily NULL},  }\item[{bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+name} & \mbox{[}in\mbox{]} message queue name \\
+\hline
+{\em read\+Only} & \mbox{[}in\mbox{]} message IO arrt \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_msg_que_a5ad26c6043aa804ac1358568e76f6f62}{}\label{class_vix_mnt_msg_que_a5ad26c6043aa804ac1358568e76f6f62} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{Vix\+Mnt\+Msg\+Que()}{VixMntMsgQue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\ttfamily Vix\+Mnt\+Msg\+Que\+::\+Vix\+Mnt\+Msg\+Que (\begin{DoxyParamCaption}\item[{mqd\+\_\+t}]{msg\+\_\+id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+reuse a certain message queue by msg\+\_\+id 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+id} & \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_vix_mnt_msg_que_a16aa3ef3cdaf66b4eb09fd8a58840dbb}{}\label{class_vix_mnt_msg_que_a16aa3ef3cdaf66b4eb09fd8a58840dbb} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!get\+Msg\+Que\+Instance@{get\+Msg\+Que\+Instance}}
+\index{get\+Msg\+Que\+Instance@{get\+Msg\+Que\+Instance}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{get\+Msg\+Que\+Instance()}{getMsgQueInstance()}}
+{\ttfamily \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} $\ast$ Vix\+Mnt\+Msg\+Que\+::get\+Msg\+Que\+Instance (\begin{DoxyParamCaption}\item[{sem\+\_\+t $\ast$}]{sem = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+produce singleton of \hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} that is utilized bettween parent process and son process. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sem} & \mbox{[}in\mbox{]} make sure it\textquotesingle{}s singleton if sem is passed\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_msg_que_ad73da8c8df46a7f9a3dec2c6adab38d2}{}\label{class_vix_mnt_msg_que_ad73da8c8df46a7f9a3dec2c6adab38d2} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!receive@{receive}}
+\index{receive@{receive}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{receive()}{receive()}}
+{\ttfamily mqd\+\_\+t Vix\+Mnt\+Msg\+Que\+::receive (\begin{DoxyParamCaption}\item[{char $\ast$}]{msg\+\_\+ptr,  }\item[{size\+\_\+t}]{msg\+\_\+len,  }\item[{unsigned $\ast$}]{msg\+\_\+prio = {\ttfamily NULL} }\end{DoxyParamCaption})}
+
+
+
+receive message (block) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+ptr} & \mbox{[}in\mbox{]} message buffer pointer \\
+\hline
+{\em msg\+\_\+len} & \mbox{[}in\mbox{]} message buffer length \\
+\hline
+{\em msg\+\_\+prio} & \mbox{[}in\mbox{]} message buffer priority\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_msg_que_ac710f60f5b4fef6ea1e38db0a0158882}{}\label{class_vix_mnt_msg_que_ac710f60f5b4fef6ea1e38db0a0158882} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!receive\+Msg@{receive\+Msg}}
+\index{receive\+Msg@{receive\+Msg}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{receive\+Msg()}{receiveMsg()}}
+{\ttfamily void Vix\+Mnt\+Msg\+Que\+::receive\+Msg (\begin{DoxyParamCaption}\item[{\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$}]{msg\+\_\+data,  }\item[{unsigned $\ast$}]{msg\+\_\+prio = {\ttfamily NULL} }\end{DoxyParamCaption})}
+
+
+
+block waiting for receiving message 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+data} & \mbox{[}out\mbox{]} libfuse operation, offset and data sector size \\
+\hline
+{\em msg\+\_\+prio} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_msg_que_a554c768d90484fcf533831034146914a}{}\label{class_vix_mnt_msg_que_a554c768d90484fcf533831034146914a} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!receive\+Msg\+Op@{receive\+Msg\+Op}}
+\index{receive\+Msg\+Op@{receive\+Msg\+Op}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{receive\+Msg\+Op()}{receiveMsgOp()}}
+{\ttfamily void Vix\+Mnt\+Msg\+Que\+::receive\+Msg\+Op (\begin{DoxyParamCaption}\item[{Vix\+Mnt\+Msg\+Op $\ast$}]{msg\+\_\+op,  }\item[{unsigned $\ast$}]{msg\+\_\+prio = {\ttfamily NULL} }\end{DoxyParamCaption})}
+
+
+
+receive message operations 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+op} & \mbox{[}out\mbox{]} message operation \\
+\hline
+{\em msg\+\_\+prio} & \mbox{[}in\mbox{]} message buffer priority \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_msg_que_a37287bf5572e8c9311aa9e8cde04cdf5}{}\label{class_vix_mnt_msg_que_a37287bf5572e8c9311aa9e8cde04cdf5} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!release\+Msg\+Que\+Instance@{release\+Msg\+Que\+Instance}}
+\index{release\+Msg\+Que\+Instance@{release\+Msg\+Que\+Instance}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{release\+Msg\+Que\+Instance()}{releaseMsgQueInstance()}}
+{\ttfamily void Vix\+Mnt\+Msg\+Que\+::release\+Msg\+Que\+Instance (\begin{DoxyParamCaption}\item[{sem\+\_\+t $\ast$}]{sem = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+release message queue 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sem} & \mbox{[}in\mbox{]} if enable singleton in multiprocess \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_msg_que_ab5684dff3d3cfa03db2db4856817e951}{}\label{class_vix_mnt_msg_que_ab5684dff3d3cfa03db2db4856817e951} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!send@{send}}
+\index{send@{send}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{send()}{send()}}
+{\ttfamily mqd\+\_\+t Vix\+Mnt\+Msg\+Que\+::send (\begin{DoxyParamCaption}\item[{const char $\ast$}]{msg\+\_\+ptr,  }\item[{size\+\_\+t}]{msg\+\_\+len,  }\item[{unsigned}]{msg\+\_\+prio = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+send a message 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+ptr} & \mbox{[}in\mbox{]} message buffer pointer \\
+\hline
+{\em msg\+\_\+len} & \mbox{[}in\mbox{]} message buffer length \\
+\hline
+{\em msg\+\_\+prio} & \mbox{[}in\mbox{]} message buffer priority\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_msg_que_a45df4e786921e87a7adfa651eb06f3d9}{}\label{class_vix_mnt_msg_que_a45df4e786921e87a7adfa651eb06f3d9} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!send\+Msg@{send\+Msg}}
+\index{send\+Msg@{send\+Msg}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{send\+Msg()}{sendMsg()}}
+{\ttfamily bool Vix\+Mnt\+Msg\+Que\+::send\+Msg (\begin{DoxyParamCaption}\item[{\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$}]{msg\+\_\+data,  }\item[{unsigned}]{msg\+\_\+prio = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+send message 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+data} & \mbox{[}in\mbox{]} message data containing message operation and message data of control path \\
+\hline
+{\em msg\+\_\+prio} & \mbox{[}in\mbox{]} message buffer priority\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_msg_que_a1da1dc845dc75159916384a51a1b3925}{}\label{class_vix_mnt_msg_que_a1da1dc845dc75159916384a51a1b3925} 
+\index{Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}!send\+Msg\+Op@{send\+Msg\+Op}}
+\index{send\+Msg\+Op@{send\+Msg\+Op}!Vix\+Mnt\+Msg\+Que@{Vix\+Mnt\+Msg\+Que}}
+\subsubsection{\texorpdfstring{send\+Msg\+Op()}{sendMsgOp()}}
+{\ttfamily bool Vix\+Mnt\+Msg\+Que\+::send\+Msg\+Op (\begin{DoxyParamCaption}\item[{Vix\+Mnt\+Msg\+Op}]{msg\+\_\+op,  }\item[{unsigned}]{msg\+\_\+prio = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+message message with op 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+op} & \mbox{[}in\mbox{]} message operation \\
+\hline
+{\em msg\+\_\+prio} & \mbox{[}in\mbox{]} message buffer priority\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vix\+Mnt\+Msg\+Que.\+h\item 
+src/vix\+Mnt\+Msg\+Que.\+cpp\end{DoxyCompactItemize}
