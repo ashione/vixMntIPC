@@ -104,7 +104,7 @@ The framwork can be described as follwing graph:
 
 And its flow chart is :
 
-![fuse][https://github.com/ashione/vixMntIPC/blob/format/asset/fuse.png]
+![fuse](https://github.com/ashione/vixMntIPC/blob/format/asset/fuse.png)
 
 -----
 
@@ -113,4 +113,3 @@ And its flow chart is :
 2.  [libfuse]: https://github.com/libfuse/libfuse
 [bugid]: https://bugzilla.eng.vmware.com/show_bug.cgi?id=1492312 "mntapibug"
 [libfuse]: https://github.com/libfuse/libfuse
- 	
