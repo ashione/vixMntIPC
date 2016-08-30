@@ -165,12 +165,12 @@ All of its shortages and problems of this solution, we should face and devise a 
 6.  [processcom]: process_com.png =600
 7.  [fusemountIPC]: fusemountIPC.png =600
 [bugid]: https://bugzilla.eng.vmware.com/show_bug.cgi?id=1492312 "mntapibug"
-[mntapi]: asset/mntapi.png =600 "mntapi_orin"
+[mntapi]:  https://github.com/ashione/vixMntIPC/format/asset/mntapi.png =600 "mntapi_orin"
 [libfuse]: https://github.com/libfuse/libfuse
 [multithread_mntapi]: multithread.png =600
-[union_mode]:asset/union_mode.png =400
-[processcom]: asset/process_com.png =600
-[fusemountIPC]: asset/fusemountIPC.png =600
-[fuse]: asset/fuse.png =600
-[fuseIPC_timeline]: asset/fuseIPC_timeline.png =600
+[union_mode]: https://github.com/ashione/vixMntIPC/format/asset/union_mode.png =400
+[processcom]:  https://github.com/ashione/vixMntIPC/format/asset/process_com.png =600
+[fusemountIPC]:  https://github.com/ashione/vixMntIPC/format/asset/fusemountIPC.png =600
+[fuse]:  https://github.com/ashione/vixMntIPC/format/asset/fuse.png =600
+[fuseIPC_timeline]:  https://github.com/ashione/vixMntIPC/format/asset/fuseIPC_timeline.png =600
  	
