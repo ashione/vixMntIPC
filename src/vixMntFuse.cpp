@@ -10,20 +10,26 @@
 static VixMntMsgQue *fuseMsgQue = VixMntMsgQue::getMsgQueInstance();
 
 /**
- * @brief  libfuse recall function
+ ****************************************************************************
+ * FuseMntIPC_Read
+ * libfuse recall function
  * If memory map & message solution : insert a message into system message
  * queue, then waiting for the result after providing a response message
  * queue name; If socket solution  : setup a socket client to connect socket
  * server, then waiting for returing.
- *
- * @param path [in] diskbacking path
- * @param buf [out] buffer pointer
- * @param size [in] read buffer size
- * @param offset [in] read buffer offset
- * @param fi [int] file info
- * @param sectorSize [in] disk sector size
- *
- * @return
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * path,
+ * size,
+ * offset,
+ * fi
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * buf
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 int
@@ -74,17 +80,25 @@ FuseMntIPC_Read(const char *path,
    return 0;
 }
 
-/**
- * @brief  libfuse write recall function, as same as read operation.
- *
- * @param path [in] diskbacking path
- * @param buf [out] buffer pointer
- * @param size [in] write buffer size
- * @param offset [in] write buffer offset
- * @param fi [int] file info
- * @param sectorSize [in] disk sector size
- *
- * @return
+/*
+ ****************************************************************************
+ * FuseMntIPC_Write
+ * libfuse recall function,
+ * As same as read operation
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * path,
+ * buf,
+ * size,
+ * offset,
+ * fi
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 int

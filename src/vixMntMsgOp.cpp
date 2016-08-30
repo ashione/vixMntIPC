@@ -25,13 +25,20 @@ bool operator==(VixMntMsgOp op, std::string str_op)
    return operator==(op, str_op.c_str());
 }
 
-
 /**
- * @brief  convert enum type to string information.
- *
- * @param op [in], enum operator
- *
- * @return  op value
+ ****************************************************************************
+ * getOpValue
+ * convert enum type to string info
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * op
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * const char*
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 const char*
@@ -48,11 +55,19 @@ getOpValue(VixMntMsgOp op)
 }
 
 /**
- * @brief  convert opeartion string to VixMntMsgOp obj.
- *
- * @param str_op [in] operation string
- *
- * @return  VixMntMsgOp obj
+ ****************************************************************************
+ * getOpIndex
+ * convert operation string to VixMntMsgOp
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * str_op
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * VixMntMsgOp
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgOp getOpIndex(const char *str_op)
@@ -92,11 +107,21 @@ VixMntMsgOp getOpIndex(const char *str_op)
 }
 
 /**
- * @brief create a new VixMntMsgData obj but only carring VixMntMsgOp obj.
- *
- * @param msg_op [in] message operation
- * @param msg_datasize [in] length of VixMntMsgOp obj
- * @param msg_buff [in] stored memory pointer
+ ****************************************************************************
+ * VixMntMsgData Constructor
+ * create a new VixMntMsgData that only ship VixMntMsgOp
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_op
+ * msg_datasize
+ * msg_buff
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
@@ -108,12 +133,20 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
    memcpy(this->msg_buff, msg_buff, this->msg_datasize);
 }
 
-
 /**
- * @brief  used when msg_buff is string
- *
- * @param msg_op
- * @param msg_buff
+ ****************************************************************************
+ * VixMntMsgData Constructor
+ * using this only when msg_buff is string
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_op
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
@@ -123,14 +156,21 @@ VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,
    new (this) VixMntMsgData(msg_op, msg_len, msg_buff);
 }
 
-
 /**
- * @brief add extra msg_response_q that only works in message queue.
- *
- * @param msg_op
- * @param msg_datasize
- * @param msg_q_name
- * @param msg_buff
+ ****************************************************************************
+ * VixMntMsgData Constructor
+ * add exra msg_response_q that only work in message queue
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_op
+ * msg_datasize
+ * msg_buff
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgData::VixMntMsgData(VixMntMsgOp msg_op,

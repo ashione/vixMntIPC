@@ -6,13 +6,6 @@
 #include <pthread.h>
 #include <string.h>
 
-/**
- * @brief  lock initilaztion
- *
- * @param shmMemMutex [in] global share memory mutex
- * @param recursive [in]
- */
-
 VixMntMutex::VixMntMutex(void *shmMemMutex, bool recursive)
 {
    _handle = shmMemMutex;
@@ -27,18 +20,10 @@ VixMntMutex::VixMntMutex(void *shmMemMutex, bool recursive)
    }
 }
 
-/**
- * @brief  destory lock
- */
-
 VixMntMutex::~VixMntMutex()
 {
    pthread_mutex_destroy((pthread_mutex_t *)_handle);
 }
-
-/**
- * @brief lock
- */
 
 void
 VixMntMutex::lock()
@@ -48,9 +33,6 @@ VixMntMutex::lock()
    }
 }
 
-/**
- * @brief unlock
- */
 void
 VixMntMutex::unlock()
 {
@@ -60,12 +42,6 @@ VixMntMutex::unlock()
       // throw VixMntException(strerror(result));
    }
 }
-
-/**
- * @brief trylock
- *
- * @return
- */
 
 bool
 VixMntMutex::trylock()

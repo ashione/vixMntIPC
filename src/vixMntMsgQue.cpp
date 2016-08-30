@@ -8,14 +8,29 @@ const std::string VixMntMsgQue::vixMntMsgName = "/vixMntApi";
 std::map<std::string, mqd_t> VixMntMsgQue::vixMntMsgMap;
 pthread_once_t VixMntMsgQue::ponce = PTHREAD_ONCE_INIT;
 
-/**
- * @brief
+/***
+ ****************************************************************************
+ * VixMntMsgQUe::getMsgQueInstance
  * produce singleton of VixMntMsgQue that is utilized bettween parent
  * process and son process.
- *
- * @param sem [in] make sure it's singleton if sem is passed
- *
- * @return
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * sem, make sure it's singleton if sem is passed
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * VixMntMsgQue
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
+ */
+
+/**
+ * abort - > this static pthread_mutex_t lock maybe not work in different
+ * threads
+ *  TODO :
+ *    add semaphore in share memory
+ *    add pthread_once for multithread safe
  */
 
 VixMntMsgQue
@@ -31,19 +46,38 @@ VixMntMsgQue
    return vixMntMsgInstance;
 }
 
-
 /**
- * @brief  guarantee singleton with pthread_once
+ ****************************************************************************
+ * VixMntMsgQue::initInstance
+ * guarantee singleton with pthread_once
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * no
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * no
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 void
 VixMntMsgQue::initInstance() { vixMntMsgInstance = new VixMntMsgQue(); }
 
 /**
- * @brief
- *
- * @param msg_name [in] message queue name
- * @param readOnly [in] message IO arrt
+ ****************************************************************************
+ * VixMntMsgQue Constructor
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_name , message queue name
+ * readOnly , message queue IO attr
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgQue::VixMntMsgQue(const char *msg_name,
@@ -75,11 +109,20 @@ VixMntMsgQue::VixMntMsgQue(const char *msg_name,
    VixMntMsgQue::vixMntMsgMap[this->vixMntMsgMapFileName] = this->vixMntMsgID;
 }
 
-
 /**
- * @brief  reuse a certain message queue by msg_id
+ ****************************************************************************
+ * VixMntMsgQue Constructor
+ * reuse a certain message queue by msg_id
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_id
+ * -------------------------------------------------------------------------
+ * output parameters :
  *
- * @param msg_id
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) {
@@ -95,9 +138,20 @@ VixMntMsgQue::VixMntMsgQue(mqd_t msg_id) {
    assert(item != VixMntMsgQue::vixMntMsgMap.end());
 }
 
-
 /**
- * @brief  unlink all created message queues by static member vixMntMsgMap.
+ ****************************************************************************
+ * VixMntMsgQue::unlink
+ * unlink all created message queue by static member vixMntMsgMap.
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * No
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 void
@@ -117,7 +171,18 @@ VixMntMsgQue::unlink() {
 }
 
 /**
- * @brief  close system message queue bus.
+ ****************************************************************************
+ * VixMntMsgQue Deconstructor
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * No
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 VixMntMsgQue::~VixMntMsgQue() {
@@ -127,11 +192,19 @@ VixMntMsgQue::~VixMntMsgQue() {
    }
 }
 
-
 /**
- * @brief release message queue
- *
- * @param sem [in] if enable singleton in multiprocess
+ ****************************************************************************
+ * VixMntMsgQue::releaseMsgQueInstance
+ * release singleton of message queue.
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * sem, if enable singleton in multiprocess
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 void
@@ -151,15 +224,22 @@ VixMntMsgQue::releaseMsgQueInstance(sem_t *sem) {
       sem_post(sem);
 }
 
-
 /**
- * @brief  send a message
- *
- * @param msg_ptr [in] message buffer pointer
- * @param msg_len [in] message buffer length
- * @param msg_prio [in] message buffer priority
- *
- * @return
+ ****************************************************************************
+ * VixMntMsgQue::send
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_ptr,    message buffer pointer
+ * msg_len,    message buffer length
+ * msg_prio,   message buffer priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * mqd_t, return sender's mqd_t if operation is successful,
+ *        otherwise return -1
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 mqd_t
@@ -172,15 +252,22 @@ VixMntMsgQue::send(const char *msg_ptr,
    return mq_send(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
-
 /**
- * @brief  receive message  (block)
- *
- * @param msg_ptr [in] message buffer pointer
- * @param msg_len [in] message buffer length
- * @param msg_prio [in] message buffer priority
- *
- * @return
+ ****************************************************************************
+ * VixMntMsgQue::receive
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_ptr,    message buffer pointer
+ * msg_len,    message buffer length
+ * msg_prio,   message buffer priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * mqd_t, return sender's mqd_t if operation is successful,
+ *        otherwise return -1
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 mqd_t
@@ -191,21 +278,30 @@ VixMntMsgQue::receive(char *msg_ptr,
    return mq_receive(this->getVixMntMsgID(), msg_ptr, msg_len, msg_prio);
 }
 
-
 /**
- * @brief message message with op
- *
- * @param msg_op [in] message operation
- * @param msg_prio [in] message buffer priority
- *
- * @return
+ ****************************************************************************
+ * VixMntMsgQue::sendMsgOp
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_op,     message operation
+ * msg_prio,   message buffer priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * bool, return true otherwise false
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 bool
 VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
                         unsigned msg_prio)
 {
-// throw exception if op equal to ERROR
+
+/**
+* bug : if op equal to ERROR
+*/
 #if defined(__cplusplus) && __cplusplus >= 201103L
    assert(msg_op != VixMntMsgOp::ERROR);
 #else
@@ -215,12 +311,19 @@ VixMntMsgQue::sendMsgOp(VixMntMsgOp msg_op,
    return send(msg_str, strlen(msg_str), msg_prio) >= 0;
 }
 
-
 /**
- * @brief receive message operations
- *
- * @param msg_op [out] message operation
- * @param msg_prio [in] message buffer priority
+ ****************************************************************************
+ * VixMntMsgQue::receiveMsgOp
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_prio,   message buffer priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * msg_op,     message operation
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 void
@@ -242,15 +345,21 @@ VixMntMsgQue::receiveMsgOp(VixMntMsgOp *msg_op,
    delete[] buf;
 }
 
-
 /**
- * @brief  send message
- *
- * @param msg_data [in] message data containing message operation and message
- * data of control path
- * @param msg_prio [in] message buffer priority
- *
- * @return
+ ****************************************************************************
+ * VixMntMsgQue::sendMsg
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_data,   message data includeing message operation
+ *             and message data of control path
+ * msg_prio,   message buffer priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * bool , return true if send successful, otherwise return false
+ * -------------------------------------------------------------------------
+ * Side Effect:
+ * No
+ ****************************************************************************
  */
 
 bool
@@ -265,12 +374,20 @@ VixMntMsgQue::sendMsg(VixMntMsgData *msg_data,
    return flag;
 }
 
-
 /**
- * @brief  block waiting for receiving message
- *
- * @param msg_data [out] libfuse operation, offset and data sector size
- * @param msg_prio
+ ****************************************************************************
+ * VixMntMsgQue::receiveMsg
+ * -------------------------------------------------------------------------
+ * input parameters  :
+ * msg_data, libfuse operator, offset and data sector size
+ * msg_prio, message priority
+ * -------------------------------------------------------------------------
+ * output parameters :
+ * No
+ * -------------------------------------------------------------------------
+ * Side Effect
+ * No
+ ****************************************************************************
  */
 
 void

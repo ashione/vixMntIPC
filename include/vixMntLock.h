@@ -5,10 +5,6 @@
 extern "C" {
 #endif
 
-/**
- * A simple lock in multiprocess read/write.
- */
-
 class VixMntLock {
 public:
    virtual void lock() = 0;
