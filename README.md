@@ -46,9 +46,9 @@ Finally, all of them are stagnating.
 
 According this failure, we drafted three solutions:
 
-1.  open vixdisklib or initalize vmacore spawns multiply threads after fusedaemon. ![union_mode][union_mode]
-*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi][multithread_mntapi]
-*   setup share memory or global message based on IPC ( inner process communication) ![processcom][processcom]
+1.  open vixdisklib or initalize vmacore spawns multiply threads after fusedaemon. ![union_mode](union_mode)
+*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi](multithread_mntapi)
+*   setup share memory or global message based on IPC ( inner process communication) ![processcom](processcom)
 
 
 All these solutions look like good designs at first appearance. 
@@ -93,14 +93,14 @@ From the system perspective, we abstract the middleware (fuse daemon)  as core c
 By fusemount IPC module, we divide whole work into four principal components and its detail can be depcited as  :
 
 
-![fuseIPC_timeline][fuseIPC_timeline]	
+![fuseIPC_timeline](fuseIPC_timeline)	
 
 Frankly speaking, we modify the part of original fusemount module since the passed conncetion is invalid so that it's out of connection in fuse daemon. According this status, read/write operation functions are only design to send a nofitication instead of real disk IO. As shown above figure, a new module are proposed to connect remote disk, do some IO operations, lookup files in mounted disk and so on. 
 
 Additionally, it's worth mentioning that a special class vixMntOperation, described as message protocol, is stored in buffer stream. In other word, a libfuse notification was serialized  as message buffer, then deserialized to class object after receiving notification by IPC module. Actually, both socket and message queue are supported in this module. 
 
 The framwork can be described as follwing graph:
-![fusemountIPC][fusemountIPC]
+![fusemountIPC](fusemountIPC)
 
 And its flow chart is :
 
@@ -117,12 +117,12 @@ And its flow chart is :
 6.  [processcom]: process_com.png =600
 7.  [fusemountIPC]: fusemountIPC.png =600
 [bugid]: https://bugzilla.eng.vmware.com/show_bug.cgi?id=1492312 "mntapibug"
-[mntapi]:  https://github.com/ashione/vixMntIPC/blob/format/asset/mntapi.png =600 "mntapi_orin"
+[mntapi]:  https://github.com/ashione/vixMntIPC/blob/format/asset/mntapi\.png =600 "mntapi_orin"
 [libfuse]: https://github.com/libfuse/libfuse
-[multithread_mntapi]: multithread.png =600
-[union_mode]: https://github.com/ashione/vixMntIPC/blob/format/asset/union_mode.png =400
-[processcom]:  https://github.com/ashione/vixMntIPC/blob/format/asset/process_com.png =600
-[fusemountIPC]:  https://github.com/ashione/vixMntIPC/blob/format/asset/fusemountIPC.png =600
+[multithread_mntapi]: https://github.com/ashione/vixMntIPC/blob/format/asset/multithread\.png =600
+[union_mode]: https://github.com/ashione/vixMntIPC/blob/format/asset/union_mode\.png =400
+[processcom]:  https://github.com/ashione/vixMntIPC/blob/format/asset/process_com\.png =600
+[fusemountIPC]:  https://github.com/ashione/vixMntIPC/blob/format/asset/fusemountIPC\.png =600
 [fuse]:  https://github.com/ashione/vixMntIPC/blob/format/asset/fuse.png =600
 [fuseIPC_timeline]:  https://github.com/ashione/vixMntIPC/blob/format/asset/fuseIPC_timeline.png =600
  	
