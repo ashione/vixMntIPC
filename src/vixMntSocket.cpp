@@ -3,19 +3,7 @@
 #include <vixMntException.h>
 
 /**
- ****************************************************************************
- * VixMntSocketServer Constructor
- * bind a given port on localhost, it will exit whenever bind error.
- * -------------------------------------------------------------------------
- * input parameters
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  bind a given port on localhost, it will exit whenever bind error.
  */
 
 VixMntSocketServer::VixMntSocketServer() : VixMntSocket()
@@ -42,20 +30,11 @@ VixMntSocketServer::VixMntSocketServer() : VixMntSocket()
 
 VixMntSocketServer::~VixMntSocketServer() { close(listenfd); }
 
+
 /**
- ****************************************************************************
- * VixMntSocketServer:;serverListen
- * starting server listening and enable epoll for socket fd
- * -------------------------------------------------------------------------
- * input parameters
- * vixdh
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief starting server listening and enbale epoll for socket fd.
+ *
+ * @param vixdh [in] opened disk handle
  */
 
 void
@@ -72,20 +51,9 @@ VixMntSocketServer::serverListen(
    }
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketServer::doEpoll
- * epoll starting
- * -------------------------------------------------------------------------
- * input parameters
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  epolling starting
  */
 
 void
@@ -109,21 +77,13 @@ VixMntSocketServer::doEpoll()
    close(epollfd);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketServer::handleEvents
- * Handle different events in different functions / operations.
- * -------------------------------------------------------------------------
- * input parameters
- * events
- * num, the number of events
- * buf
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  handle different event in propety operating function.
+ *
+ * @param events [in]
+ * @param num [in]
+ * @param buf [in] local buffer array
  */
 
 void
@@ -148,20 +108,9 @@ VixMntSocketServer::handleEvents(epoll_event *events,
 
 }
 
+
 /**
- ****************************************************************************
- * vixMntSocketServer::handleAccept
- * Accpet a new socket client or report error.
- * -------------------------------------------------------------------------
- * input parameters :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  Accept a new socket client or report error.
  */
 
 void
@@ -183,24 +132,15 @@ VixMntSocketServer::handleAccept()
    }
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketServer::doRead
- * parser control data, then read data from remote disk via vixmntdiskhandle.
- * if realted filename(diskname) not exist in vixdhMap, no handle will be
- * responsed.
- * -------------------------------------------------------------------------
- * input parameters :
- * fd
- * buf
- * maxLen, deprecated now
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  parser control data, then read data from remote disk via
+ * vixmntdiskhandle. If realted filename(diskname) not exist in vixdhMap,
+ * no handle will be responsed.
+ *
+ * @param fd
+ * @param buf
+ * @param maxLen
  */
 
 void VixMntSocketServer::doRead(int fd,
@@ -222,7 +162,6 @@ void VixMntSocketServer::doRead(int fd,
       VixMntOpSocket vixskop;
       vixskop.convertFromBytes(buf);
       std::string diskHandleName = vixskop.fileName;
-      //ILog("operation diskname %s",vixskop.fileName);
       VixMntDiskHandle *vixDiskHandle = NULL;
       if (vixdhMap->find(diskHandleName) != vixdhMap->end()) {
           vixDiskHandle = (*vixdhMap)[diskHandleName];
@@ -302,21 +241,13 @@ void VixMntSocketServer::doRead(int fd,
    }
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketServer::doWrite
- * deprecated now if read size is bigger than SOCKET_BUF_MAX_SIZE
- * -------------------------------------------------------------------------
- * input parameters :
- * fd
- * buf
- * maxLen
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  deprecated.
+ *
+ * @param fd
+ * @param buf
+ * @param maxLen
  */
 
 void
@@ -336,21 +267,12 @@ VixMntSocketServer::doWrite(int fd,
       modifyEvent(fd, EPOLLIN);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocket::addEvent
- * add event for socket epoll
- * -------------------------------------------------------------------------
- * input parameters :
- * fd
- * state
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief Add event for socket epoll
+ *
+ * @param fd
+ * @param state [in] epoll action
  */
 
 void
@@ -364,20 +286,12 @@ VixMntSocket::addEvent(int fd,
    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocket::deleteEvent
- * -------------------------------------------------------------------------
- * input parameters :
- * fd
- * state
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  delete event from epoll eventlist
+ *
+ * @param fd
+ * @param state
  */
 
 void
@@ -391,20 +305,12 @@ VixMntSocket::deleteEvent(int fd,
    epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &ev);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocket::modifyEvent
- * -------------------------------------------------------------------------
- * input parameters  :
- * fd
- * state
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief modify event from epoll eventlist
+ *
+ * @param fd
+ * @param state
  */
 
 void
@@ -418,22 +324,16 @@ VixMntSocket::modifyEvent(int fd,
    epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &ev);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocket::rawRead
- * read data directly, but it will keep reading until recived data length
- * is equal to buffer size
- * -------------------------------------------------------------------------
- * input parameters  :
- * fd
- * bufsize
- * -------------------------------------------------------------------------
- * output parameters :
- * buf
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  read data directly, but it will keep reading until received data
+ * length is equal to buffer size.
+ *
+ * @param fd
+ * @param buf
+ * @param bufsize
+ *
+ * @return
  */
 
 int
@@ -460,21 +360,15 @@ VixMntSocket::rawRead(int fd,
    return recvSize;
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocket::rawWrite
- * keep writing until all data are sent out
- * -------------------------------------------------------------------------
- * input parameters  :
- * fd
- * buf
- * bufsize
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  keep writing until all data were sent out.
+ *
+ * @param fd
+ * @param buf
+ * @param bufsize
+ *
+ * @return  written length
  */
 
 int
@@ -501,20 +395,9 @@ VixMntSocket::rawWrite(int fd,
    return bufsize;
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketClient Constructor
- * connect socket server automatically
- * -------------------------------------------------------------------------
- * input parameters  :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  connect socket server antomatically.
  */
 
 VixMntSocketClient::VixMntSocketClient() : VixMntSocket()
@@ -531,85 +414,28 @@ VixMntSocketClient::VixMntSocketClient() : VixMntSocket()
    }
 }
 
-/**
- ****************************************************************************
- * VixMntSocketClient Deconstructor
- * -------------------------------------------------------------------------
- * input parameters  :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
- */
-
 VixMntSocketClient::~VixMntSocketClient() { close(sockfd); }
 
-/**
- ****************************************************************************
- * VixMntSocketClient::doRead
- * unimplemented
- * -------------------------------------------------------------------------
- * input parameters  :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
- */
 
 void
 VixMntSocketClient::doRead(int fd,
                            char *buf,
                            int maxLen)
 {
-   // TODO
+   throw VixMntException("Unimplemented");
 }
-
-/**
- ****************************************************************************
- * VixMntSocketClinet::doWrite
- * unimplemented
- * -------------------------------------------------------------------------
- * input parameters  :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
- */
 
 void
 VixMntSocketClient::doWrite(int fd,
                             char *buf,
                             int maxLen)
 {
-   // TODO
+   throw VixMntException("Unimplemented");
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketCLient::handleConnect
- * deprecated now
- * -------------------------------------------------------------------------
- * input parameters  :
- * No
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  deprecated.
  */
 
 void
@@ -635,22 +461,13 @@ VixMntSocketClient::handleConnect()
    close(epollfd);
 }
 
+
 /**
- ****************************************************************************
- * VixMntSocketClient:handleEvents
- * work in testing, deprecated now
- * -------------------------------------------------------------------------
- * input parameters  :
- * events
- * num, the number of events
- * buf
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  client epoll events handle.
+ *
+ * @param events
+ * @param num
+ * @param buf
  */
 
 void
@@ -669,23 +486,14 @@ VixMntSocketClient::handleEvents(epoll_event *events,
    }
 }
 
-/**
- ****************************************************************************
- * VixMntSocketClient::rawRead
- * class super class rawRead directly
- * -------------------------------------------------------------------------
- * input parameters  :
- * bufsize
- * -------------------------------------------------------------------------
- * output parameters :
- * buf
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
- */
 
 /**
+ * @brief  super class rawRead directly
+ *
+ * @param buf
+ * @param bufsize
+ *
+ * @return
  * read whole needed sectors
  * if not do this, client receiver will get incomplete data
  */
@@ -698,20 +506,12 @@ VixMntSocketClient::rawRead(char *buf,
 }
 
 /**
- ****************************************************************************
- * VixMntSocketClient::rawWrite
- * call super class directly
- * -------------------------------------------------------------------------
- * input parameters  :
- * buf
- * bufsize
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect
- * No
- ****************************************************************************
+ * @brief  call super class  write fucntion directly.
+ *
+ * @param buf
+ * @param bufsize
+ *
+ * @return
  */
 
 int

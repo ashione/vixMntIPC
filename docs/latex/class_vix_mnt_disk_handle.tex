@@ -1,0 +1,243 @@
+\hypertarget{class_vix_mnt_disk_handle}{}\section{Vix\+Mnt\+Disk\+Handle Class Reference}
+\label{class_vix_mnt_disk_handle}\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+
+
+{\ttfamily \#include $<$vix\+Mnt\+Disk.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_vix_mnt_disk_handle_a92186fd06d5467664f79b15a23453c78}{Vix\+Mnt\+Disk\+Handle} (Vix\+Disk\+Lib\+Connection connection, const char $\ast$path, uint32 flag)
+\begin{DoxyCompactList}\small\item\em setup a disk object via passing connection. \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_disk_handle_a22bc58dfbd7a00535abb8e5986de318c}{}\label{class_vix_mnt_disk_handle_a22bc58dfbd7a00535abb8e5986de318c} 
+\hyperlink{class_vix_mnt_disk_handle_a22bc58dfbd7a00535abb8e5986de318c}{$\sim$\+Vix\+Mnt\+Disk\+Handle} ()
+\begin{DoxyCompactList}\small\item\em clean disk metadata \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_disk_handle_a254eabad8d4f3c619898e131f0db7f36}{prepare} (\hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} $\ast$msg\+Q\+\_\+, \hyperlink{class_vix_mnt_mmap}{Vix\+Mnt\+Mmap} $\ast$mmap\+\_\+)
+\begin{DoxyCompactList}\small\item\em prepare for listening function called by libfuse, this msgQ can contract with the other process by sending or receving message, and then write or read buf via mmap. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{class_vix_mnt_disk_handle_aa6969e37bbfba234fe62aeb4bdf38fc9}{listen} (void $\ast$args)
+\begin{DoxyCompactList}\small\item\em call proper function via specific operator message type. \end{DoxyCompactList}\item 
+Vix\+Error \hyperlink{class_vix_mnt_disk_handle_a58eb682826a8be39431c258aa531a00c}{read} (uint8 $\ast$buf, uint64 offset, uint64 number\+Sector)
+\begin{DoxyCompactList}\small\item\em vixdisklib read function (read data only sector by sector) \end{DoxyCompactList}\item 
+Vix\+Error \hyperlink{class_vix_mnt_disk_handle_a2f601858b3a6dc381d70bf56bec0771c}{read} (\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$msg\+\_\+data)
+\begin{DoxyCompactList}\small\item\em read function by passing message \end{DoxyCompactList}\item 
+Vix\+Error \hyperlink{class_vix_mnt_disk_handle_a85573095a247d911f2f565bff91d5709}{write} (\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$msg\+\_\+data)
+\begin{DoxyCompactList}\small\item\em ifmmap size is less than read buffer size, mmap will throw exception \end{DoxyCompactList}\item 
+Vix\+Error \hyperlink{class_vix_mnt_disk_handle_ab6552b9226705bdffb0d4ee7d3ab4e29}{write} (uint8 $\ast$buf, uint64 offset, uint64 number\+Sector)
+\begin{DoxyCompactList}\small\item\em vixdisklib write function \end{DoxyCompactList}\item 
+Vix\+Error \hyperlink{class_vix_mnt_disk_handle_a22ad3792bc17dc02ecfe73a9af595e12}{get\+Disk\+Info} (Vix\+Disk\+Lib\+Info $\ast$$\ast$info)
+\begin{DoxyCompactList}\small\item\em get disk info from opened disk. \end{DoxyCompactList}\item 
+void \hyperlink{class_vix_mnt_disk_handle_a798c98664a2978ff46b8224a5a2431d5}{free\+Disk\+Info} (Vix\+Disk\+Lib\+Info $\ast$info)
+\begin{DoxyCompactList}\small\item\em free disk info pointer \end{DoxyCompactList}\item 
+\hypertarget{class_vix_mnt_disk_handle_a59fafae47f7971a4378eeab47ad1bab4}{}\label{class_vix_mnt_disk_handle_a59fafae47f7971a4378eeab47ad1bab4} 
+Sector\+Type {\bfseries get\+Capacity} ()
+\item 
+\hypertarget{class_vix_mnt_disk_handle_a6262117c52d45b8e4336cdf1725f08d2}{}\label{class_vix_mnt_disk_handle_a6262117c52d45b8e4336cdf1725f08d2} 
+uint32 {\bfseries get\+Sector\+Size} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \hyperlink{class_vix_mnt_disk_handle_af82283b2e5ae7e90d81ed9c920998b09}{get\+Error\+Msg} (Vix\+Error vix\+Error)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_vix_mnt_disk_handle_a49417543df05b10e0d65c738ec0909d7}{}\label{class_vix_mnt_disk_handle_a49417543df05b10e0d65c738ec0909d7} 
+std\+::string {\bfseries disk\+Backing\+Path}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Note \hyperlink{class_vix_mnt_disk_handle}{Vix\+Mnt\+Disk\+Handle} is defined to be an operator for remote disk. It has capability to read/write remote disk with opening a diskhandle. Actually, New disk operations can be added easily. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_vix_mnt_disk_handle_a92186fd06d5467664f79b15a23453c78}{}\label{class_vix_mnt_disk_handle_a92186fd06d5467664f79b15a23453c78} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{Vix\+Mnt\+Disk\+Handle()}{VixMntDiskHandle()}}
+{\ttfamily Vix\+Mnt\+Disk\+Handle\+::\+Vix\+Mnt\+Disk\+Handle (\begin{DoxyParamCaption}\item[{Vix\+Disk\+Lib\+Connection}]{connection,  }\item[{const char $\ast$}]{path,  }\item[{uint32}]{flag }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+setup a disk object via passing connection. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em connection} & \mbox{[}in\mbox{]} connection of vixdisk\+Lib \\
+\hline
+{\em path} & \mbox{[}in\mbox{]} diskbaking path \\
+\hline
+{\em flag} & \mbox{[}in\mbox{]} disk operating mode \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_vix_mnt_disk_handle_a798c98664a2978ff46b8224a5a2431d5}{}\label{class_vix_mnt_disk_handle_a798c98664a2978ff46b8224a5a2431d5} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!free\+Disk\+Info@{free\+Disk\+Info}}
+\index{free\+Disk\+Info@{free\+Disk\+Info}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{free\+Disk\+Info()}{freeDiskInfo()}}
+{\ttfamily void Vix\+Mnt\+Disk\+Handle\+::free\+Disk\+Info (\begin{DoxyParamCaption}\item[{Vix\+Disk\+Lib\+Info $\ast$}]{info }\end{DoxyParamCaption})}
+
+
+
+free disk info pointer 
+
+
+\begin{DoxyParams}{Parameters}
+{\em info} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_disk_handle_a22ad3792bc17dc02ecfe73a9af595e12}{}\label{class_vix_mnt_disk_handle_a22ad3792bc17dc02ecfe73a9af595e12} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!get\+Disk\+Info@{get\+Disk\+Info}}
+\index{get\+Disk\+Info@{get\+Disk\+Info}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{get\+Disk\+Info()}{getDiskInfo()}}
+{\ttfamily Vix\+Error Vix\+Mnt\+Disk\+Handle\+::get\+Disk\+Info (\begin{DoxyParamCaption}\item[{Vix\+Disk\+Lib\+Info $\ast$$\ast$}]{info }\end{DoxyParamCaption})}
+
+
+
+get disk info from opened disk. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em info} & \mbox{[}in/out\mbox{]}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_af82283b2e5ae7e90d81ed9c920998b09}{}\label{class_vix_mnt_disk_handle_af82283b2e5ae7e90d81ed9c920998b09} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!get\+Error\+Msg@{get\+Error\+Msg}}
+\index{get\+Error\+Msg@{get\+Error\+Msg}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{get\+Error\+Msg()}{getErrorMsg()}}
+{\ttfamily std\+::string Vix\+Mnt\+Disk\+Handle\+::get\+Error\+Msg (\begin{DoxyParamCaption}\item[{Vix\+Error}]{vix\+Error }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em vix\+Error} & \mbox{[}in\mbox{]}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+message description by string format 
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_aa6969e37bbfba234fe62aeb4bdf38fc9}{}\label{class_vix_mnt_disk_handle_aa6969e37bbfba234fe62aeb4bdf38fc9} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!listen@{listen}}
+\index{listen@{listen}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{listen()}{listen()}}
+{\ttfamily void $\ast$ Vix\+Mnt\+Disk\+Handle\+::listen (\begin{DoxyParamCaption}\item[{void $\ast$}]{args }\end{DoxyParamCaption})}
+
+
+
+call proper function via specific operator message type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em args} & \mbox{[}in\mbox{]} pthread passed arguments\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_a254eabad8d4f3c619898e131f0db7f36}{}\label{class_vix_mnt_disk_handle_a254eabad8d4f3c619898e131f0db7f36} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!prepare@{prepare}}
+\index{prepare@{prepare}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{prepare()}{prepare()}}
+{\ttfamily void Vix\+Mnt\+Disk\+Handle\+::prepare (\begin{DoxyParamCaption}\item[{\hyperlink{class_vix_mnt_msg_que}{Vix\+Mnt\+Msg\+Que} $\ast$}]{msg\+Q\+\_\+,  }\item[{\hyperlink{class_vix_mnt_mmap}{Vix\+Mnt\+Mmap} $\ast$}]{mmap\+\_\+ }\end{DoxyParamCaption})}
+
+
+
+prepare for listening function called by libfuse, this msgQ can contract with the other process by sending or receving message, and then write or read buf via mmap. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+Q\+\_\+} & \mbox{[}in\mbox{]} system message queue \\
+\hline
+{\em mmap\+\_\+} & \mbox{[}in\mbox{]} memory map handle \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_vix_mnt_disk_handle_a58eb682826a8be39431c258aa531a00c}{}\label{class_vix_mnt_disk_handle_a58eb682826a8be39431c258aa531a00c} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!read@{read}}
+\index{read@{read}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{read()}{read()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\ttfamily Vix\+Error Vix\+Mnt\+Disk\+Handle\+::read (\begin{DoxyParamCaption}\item[{uint8 $\ast$}]{buf,  }\item[{uint64}]{offset,  }\item[{uint64}]{number\+Sector }\end{DoxyParamCaption})}
+
+
+
+vixdisklib read function (read data only sector by sector) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & \mbox{[}out\mbox{]} \\
+\hline
+{\em offset} & \mbox{[}in\mbox{]} disk offset \\
+\hline
+{\em number\+Sector} & \mbox{[}in\mbox{]} buffer sector number of disk\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_a2f601858b3a6dc381d70bf56bec0771c}{}\label{class_vix_mnt_disk_handle_a2f601858b3a6dc381d70bf56bec0771c} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!read@{read}}
+\index{read@{read}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{read()}{read()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\ttfamily Vix\+Error Vix\+Mnt\+Disk\+Handle\+::read (\begin{DoxyParamCaption}\item[{\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$}]{msg\+\_\+data }\end{DoxyParamCaption})}
+
+
+
+read function by passing message 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+data} & \mbox{[}in\mbox{]} message\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_a85573095a247d911f2f565bff91d5709}{}\label{class_vix_mnt_disk_handle_a85573095a247d911f2f565bff91d5709} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!write@{write}}
+\index{write@{write}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\ttfamily Vix\+Error Vix\+Mnt\+Disk\+Handle\+::write (\begin{DoxyParamCaption}\item[{\hyperlink{class_vix_mnt_msg_data}{Vix\+Mnt\+Msg\+Data} $\ast$}]{msg\+\_\+data }\end{DoxyParamCaption})}
+
+
+
+ifmmap size is less than read buffer size, mmap will throw exception 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+data} & \mbox{[}in\mbox{]} libfuse operator, offset adn data sector size\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_vix_mnt_disk_handle_ab6552b9226705bdffb0d4ee7d3ab4e29}{}\label{class_vix_mnt_disk_handle_ab6552b9226705bdffb0d4ee7d3ab4e29} 
+\index{Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}!write@{write}}
+\index{write@{write}!Vix\+Mnt\+Disk\+Handle@{Vix\+Mnt\+Disk\+Handle}}
+\subsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\ttfamily Vix\+Error Vix\+Mnt\+Disk\+Handle\+::write (\begin{DoxyParamCaption}\item[{uint8 $\ast$}]{buf,  }\item[{uint64}]{offset,  }\item[{uint64}]{number\+Sector }\end{DoxyParamCaption})}
+
+
+
+vixdisklib write function 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & \mbox{[}in\mbox{]} buf location \\
+\hline
+{\em offset} & \mbox{[}int\mbox{]} disk offset \\
+\hline
+{\em number\+Sector} & buffer sector number of disk\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vix\+Mnt\+Disk.\+h\item 
+src/vix\+Mnt\+Disk.\+cpp\end{DoxyCompactItemize}

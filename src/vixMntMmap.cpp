@@ -10,19 +10,12 @@
 std::string VixMntMmap::fileRoot = "/vmware_mnt_shm";
 
 /**
- ****************************************************************************
- * VixMntMmap Constructor
- * share memory will be used when isRoot is True.
+ * @brief share memory will be used when isRoot is True.
  * it opens [datasize/pagesize] +1 frame for share memory or memory map.
- * -------------------------------------------------------------------------
- * input parameters  :
- * mmap_datasize,  allocate a set number of share memory for memory map
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect:
- * No
- ****************************************************************************
+ *
+ * @param mmap_datasize [in] allocate a set number of share memory for memory
+ * map
+ * @param isRoot [in]
  */
 
 VixMntMmap::VixMntMmap(size_t mmap_datasize,
@@ -32,8 +25,7 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize,
       if (isRoot) {
          this->file_name = VixMntMmap::fileRoot;
       } else
-         //   this->file_name = getRandomFileName(fileRoot);
-         this->file_name = VixMntMmap::fileRoot;
+         this->file_name = "/vmware_mnt_tmp";
    } catch (std::exception &e) {
       ELog("set file_name error");
       this->file_name = "/vmware_mnt_shm";
@@ -68,70 +60,46 @@ VixMntMmap::VixMntMmap(size_t mmap_datasize,
    ILog("shm mmap addr : %x", this->mmap_data);
 }
 
+
 /**
- ****************************************************************************
- * VixMntMmap::mntWriteMmap
- * A packaged function for writing buffer to shared memory.
- * -------------------------------------------------------------------------
- * input parameters  :
- * buf,        data buffer pointer
- * write_pos,  write position ( offset  )
- * write_size, data size
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect:
- * No
- ****************************************************************************
+ * @brief  write buffer into shared memory
+ *
+ * @param buf [in] data buffer pointer
+ * @param write_pos [in] write position
+ * @param write_size [int] writable data size
  */
 
-void VixMntMmap::mntWriteMmap(const uint8 *buf,
-                              size_t write_pos,
-                              size_t write_size)
+void
+VixMntMmap::mntWriteMmap(const uint8 *buf,
+                         size_t write_pos,
+                         size_t write_size)
 {
 
    memcpy(this->mmap_data + write_pos, buf,
           write_size > 0 ? write_size : this->mmap_datasize);
 }
 
+
 /**
- ****************************************************************************
- * VixMntMmap::mntReadMmap
- * Await for reading data from shared memory.
- * -------------------------------------------------------------------------
- * input parameters  :
- * buf,      data buffer pointer
- * read_pos , read position (offset)
- * read_size, data size
- * -------------------------------------------------------------------------
- * output parameters :
- * No
- * -------------------------------------------------------------------------
- * Side Effect:
- * No
- ****************************************************************************
+ * @brief  await for reading data from shared memory.
+ *
+ * @param buf [out]
+ * @param read_pos [in] read postion
+ * @param read_size [in] readable data size
  */
 
-void VixMntMmap::mntReadMmap(uint8 *buf,
-                             size_t read_pos,
-                             size_t read_size)
+void
+VixMntMmap::mntReadMmap(uint8 *buf,
+                        size_t read_pos,
+                        size_t read_size)
 {
    memcpy(buf, this->mmap_data + read_pos,
           read_size > 0 ? read_size : this->mmap_datasize);
 }
 
+
 /**
- ****************************************************************************
- * VixMntMmap Deconstructor
- * -------------------------------------------------------------------------
- * input parameters  :
- * -------------------------------------------------------------------------
- * output parameters :
- * -------------------------------------------------------------------------
- * Side Effect:
- * No
- ****************************************************************************
+ * @brief  memory unmap all allocated area.
  */
 
 VixMntMmap::~VixMntMmap() {

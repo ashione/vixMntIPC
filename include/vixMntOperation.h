@@ -30,7 +30,6 @@ class VixMntOpBase {
 public:
    VixMntOpBase(const char *, uint64, uint64);
    VixMntOpBase(){};
-   //virtual ~VixMntOpBase();
    virtual void convertToBytes(char *buf) { memcpy(buf, this, sizeof(*this)); }
    virtual void convertFromBytes(const char *buf) {
       memcpy(this, buf, sizeof(*this));
@@ -44,7 +43,7 @@ public:
 };
 
 /*
- * warning : bufsize is sector number in vixdisklib
+ * warning : bufsize is sector number in vixdisklib.
  * VixMntOpRead is protool for control path.
  */
 
