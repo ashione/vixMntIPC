@@ -47,7 +47,7 @@ Finally, all of them are stagnating.
 According this failure, we drafted three solutions:
 
 1.  open vixdisklib or initalize vmacore spawns multiply threads after fusedaemon. ![union_mode](https://github.com/ashione/vixMntIPC/blob/format/asset/union_mode.png)
-*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi](https://github.com/ashione/vixMntIPC/blob/format/asset/\multithread.png)
+*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi](https://github.com/ashione/vixMntIPC/blob/format/asset/multithread.png)
 *   setup share memory or global message based on IPC ( inner process communication) ![processcom](https://github.com/ashione/vixMntIPC/blob/format/asset/process_com.png)
 
 
