@@ -9,21 +9,19 @@ For this reason, we proposed a filesystem level tool named VixMountApi ( as is m
 Besides, there are additional motivations :
 
 1. The install ratio of linux guest os has been increasing dramatically.
-2.  With disk capacity growing, the original NBD mode can’t meet the requirements.  * These advanced transport modes realize significantly performance improvements, however these are still not supported in file level.
+2.  With disk capacity growing, the original NBD mode can’t meet the requirements.  
+3. These advanced transport modes realize significantly performance improvements, however these are still not supported in file level.
 
 ----
    
 ### 1.1 Issue
 
 Although mountapi have capability to mount remote VMDK or snapshot via VixDiskLib, 
-a [bug][bugid] demonstrated that mount test on advanced transport mode ( such as nbdssl, hotadd and san) had JVM crash on alternate runs at VixMntapi_GetVolumeHandles as VixMntapi_OpenDisks does not return a valid disksetHandle. Some efforts have been utilized to fix this bug, but VixMntapi_OpenDisks still doesn't return a valid disksetHandle. 
+a [bug][bugid] demonstrated that mount test on advanced transport mode ( such as nbdssl, hotadd and san) had JVM crash on alternate runs at VixMntapi\_GetVolumeHandles as VixMntapi\_OpenDisks does not return a valid disksetHandle. Some efforts have been utilized to fix this bug, but VixMntapi\_OpenDisks still doesn't return a valid disksetHandle. 
 
-We strive to search a constructive way to slove this problem and finally  Fletcher‘s diagnostics may help us to some degree or another.
-	
-	As I dig into this it's all coming back to me now.  A few years ago I looked into this issue, and I concluded that no matter which transport mode is used, when the plugin is loaded, you cannot use vixMntapi on Linux.  The problem is that vmacore spawns multiple threads to do its job, and these threads to not survive across a fork.  This means that the spawned process is broken and cannot function correctly.  This is why we put a fix into the Linux version of vixMntapi.  The fix causes an error for vixMntapi on Linux for any transport mode including nbd when the plugin is loaded.
+We strive to search a constructive way to slove this problem and finally diagnostics may help us to some degree or another.
 	
 Based on above investigates, we summarize that 
-
 **the fork subprocess libfuse can't connect vmdk disk when the plugin is loaded because vmacore spawns multiple threads are isolated from [libfuse][libfuse] read and write callback.**
 
 ----  
@@ -99,7 +97,12 @@ and its detail can be depcited as  :
 
 ![fuseIPC_timeline](asset/fuseIPC_timeline.png)	
 
-Frankly speaking, we modify the part of original fusemount module since the passed conncetion is invalid so that it's out of connection in fuse daemon. According this status, read/write operation functions are only design to send a nofitication instead of real disk IO. As shown above figure, a new module are proposed to connect remote disk, do some IO operations, lookup files in mounted disk and so on. 
+Frankly speaking,
+we modify the part of original fusemount module since the passed conncetion
+is invalid so that it's out of connection in fuse daemon. According this
+status, read/write operation functions are only design to send a nofitication
+instead of real disk IO. As shown above figure, a new module are proposed
+to connect remote disk, do some IO operations, lookup files in mounted disk and so on. 
 
 Additionally, it's worth mentioning that a special class vixMntOperation,
 described as message protocol, is stored in buffer stream. In other word,
@@ -107,11 +110,7 @@ a libfuse notification was serialized  as message buffer,
 then deserialized to class object after receiving notification by IPC module.
 Actually, both socket and message queue are supported in this module. 
 
-The framwork can be described as follwing graph:
-![fusemountIPC](asset/fusemountIPC.png)
-
-And its flow chart is :
-
+The framework and its flow chart can be described as follwing graph:
 ![fuse](asset/fuse.png)
 
 -----
@@ -137,6 +136,10 @@ Usage :
 2. vixDisklib (backend library used to acess remote disks)
 3. rt (message queue for control path protocol passing)
 4. stdc++ ( if compiling mixed with C)
+
+### 3.3 Compatibility
+**Scons config file (bora/apps/fuseMount.sc) shouble be modified
+if it's added in ws or another component.**
 
 
 ## 4. Reference 
