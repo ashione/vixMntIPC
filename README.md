@@ -9,7 +9,7 @@ For this reason, we proposed a filesystem level tool named VixMountApi ( as is m
 Besides, there are additional motivations :
 
 1. The install ratio of linux guest os has been increasing dramatically.
-*  With disk capacity growing, the original NBD mode can’t meet the requirements.  * These advanced transport modes realize significantly performance improvements, however these are still not supported in file level.
+2.  With disk capacity growing, the original NBD mode can’t meet the requirements.  * These advanced transport modes realize significantly performance improvements, however these are still not supported in file level.
 
 ----
    
@@ -30,7 +30,7 @@ Based on above investigates, we summarize that
 ### 1.2 Solutions
 Firstly, it's necessary to review original metric and 
 entire workflow can be descirbed as ths following image.
-![image](https://github.com/ashione/vixMntIPC/blob/format/asset/mntapi.png)
+![image](asset/mntapi.png)
 
 From above samplecode workflow, we know libfuse is empolyed by mountapi.(FUSE (Filesystem in Userspace) is an interface for userspace programs to export a filesystem to the Linux kernel.)  
 
@@ -46,9 +46,9 @@ Finally, all of them are stagnating.
 
 According this failure, we drafted three solutions:
 
-1.  open vixdisklib or initalize vmacore spawns multiply threads after fusedaemon. ![union_mode](https://github.com/ashione/vixMntIPC/blob/format/asset/union_mode.png)
-*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi](https://github.com/ashione/vixMntIPC/blob/format/asset/multithread.png)
-*   setup share memory or global message based on IPC ( inner process communication) ![processcom](https://github.com/ashione/vixMntIPC/blob/format/asset/process_com.png)
+1.  open vixdisklib or initalize vmacore spawns multiply threads after fusedaemon. ![union_mode](asset/union_mode.png)
+*   use multithread instead of multiprocess forked by fusemount. ![multithread_mntapi](asset/multithread.png)
+*   setup share memory or global message based on IPC ( inner process communication) ![processcom](asset/process_com.png)
 
 
 All these solutions look like good designs at first appearance. 
@@ -68,47 +68,78 @@ As we know, vmacore threads have been created at beginning,
 which make waiting fuse initialization function hanging out here.
 To slove above problem, note that we define some class objects :
 
-+ **vixMntDiskHandle** :`It can open a disk and does IO operations by passing diskHandle parameter.
++ **vixMntDiskHandle** : `It can open a disk and does IO operations by passing diskHandle parameter.
 Moreover, a permanent thread will be invoked for listening to system messages.
 Then, according different message type, listen thread should call a proper handle function.`
 + **vixMntMmap** : `Packaged share memory for data path by memory map.`
-+ **vixMntMsgQue** :`Packaged message queue for control path`
++ **vixMntMsgQue** : `Packaged message queue for control path`
 	
-+ **vixMntMsgOp** :`Enum class, these message types include MntRead,MntReadDone,MntWrite,MntWriteDone and so on.
++ **vixMntMsgOp** : `Enum class, these message types include MntRead,MntReadDone,MntWrite,MntWriteDone and so on.
 	A object of this class will be shipped from sender to receiver by message queue. ` 
 	
-+ **vixMntOperation** :`Operations consist of read and write parameters needed by libfuse.`
++ **vixMntOperation** : `Operations consist of read and write parameters needed by libfuse.`
  
-+ **vixMntUtility** :`Export interface to bottom layer. ( Initialization, Main handle function, clear function)`
++ **vixMntUtility** : `Export interface to bottom layer. ( Initialization, Main handle function, clear function)`
 
-+ **vixMntSocket** :`The other metric differs from the solution about data tranposort by share memory`
++ **vixMntSocket** : `The other metric differs from the solution about data tranposort by share memory`
 
-+ **vixMntFuse** :`Entry point for libfuse callback.`
++ **vixMntFuse** : `Entry point for libfuse callback.`
 
 + **vixMntLock&vixMntException** : `Specific lock & exception class`
 
 
-From the system perspective, we abstract the middleware (fuse daemon)  as core communication layer  from  different modules, for which data control layer is able to focus on message passing. So that new features can be added easily.
+From the system perspective,
+we abstract the middleware (fuse daemon)  as core communication layer  from 
+different modules, for which data control layer is able to focus on message 
+passing. So that new features can be added easily.
 
-By fusemount IPC module, we divide whole work into four principal components and its detail can be depcited as  :
+By fusemount IPC module, we divide whole work into four principal components
+and its detail can be depcited as  :
 
 
-![fuseIPC_timeline](https://github.com/ashione/vixMntIPC/blob/format/asset/fuseIPC_timeline.png)	
+![fuseIPC_timeline](asset/fuseIPC_timeline.png)	
 
 Frankly speaking, we modify the part of original fusemount module since the passed conncetion is invalid so that it's out of connection in fuse daemon. According this status, read/write operation functions are only design to send a nofitication instead of real disk IO. As shown above figure, a new module are proposed to connect remote disk, do some IO operations, lookup files in mounted disk and so on. 
 
-Additionally, it's worth mentioning that a special class vixMntOperation, described as message protocol, is stored in buffer stream. In other word, a libfuse notification was serialized  as message buffer, then deserialized to class object after receiving notification by IPC module. Actually, both socket and message queue are supported in this module. 
+Additionally, it's worth mentioning that a special class vixMntOperation,
+described as message protocol, is stored in buffer stream. In other word,
+a libfuse notification was serialized  as message buffer,
+then deserialized to class object after receiving notification by IPC module.
+Actually, both socket and message queue are supported in this module. 
 
 The framwork can be described as follwing graph:
-![fusemountIPC](https://github.com/ashione/vixMntIPC/blob/format/asset/fusemountIPC.png)
+![fusemountIPC](asset/fusemountIPC.png)
 
 And its flow chart is :
 
-![fuse](https://github.com/ashione/vixMntIPC/blob/format/asset/fuse.png)
+![fuse](asset/fuse.png)
 
 -----
+## 3. Details
+### 3.1 Instructions
+For unit test, I add a makefile in directory of fusemountIPC.
 
-## 3. Reference 
+Usage :
+
++ make vddk : it will generate hardlink in current dir. These files come from
+  include and src diretory. Actually this function is providing a simple way to
+  make VDDK package easily.
++ make : compile the whole project and produce a shared library in lib.
+  one more thing, the libfuse library path is
+  hardcode in makefile.
++ make test : generate simple test binary file in bin.
++ make clean : clean lib bin
++ make vddk clean : unlink the header files and source files in current
+  directory.
+
+### 3.2 Dependencies
+1. fuse (min version 2.5, transfor userspace filesystem to kernel space)
+2. vixDisklib (backend library used to acess remote disks)
+3. rt (message queue for control path protocol passing)
+4. stdc++ ( if compiling mixed with C)
+
+
+## 4. Reference 
 1.  [bugid] ("https://bugzilla.eng.vmware.com/show_bug.cgi?id=1492312") 
 2.  [libfuse]: https://github.com/libfuse/libfuse
 [bugid]: https://bugzilla.eng.vmware.com/show_bug.cgi?id=1492312 "mntapibug"
