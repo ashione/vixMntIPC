@@ -1,5 +1,0 @@
-#!/bin/bash
-for f in `find . -type f -name "*.[ch]*"`; do
-    clang-format $f > test.format &&  cp test.format $f 
-    rm test.format
-done
